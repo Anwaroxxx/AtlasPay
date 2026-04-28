@@ -16,8 +16,12 @@ trait ProfileValidationRules
     protected function profileRules(?int $userId = null): array
     {
         return [
-            'name' => $this->nameRules(),
+            'first_name' => $this->nameRules(),
+            'last_name' => $this->nameRules(),
+            'phone' => $this->phoneRules(),
             'email' => $this->emailRules($userId),
+            'address' => $this->nameRules(),
+            'goverment_id' => $this->nameRules()
         ];
     }
 
@@ -46,6 +50,16 @@ trait ProfileValidationRules
             $userId === null
                 ? Rule::unique(User::class)
                 : Rule::unique(User::class)->ignore($userId),
+        ];
+    }
+
+    protected function phoneRules(): array
+    {
+        return [
+            'required',
+            'string',
+            'phone:MA',
+            'max:255',
         ];
     }
 }

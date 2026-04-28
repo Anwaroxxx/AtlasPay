@@ -8,14 +8,27 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function Register() {
+export default function Register(props) {
+    // console.log(props.accounts);
+   
+    
+    
     return (
         <>
             <Head title="Register" />
             <Form
                 {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
+                resetOnSuccess={['password', 'phone', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
             >
@@ -23,19 +36,63 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="first_name">Fisrt name</Label>
                                 <Input
-                                    id="name"
+                                    id="first_name"
                                     type="text"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
+                                    autoComplete="first_name"
+                                    name="first_name"
+                                    placeholder="First name"
                                 />
                                 <InputError
-                                    message={errors.name}
+                                    message={errors.First_name}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div className="">
+                                <Label htmlFor="account_type">
+                                    Account type{' '}
+                                </Label>
+
+                                <Select required
+                                name='account'
+                                >
+                                    <SelectTrigger className="w-full max-w-48">
+                                        <SelectValue placeholder="Select a an account" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Fruits</SelectLabel>
+                                            {props.accounts.map((account)=>
+                                            {
+                                                return(
+                                                    <SelectItem value={account}>{account}</SelectItem>  
+
+                                                )
+                                            })}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="last_name">Last name</Label>
+                                <Input
+                                    id="last_name"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    tabIndex={2}
+                                    autoComplete="last_name"
+                                    name="last_name"
+                                    placeholder="Last name"
+                                />
+                                <InputError
+                                    message={errors.Last_name}
                                     className="mt-2"
                                 />
                             </div>
@@ -46,12 +103,65 @@ export default function Register() {
                                     id="email"
                                     type="email"
                                     required
-                                    tabIndex={2}
+                                    tabIndex={3}
                                     autoComplete="email"
                                     name="email"
                                     placeholder="email@example.com"
                                 />
                                 <InputError message={errors.email} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="phone">Phone number</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    tabIndex={4}
+                                    autoComplete="phone"
+                                    name="phone"
+                                    placeholder="+212XXXXXXXXX"
+                                    // value="+212612345678"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="address">Address</Label>
+                                <Input
+                                    id="address"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    tabIndex={2}
+                                    autoComplete="address"
+                                    name="address"
+                                    placeholder="Enter you address"
+                                />
+                                <InputError
+                                    message={errors.Last_name}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="goverment_id">
+                                    Goverment ID
+                                </Label>
+                                <Input
+                                    id="goverment_id"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    tabIndex={2}
+                                    autoComplete="goverment_id"
+                                    name="goverment_id"
+                                    placeholder="Enter you goverment_id"
+                                />
+                                <InputError
+                                    message={errors.Last_name}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div className="grid gap-2">
