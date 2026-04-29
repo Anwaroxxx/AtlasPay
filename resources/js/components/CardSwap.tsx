@@ -1,16 +1,17 @@
+import gsap from 'gsap';
+import type {
+  ReactElement,
+  ReactNode,
+  RefObject} from 'react';
 import React, {
   Children,
   cloneElement,
   forwardRef,
   isValidElement,
-  ReactElement,
-  ReactNode,
-  RefObject,
   useEffect,
   useMemo,
   useRef,
 } from 'react';
-import gsap from 'gsap';
 
 export interface CardSwapProps {
   width?: number | string;
@@ -119,7 +120,10 @@ const CardSwap: React.FC<CardSwapProps> = ({
     );
 
     const swap = () => {
-      if (order.current.length < 2) return;
+      if (order.current.length < 2) {
+return;
+}
+
       const [front, ...rest] = order.current;
       const elFront = refs[front].current!;
       const tl = gsap.timeline();
@@ -141,13 +145,17 @@ const CardSwap: React.FC<CardSwapProps> = ({
 
       const backSlot = makeSlot(refs.length - 1, cardDistance, verticalDistance, refs.length);
       tl.addLabel('return', `promote+=${config.durMove * config.returnDelay}`);
-      tl.call(() => { gsap.set(elFront, { zIndex: backSlot.zIndex }); }, undefined, 'return');
+      tl.call(() => {
+ gsap.set(elFront, { zIndex: backSlot.zIndex }); 
+}, undefined, 'return');
       tl.to(
         elFront,
         { x: backSlot.x, y: backSlot.y, z: backSlot.z, duration: config.durReturn, ease: config.ease },
         'return',
       );
-      tl.call(() => { order.current = [...rest, front]; });
+      tl.call(() => {
+ order.current = [...rest, front]; 
+});
     };
 
     swap();
@@ -155,16 +163,22 @@ const CardSwap: React.FC<CardSwapProps> = ({
 
     if (pauseOnHover) {
       const node = container.current!;
-      const pause = () => { tlRef.current?.pause(); clearInterval(intervalRef.current); };
-      const resume = () => { tlRef.current?.play(); intervalRef.current = window.setInterval(swap, delay); };
+      const pause = () => {
+ tlRef.current?.pause(); clearInterval(intervalRef.current); 
+};
+      const resume = () => {
+ tlRef.current?.play(); intervalRef.current = window.setInterval(swap, delay); 
+};
       node.addEventListener('mouseenter', pause);
       node.addEventListener('mouseleave', resume);
+
       return () => {
         node.removeEventListener('mouseenter', pause);
         node.removeEventListener('mouseleave', resume);
         clearInterval(intervalRef.current);
       };
     }
+
     return () => clearInterval(intervalRef.current);
   }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
 
@@ -185,7 +199,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
   return (
     <div
       ref={container}
-      className="absolute bottom-0 right-0 origin-bottom-right [perspective:900px] overflow-visible translate-x-[5%] translate-y-[20%] max-[768px]:translate-x-[25%] max-[768px]:translate-y-[25%] max-[768px]:scale-[0.75] max-[480px]:scale-[0.55]"
+      className="relative origin-center [perspective:1200px] overflow-visible"
       style={{ width, height }}
     >
       {rendered}

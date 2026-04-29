@@ -29,11 +29,11 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-4"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
@@ -55,10 +55,10 @@ export default function Login({
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="ml-auto text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-brand-medium transition-colors"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            Forgot?
                                         </TextLink>
                                     )}
                                 </div>
@@ -68,7 +68,7 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="••••••••"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -79,26 +79,26 @@ export default function Login({
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember" className="normal-case tracking-normal text-sm! text-gray-400!">Remember me</Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 w-full h-12 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Access Vault
                             </Button>
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
+                            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-500">
                                 Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
+                                <TextLink href={register()} tabIndex={5} className="text-brand-medium hover:text-brand-light transition-colors">
+                                    Apply for Access
                                 </TextLink>
                             </div>
                         )}

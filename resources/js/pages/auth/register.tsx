@@ -5,9 +5,6 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
 import {
   Select,
   SelectContent,
@@ -17,6 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from '@/components/ui/spinner';
+import { login } from '@/routes';
+import { store } from '@/routes/register';
 
 export default function Register(props) {
     // console.log(props.accounts);
@@ -30,185 +30,167 @@ export default function Register(props) {
                 {...store.form()}
                 resetOnSuccess={['password', 'phone', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-3"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="first_name">Fisrt name</Label>
-                                <Input
-                                    id="first_name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="first_name"
-                                    name="first_name"
-                                    placeholder="First name"
-                                />
-                                <InputError
-                                    message={errors.First_name}
-                                    className="mt-2"
-                                />
+                        <div className="grid gap-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="grid gap-1">
+                                    <Label htmlFor="first_name">First name</Label>
+                                    <Input
+                                        id="first_name"
+                                        type="text"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="first_name"
+                                        name="first_name"
+                                        placeholder="First name"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.First_name} className="text-[10px] mt-0" />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label htmlFor="last_name">Last name</Label>
+                                    <Input
+                                        id="last_name"
+                                        type="text"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="last_name"
+                                        name="last_name"
+                                        placeholder="Last name"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                </div>
                             </div>
 
-                            <div className="">
-                                <Label htmlFor="account_type">
-                                    Account type{' '}
-                                </Label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="grid gap-1">
+                                    <Label htmlFor="email">Email address</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        tabIndex={3}
+                                        autoComplete="email"
+                                        name="email"
+                                        placeholder="email@example.com"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.email} className="text-[10px] mt-0" />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label htmlFor="phone">Phone number</Label>
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        required
+                                        tabIndex={4}
+                                        autoComplete="phone"
+                                        name="phone"
+                                        placeholder="+212XXXXXXXXX"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.phone} className="text-[10px] mt-0" />
+                                </div>
+                            </div>
 
-                                <Select required
-                                name='account'
-                                >
-                                    <SelectTrigger className="w-full max-w-48">
-                                        <SelectValue placeholder="Select a an account" />
+                            <div className="grid gap-1">
+                                <Label htmlFor="account_type">Account type</Label>
+                                <Select required name="account">
+                                    <SelectTrigger className="w-full h-9">
+                                        <SelectValue placeholder="Select an account type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectLabel>Fruits</SelectLabel>
-                                            {props.accounts.map((account)=>
-                                            {
-                                                return(
-                                                    <SelectItem value={account}>{account}</SelectItem>  
-
-                                                )
-                                            })}
+                                            <SelectLabel>Available Tiers</SelectLabel>
+                                            {props.accounts.map((account) => (
+                                                <SelectItem key={account} value={account}>{account}</SelectItem>
+                                            ))}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="last_name">Last name</Label>
-                                <Input
-                                    id="last_name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={2}
-                                    autoComplete="last_name"
-                                    name="last_name"
-                                    placeholder="Last name"
-                                />
-                                <InputError
-                                    message={errors.Last_name}
-                                    className="mt-2"
-                                />
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="grid gap-1">
+                                    <Label htmlFor="goverment_id">Gov ID</Label>
+                                    <Input
+                                        id="goverment_id"
+                                        type="text"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="goverment_id"
+                                        name="goverment_id"
+                                        placeholder="ID Number"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label htmlFor="address">Address</Label>
+                                    <Input
+                                        id="address"
+                                        type="text"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="address"
+                                        name="address"
+                                        placeholder="City, Morocco"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                </div>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="phone">Phone number</Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="phone"
-                                    name="phone"
-                                    placeholder="+212XXXXXXXXX"
-                                    // value="+212612345678"
-                                />
-                                <InputError message={errors.phone} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="address">Address</Label>
-                                <Input
-                                    id="address"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={2}
-                                    autoComplete="address"
-                                    name="address"
-                                    placeholder="Enter you address"
-                                />
-                                <InputError
-                                    message={errors.Last_name}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="goverment_id">
-                                    Goverment ID
-                                </Label>
-                                <Input
-                                    id="goverment_id"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={2}
-                                    autoComplete="goverment_id"
-                                    name="goverment_id"
-                                    placeholder="Enter you goverment_id"
-                                />
-                                <InputError
-                                    message={errors.Last_name}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="grid gap-1">
+                                    <Label htmlFor="password">Password</Label>
+                                    <PasswordInput
+                                        id="password"
+                                        required
+                                        tabIndex={3}
+                                        autoComplete="new-password"
+                                        name="password"
+                                        placeholder="••••••••"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.password} className="text-[10px] mt-0" />
+                                </div>
+                                <div className="grid gap-1">
+                                    <Label htmlFor="password_confirmation">Confirm</Label>
+                                    <PasswordInput
+                                        id="password_confirmation"
+                                        required
+                                        tabIndex={4}
+                                        autoComplete="new-password"
+                                        name="password_confirmation"
+                                        placeholder="••••••••"
+                                        className="h-9"
+                                    />
+                                    <InputError message={errors.password_confirmation} className="text-[10px] mt-0" />
+                                </div>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full"
+                                className="mt-1 w-full h-11 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                Create account
+                                Begin Journey
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+
+                        <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-500">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
+                            <TextLink href={login()} tabIndex={6} className="text-brand-medium hover:text-brand-light transition-colors">
+                                Access Vault
                             </TextLink>
                         </div>
                     </>
