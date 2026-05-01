@@ -35,7 +35,7 @@ export default function Register(props) {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-3">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid sm:grid-cols-2 gap-3">
                                 <div className="grid gap-1">
                                     <Label htmlFor="first_name">First name</Label>
                                     <Input
@@ -49,7 +49,7 @@ export default function Register(props) {
                                         placeholder="First name"
                                         className="h-9"
                                     />
-                                    <InputError message={errors.First_name} className="text-[10px] mt-0" />
+                                    <InputError message={errors.first_name} className="text-[10px] mt-0" />
                                 </div>
                                 <div className="grid gap-1">
                                     <Label htmlFor="last_name">Last name</Label>
@@ -63,11 +63,11 @@ export default function Register(props) {
                                         placeholder="Last name"
                                         className="h-9"
                                     />
-                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                    <InputError message={errors.last_name} className="text-[10px] mt-0" />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid sm:grid-cols-2 gap-3">
                                 <div className="grid gap-1">
                                     <Label htmlFor="email">Email address</Label>
                                     <Input
@@ -115,7 +115,7 @@ export default function Register(props) {
                                 </Select>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid sm:grid-cols-2 gap-3">
                                 <div className="grid gap-1">
                                     <Label htmlFor="goverment_id">Gov ID</Label>
                                     <Input
@@ -128,7 +128,7 @@ export default function Register(props) {
                                         placeholder="ID Number"
                                         className="h-9"
                                     />
-                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                    <InputError message={errors.goverment_id} className="text-[10px] mt-0" />
                                 </div>
                                 <div className="grid gap-1">
                                     <Label htmlFor="address">Address</Label>
@@ -142,11 +142,11 @@ export default function Register(props) {
                                         placeholder="City, Morocco"
                                         className="h-9"
                                     />
-                                    <InputError message={errors.Last_name} className="text-[10px] mt-0" />
+                                    <InputError message={errors.address} className="text-[10px] mt-0" />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid sm:grid-cols-2 gap-3">
                                 <div className="grid gap-1">
                                     <Label htmlFor="password">Password</Label>
                                     <PasswordInput
@@ -177,7 +177,7 @@ export default function Register(props) {
 
                             <Button
                                 type="submit"
-                                className="mt-1 w-full h-11 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
+                                className="mt-2 w-full h-11 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(118,177,130,0.3)] shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >

@@ -9,6 +9,9 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    
+    // Report Endpoints
+    Route::get('/reports/transactions', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.transactions');
 });
 
 require __DIR__.'/settings.php';

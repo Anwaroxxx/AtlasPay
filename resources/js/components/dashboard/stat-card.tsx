@@ -15,8 +15,8 @@ interface StatCardProps {
 export function StatCard({ title, value, description, icon: Icon, trend }: StatCardProps) {
     return (
         <motion.div
-            whileHover={{ y: -4 }}
-            className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:border-brand-medium/30 hover:shadow-[0_0_25px_rgba(118,177,130,0.15)] dark:border-neutral-800 dark:bg-neutral-900"
         >
             <div className="flex items-center justify-between">
                 <div>

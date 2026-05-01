@@ -21,11 +21,8 @@ return new class extends Migration
                     ->constrained("accounts");
             
             $table->decimal('amount',15,2);
-            // type is whether the moyed is in or out of the account (credit or debit)
             $table->string('type');
-            // transaction method QR-code, transfer, atm,..
             $table->string('method');
-            // status (pending, completed, failed);
             $table->string("status")->default("pending");
             $table->timestamps();
         });

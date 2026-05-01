@@ -81,7 +81,7 @@ const SectionHeading = ({ title, subtitle }: { title: string; subtitle: string }
         <div className="h-[1px] w-12 bg-emerald-500/30" />
         <span className="text-[10px] uppercase tracking-[0.5em] font-bold">{subtitle}</span>
       </div>
-      <h2 className="text-5xl md:text-7xl font-serif font-bold tracking-tighter leading-none">
+      <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold tracking-tighter leading-none">
         {title}
       </h2>
     </motion.div>
@@ -150,7 +150,7 @@ export default function LandingPage() {
               Access Vault
             </Link>
             <Link href="/register">
-              <Button className="bg-brand-medium hover:bg-brand-light text-black font-bold px-8 h-12 rounded-none uppercase tracking-widest text-[10px] shadow-[0_0_30px_rgba(118,177,130,0.2)] cursor-pointer">
+              <Button className="bg-brand-medium hover:bg-brand-light text-black font-bold px-6 md:px-8 h-10 md:h-12 rounded-none uppercase tracking-widest text-[9px] md:text-[10px] shadow-[0_0_30px_rgba(118,177,130,0.2)] hover:shadow-[0_0_40px_rgba(118,177,130,0.4)] transition-all hover:scale-[1.02] cursor-pointer">
                 Open Account
               </Button>
             </Link>
@@ -173,7 +173,7 @@ export default function LandingPage() {
                   <div className="h-2 w-2 rounded-full bg-brand-medium animate-ping" />
                   <span className="text-[10px] uppercase tracking-[0.6em] font-bold">Kingdom Collection 2026</span>
                 </div>
-                <h1 className="text-7xl md:text-9xl font-serif font-bold leading-[0.85] tracking-tighter text-glow">
+                <h1 className="text-5xl md:text-7xl lg:text-9xl font-serif font-bold leading-[0.9] tracking-tighter text-glow">
                   Wealth <br />
                   <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-brand-medium to-brand-light">Transcended.</span>
                 </h1>
@@ -188,13 +188,13 @@ export default function LandingPage() {
                 <p className="text-xl text-gray-400 font-light leading-relaxed">
                   Redefining the architecture of Moroccan finance. A seamless fusion of ancestral sovereignty and digital precision.
                 </p>
-                <div className="flex gap-8 items-center">
+                <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-center">
                   <Link href="/register">
-                    <Button className="h-20 px-16 bg-white text-black hover:bg-brand-light rounded-none text-sm font-bold uppercase tracking-[0.3em] transition-all hover:scale-105 cursor-pointer">
+                    <Button className="h-16 md:h-20 px-10 md:px-16 bg-white text-black hover:bg-brand-light rounded-none text-xs md:text-sm font-bold uppercase tracking-[0.3em] transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.15)] cursor-pointer">
                       Start Journey
                     </Button>
                   </Link>
-                  <Link href="#collections" className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-brand-medium transition-colors">
+                  <Link href="#collections" className="flex items-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:text-brand-medium transition-colors">
                     Explore Vault <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -328,10 +328,10 @@ export default function LandingPage() {
         <section id="elite" className="py-40 border-b border-white/5">
            <div className="max-w-screen-2xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-32 items-center">
               <div className="lg:w-1/2 space-y-12">
-                 <h2 className="text-6xl md:text-8xl font-serif font-bold tracking-tight leading-none">
+                 <h2 className="text-4xl md:text-6xl lg:text-8xl font-serif font-bold tracking-tight leading-none">
                    The Sovereign <br /> <span className="italic text-brand-medium">Network.</span>
                  </h2>
-                 <p className="text-xl text-gray-400 font-light leading-relaxed max-w-lg">
+                 <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-lg">
                    An exclusive ecosystem of 2.5 million visionaries. We don't just process transactions; we curate financial destinies.
                  </p>
                  <div className="grid grid-cols-2 gap-12 border-t border-white/5 pt-12">

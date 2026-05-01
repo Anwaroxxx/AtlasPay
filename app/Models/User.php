@@ -11,12 +11,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['first_name', 'last_name','phone', 'email', 'password', 'address', 'goverment_id'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
+
+    protected $fillable = ['first_name', 'last_name', 'phone', 'email', 'password', 'address', 'goverment_id'];
+
+    protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
+
+    protected $appends = ['name'];
+
+    public function getNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -34,6 +43,6 @@ class User extends Authenticatable
 
     public function accounts()
     {
-        $this->hasMany(Account::class);
+        return $this->hasMany(Account::class);
     }
 }

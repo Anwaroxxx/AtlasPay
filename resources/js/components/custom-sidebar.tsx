@@ -5,7 +5,8 @@ import {
     Settings, 
     User, 
     LogOut, 
-    ChevronRight
+    ChevronRight,
+    Activity
 } from 'lucide-react';
 import { dashboard, logout } from '@/routes';
 import { UserInfo } from '@/components/user-info';
@@ -19,6 +20,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+    { title: 'Transactions', href: '/reports/transactions', icon: Activity },
     { title: 'Profile', href: '/settings/profile', icon: User },
     { title: 'Security', href: '/settings/security', icon: Settings },
 ];
@@ -36,25 +38,27 @@ export function CustomSidebar() {
             className="relative flex h-screen flex-col border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300"
         >
             {/* Logo Section */}
-            <div className="flex h-20 items-center justify-between px-6">
-                <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            className="flex items-center gap-3"
-                        >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900 text-white dark:bg-neutral-50 dark:text-neutral-900">
-                                <span className="text-lg font-bold italic">A</span>
-                            </div>
-                            <span className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-50">AtlasPay</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+            <div className={`flex h-20 items-center px-6 transition-all duration-300 ${isCollapsed ? 'justify-center px-0' : 'justify-between'}`}>
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-900 text-white dark:bg-neutral-50 dark:text-neutral-900">
+                        <span className="text-lg font-bold italic">A</span>
+                    </div>
+                    <AnimatePresence mode="wait">
+                        {!isCollapsed && (
+                            <motion.span
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+                            >
+                                AtlasPay
+                            </motion.span>
+                        )}
+                    </AnimatePresence>
+                </div>
                 <button 
                     onClick={() => setOpen(!open)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900"
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-all duration-300 ${isCollapsed ? 'hidden' : ''}`}
                 >
                     <ChevronRight className={`h-5 w-5 transition-transform duration-300 ${isCollapsed ? '' : 'rotate-180'}`} />
                 </button>
@@ -70,8 +74,8 @@ export function CustomSidebar() {
                             href={item.href}
                             className={`group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-all ${
                                 isActive 
-                                ? 'bg-neutral-900 text-white dark:bg-neutral-50 dark:text-neutral-900 shadow-sm' 
-                                : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-900'
+                                ? 'bg-emerald-400 text-neutral-900 shadow-[0_0_15px_rgba(52,211,153,0.3)] dark:bg-emerald-500 dark:text-neutral-950' 
+                                : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-900 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors'
                             }`}
                         >
                             <item.icon className="h-5 w-5 shrink-0" />
@@ -87,7 +91,7 @@ export function CustomSidebar() {
                             {isActive && !isCollapsed && (
                                 <motion.div
                                     layoutId="active-pill"
-                                    className="absolute right-2 h-1.5 w-1.5 rounded-full bg-white dark:bg-neutral-900"
+                                    className="absolute right-2 h-1.5 w-1.5 rounded-full bg-black"
                                 />
                             )}
                         </Link>

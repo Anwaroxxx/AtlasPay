@@ -42,9 +42,18 @@ export default function AuthSimpleLayout({
                         </div>
                     </div>
                     
-                    <div className="glass-card p-5 md:p-6 border border-white/5 bg-white/[0.01] backdrop-blur-3xl w-full">
-                        {children}
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="glass-card p-6 md:p-8 border border-white/10 bg-white/[0.02] backdrop-blur-[40px] w-full rounded-xl shadow-2xl relative"
+                    >
+                        {/* Inner subtle glow */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-xl pointer-events-none" />
+                        <div className="relative z-10">
+                            {children}
+                        </div>
+                    </motion.div>
                 </motion.div>
             </div>
 
@@ -68,12 +77,13 @@ export default function AuthSimpleLayout({
                     background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L61.226 34.549H97.553L68.163 55.902L79.389 90.451L50 69.098L20.611 90.451L31.837 55.902L2.447 34.549H38.774L50 0Z' fill='%2376b182' fill-opacity='0.05'/%3E%3C/svg%3E");
                 }
                 .glass-card {
-                    background: rgba(255, 255, 255, 0.01);
-                    backdrop-filter: blur(20px);
+                    background: rgba(255, 255, 255, 0.02);
+                    backdrop-filter: blur(40px);
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
                 }
-                input:focus {
+                input:focus, textarea:focus {
                     border-color: var(--brand-medium) !important;
-                    box-shadow: 0 0 0 2px rgba(118, 177, 130, 0.1) !important;
+                    box-shadow: 0 0 0 1px var(--brand-medium), 0 0 20px rgba(118, 177, 130, 0.15) !important;
                 }
                 [data-slot="checkbox"][data-state="checked"] {
                     background-color: var(--brand-medium) !important;
