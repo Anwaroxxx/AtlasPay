@@ -20,7 +20,8 @@ return new class extends Migration
             $table->foreignId('to_account_id')
                     ->constrained("accounts");
             
-            $table->decimal('amount',15,2);
+            $table->decimal('amount', 15, 2);
+            $table->string('category')->default('General');
             $table->string('method');
             $table->string("status")->default("pending");
             $table->timestamps();
