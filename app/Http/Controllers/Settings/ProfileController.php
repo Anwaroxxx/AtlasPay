@@ -22,6 +22,22 @@ class ProfileController extends Controller
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'spendingData' => [
+                ['name' => 'Housing', 'value' => 4500],
+                ['name' => 'Food', 'value' => 2500],
+                ['name' => 'Transport', 'value' => 1200],
+                ['name' => 'Entertainment', 'value' => 800],
+                ['name' => 'Utilities', 'value' => 1000],
+            ],
+            'securityHistory' => [
+                ['day' => 'Mon', 'score' => 92],
+                ['day' => 'Tue', 'score' => 94],
+                ['day' => 'Wed', 'score' => 95],
+                ['day' => 'Thu', 'score' => 93],
+                ['day' => 'Fri', 'score' => 98],
+                ['day' => 'Sat', 'score' => 99],
+                ['day' => 'Sun', 'score' => 100],
+            ]
         ]);
     }
 

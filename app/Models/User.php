@@ -16,7 +16,7 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    protected $fillable = ['first_name', 'last_name', 'phone', 'email', 'password', 'address', 'goverment_id'];
+    protected $fillable = ['first_name', 'last_name', 'phone', 'email', 'password', 'address', 'goverment_id', 'credit_score'];
 
     protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
 
@@ -44,5 +44,15 @@ class User extends Authenticatable
     public function accounts()
     {
         return $this->hasMany(Account::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
     }
 }
