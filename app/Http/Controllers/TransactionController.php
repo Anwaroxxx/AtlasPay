@@ -22,7 +22,7 @@ class TransactionController extends Controller
         $validated = $request->validate([
             "from_account_rib" => ["required"],
             "to_account_rib" => ["required"],
-            "amount" => ["required","numeric"]
+            "amount" => ["required","numeric","min:0.01"]
             ]);
             
             $from = Account::where("account_number",$request->from_account_rib)->first();
@@ -35,14 +35,20 @@ class TransactionController extends Controller
         if(!$from || ! $to )
             {
                 return back()->withErrors([
-                    'message' => 'Invalid account'
+                    'message' => 'Invalid account number. Please check the RIB and try again.'
                 ],422);
+            }
+        if($from->id === $to->id)
+            {
+                return back()->withErrors([
+                    'message' => 'You cannot transfer money to the same account.'
+                ]);
             }
         if($amount > $from->balance)
             {
 
                 return back()->withErrors ([
-                    'message' =>"insufficient funds"
+                    'message' =>"Insufficient funds. Your balance is " . number_format($from->balance, 2) . " MAD."
                 ]);
             }
         if($from->status !== "active" )
@@ -54,7 +60,7 @@ class TransactionController extends Controller
         if( $to->status !== "active")
             {
                 return back()->withErrors ([
-                    'message' =>"Reciver account is not active"
+                    'message' =>"Receiver account is not active"
                 ]);
             }
 
@@ -63,7 +69,7 @@ class TransactionController extends Controller
             if(!auth()->user()->can("transferMoney",$from))
                 {
                     return back()->withErrors ([
-                    'message' =>"action not athorized"
+                    'message' =>"You are not authorized to perform this action."
                 ]);
                 }
         
@@ -73,6 +79,8 @@ class TransactionController extends Controller
             "amount" => $amount,
             "method" => $method,
         ]);
+
+        return back()->with('success', 'Transfer of ' . number_format($amount, 2) . ' MAD completed successfully!');
     }
 
     

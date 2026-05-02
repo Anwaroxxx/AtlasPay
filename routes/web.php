@@ -29,6 +29,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Chat Route
     Route::post('/chat', [ChatController::class, 'ask'])->name('chat.ask');
+
+    // Transfer Page
+    Route::get('/transfer', function () {
+        $user = request()->user();
+        $accounts = $user->accounts()->where('status', 'active')->get();
+        return \Inertia\Inertia::render('transfer', [
+            'accounts' => $accounts,
+        ]);
+    })->name('transfer');
+
+    // Transfer Endpoints (3 methods)
+    Route::post("/transfer/bank", [TransactionController::class, 'store'])->defaults("transfer", "transfer")->name('transfer.bank');
+    Route::post("/transfer/qr", [TransactionController::class, 'store'])->defaults("transfer", "qr")->name('transfer.qr');
+    Route::post("/transfer/card", [TransactionController::class, 'store'])->defaults("transfer", "cash")->name('transfer.card');
 });
 
 
