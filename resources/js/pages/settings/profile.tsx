@@ -77,14 +77,14 @@ export default function Profile() {
                 className="flex flex-1 flex-col gap-10 p-4 md:p-8 max-w-7xl mx-auto"
             >
                 {/* Stunning Profile Header */}
-                <motion.div variants={item} className="relative overflow-hidden rounded-[3rem] bg-neutral-900 p-8 text-white shadow-2xl dark:bg-[#0a0a0a]">
+                <motion.div variants={item} className="relative overflow-hidden rounded-2xl md:rounded-[3rem] bg-neutral-900 p-5 md:p-8 text-white shadow-2xl dark:bg-[#0a0a0a]">
                     <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-emerald-500/10 blur-[120px]" />
                     <div className="absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-blue-500/10 blur-[120px]" />
                     
-                    <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center">
+                    <div className="relative z-10 flex flex-col gap-6 md:gap-8 md:flex-row md:items-center">
                         <div className="relative group">
-                            <div className="h-32 w-32 rounded-[2.5rem] bg-emerald-500 flex items-center justify-center text-5xl font-black text-neutral-900 shadow-2xl border-4 border-white/10 overflow-hidden">
-                                {user.name.charAt(0)}
+                            <div className="h-20 w-20 md:h-32 md:w-32 rounded-2xl md:rounded-[2.5rem] bg-emerald-500 flex items-center justify-center text-3xl md:text-5xl font-black text-neutral-900 shadow-2xl border-4 border-white/10 overflow-hidden">
+                                {(user.first_name || 'U').charAt(0)}
                             </div>
                             <button className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-white text-neutral-900 shadow-xl flex items-center justify-center hover:scale-110 transition-transform">
                                 <Camera className="h-5 w-5" />
@@ -93,7 +93,7 @@ export default function Profile() {
                         
                         <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-3">
-                                <h1 className="text-4xl font-black tracking-tighter md:text-5xl">{user.name}</h1>
+                                <h1 className="text-2xl font-black tracking-tighter sm:text-4xl md:text-5xl">{user.first_name} {user.last_name}</h1>
                                 <Badge className="bg-emerald-500 text-neutral-900 font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px]">
                                     Verified Platinum
                                 </Badge>

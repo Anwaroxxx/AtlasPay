@@ -79,17 +79,17 @@ export default function Security({
                 variants={container} 
                 initial="hidden" 
                 animate="show" 
-                className="space-y-8"
+                className="space-y-6 md:space-y-8 p-4 md:p-0"
             >
                 <motion.div variants={item}>
-                    <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">Security Command Center</h1>
-                    <p className="text-neutral-500 dark:text-neutral-400">Manage your vault access and authentication protocols.</p>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">Security Command Center</h1>
+                    <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400">Manage your vault access and authentication protocols.</p>
                 </motion.div>
 
                 <div className="grid gap-6 lg:grid-cols-2">
                     {/* Password Management */}
                     <motion.div variants={item}>
-                        <Card className="h-full border-none shadow-xl">
+                        <Card className="h-full border-none shadow-xl rounded-2xl md:rounded-[2.5rem]">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Key className="h-5 w-5 text-blue-500" />
@@ -153,7 +153,7 @@ export default function Security({
 
                     {/* 2FA Section */}
                     <motion.div variants={item}>
-                        <Card className="h-full border-none shadow-xl bg-neutral-900 text-white dark:bg-neutral-950">
+                        <Card className="h-full border-none shadow-xl bg-neutral-900 text-white dark:bg-neutral-950 rounded-2xl md:rounded-[2.5rem]">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <Fingerprint className="h-5 w-5 text-emerald-500" />
@@ -213,8 +213,8 @@ export default function Security({
                 </div>
 
                 {/* Additional Security Insights */}
-                <motion.div variants={item} className="grid gap-6 md:grid-cols-3">
-                    <Card className="border-none shadow-lg">
+                <motion.div variants={item} className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                    <Card className="border-none shadow-lg rounded-2xl md:rounded-3xl">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-xs font-bold uppercase text-neutral-400 tracking-widest flex items-center gap-2">
                                 <Smartphone className="h-3 w-3" />
@@ -226,7 +226,7 @@ export default function Security({
                             <p className="text-[10px] text-neutral-500">Currently active sessions</p>
                         </CardContent>
                     </Card>
-                    <Card className="border-none shadow-lg">
+                    <Card className="border-none shadow-lg rounded-2xl md:rounded-3xl">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-xs font-bold uppercase text-neutral-400 tracking-widest flex items-center gap-2">
                                 <History className="h-3 w-3" />
@@ -238,7 +238,7 @@ export default function Security({
                             <p className="text-[10px] text-neutral-500">No suspicious activity detected</p>
                         </CardContent>
                     </Card>
-                    <Card className="border-none shadow-lg bg-emerald-500 text-white">
+                    <Card className="border-none shadow-lg bg-emerald-500 text-white rounded-2xl md:rounded-3xl">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-xs font-bold uppercase text-white/70 tracking-widest flex items-center gap-2">
                                 <ShieldCheck className="h-3 w-3" />
