@@ -14,7 +14,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $accounts = $user->accounts()->get();
-        $totalBalance = $accounts->sum('blance');
+        $totalBalance = $accounts->sum('balance');
         
         $recentTransactions = Transaction::whereIn('from_account_id', $accounts->pluck('id'))
             ->orWhereIn('to_account_id', $accounts->pluck('id'))
@@ -42,6 +42,7 @@ class DashboardController extends Controller
                 'activeLoan' => $activeCredit ? $activeCredit->amount : 0,
                 'currency' => 'MAD',
             ],
+            'accounts' => $accounts,
             'recentTransactions' => $recentTransactions,
             'chartData' => $chartData,
         ]);
