@@ -2,7 +2,7 @@
 
 // declare(strict_types=1);
 
-namespace App\services;
+namespace App\Services;
 use App\Models\Account;
 
 class TransferMoneyService

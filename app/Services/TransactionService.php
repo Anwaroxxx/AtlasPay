@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\services;
+namespace App\Services;
 
 use App\Models\Transaction;
-use App\services\TransferMoneyService as ServicesTransferMoneyService;
+use App\Services\TransferMoneyService as ServicesTransferMoneyService;
 use TransferMoneyService;
 
 class TransactionService

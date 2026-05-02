@@ -7,7 +7,7 @@ use App\Concerns\ProfileValidationRules;
 use App\Models\Account;
 use App\Models\AccountTypes;
 use App\Models\User;
-use App\services\GenerateRibService;
+use App\Services\GenerateRibService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
