@@ -75,7 +75,7 @@ export default function Transactions({ reportData }: any) {
                 variants={container} 
                 initial="hidden" 
                 animate="show" 
-                className="flex flex-1 flex-col gap-10 p-4 md:p-8"
+                className="flex flex-1 flex-col gap-6 md:gap-10 p-4 md:p-8"
             >
                 {/* Header */}
                 <motion.div variants={item} className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -84,10 +84,10 @@ export default function Transactions({ reportData }: any) {
                             <BrainCircuit className="h-5 w-5 fill-current" />
                             <span className="text-xs font-black uppercase tracking-[0.2em]">Bank Assistant Insights</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-neutral-900 md:text-6xl dark:text-neutral-50">
+                        <h1 className="text-3xl font-black tracking-tighter text-neutral-900 sm:text-4xl md:text-6xl dark:text-neutral-50">
                             Your <span className="text-emerald-500">Transactions.</span>
                         </h1>
-                        <p className="text-neutral-500 dark:text-neutral-400">Track and analyze your spending behavior.</p>
+                        <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400">Track and analyze your spending behavior.</p>
                     </div>
                     <div className="flex gap-3">
                         <Button variant="outline" className="rounded-2xl border-neutral-100 bg-white shadow-sm dark:bg-neutral-900 dark:border-neutral-800">
@@ -100,10 +100,10 @@ export default function Transactions({ reportData }: any) {
                 </motion.div>
 
                 {/* Top Row: AI Insights & Charts */}
-                <div className="grid gap-8 lg:grid-cols-3">
+                <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
                     {/* AI Insights Card */}
                     <motion.div variants={item} className="lg:col-span-2">
-                        <Card className="h-full border-none bg-neutral-900 text-white shadow-[0_30px_60px_-15px_rgba(16,185,129,0.2)] dark:bg-neutral-950 relative overflow-hidden rounded-[2.5rem]">
+                        <Card className="h-full border-none bg-neutral-900 text-white shadow-[0_30px_60px_-15px_rgba(16,185,129,0.2)] dark:bg-neutral-950 relative overflow-hidden rounded-2xl md:rounded-[2.5rem]">
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <BrainCircuit className="h-48 w-48 text-emerald-500 animate-pulse" />
                             </div>
@@ -125,7 +125,7 @@ export default function Transactions({ reportData }: any) {
 
                     {/* Category Distribution Chart */}
                     <motion.div variants={item}>
-                        <Card className="h-full border-none shadow-xl bg-white dark:bg-neutral-900/50 rounded-[2.5rem]">
+                        <Card className="h-full border-none shadow-xl bg-white dark:bg-neutral-900/50 rounded-2xl md:rounded-[2.5rem]">
                             <CardHeader>
                                 <CardTitle className="text-xs font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
                                     <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -169,10 +169,10 @@ export default function Transactions({ reportData }: any) {
                 </div>
 
                 {/* Middle Row: Monthly Trends & Budgets */}
-                <div className="grid gap-8 lg:grid-cols-2">
+                <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
                     {/* Monthly Trends */}
                     <motion.div variants={item}>
-                        <Card className="border-none shadow-xl bg-white dark:bg-neutral-900/50 rounded-[2.5rem]">
+                        <Card className="border-none shadow-xl bg-white dark:bg-neutral-900/50 rounded-2xl md:rounded-[2.5rem]">
                             <CardHeader>
                                 <CardTitle className="text-xs font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
                                     <Activity className="h-4 w-4 text-blue-500" />
@@ -203,7 +203,7 @@ export default function Transactions({ reportData }: any) {
 
                     {/* Budgets */}
                     <motion.div variants={item}>
-                        <Card className="border-none shadow-xl rounded-[2.5rem]">
+                        <Card className="border-none shadow-xl rounded-2xl md:rounded-[2.5rem]">
                             <CardHeader>
                                 <CardTitle className="text-xs font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
                                     <Target className="h-4 w-4 text-orange-500" />
@@ -277,7 +277,7 @@ export default function Transactions({ reportData }: any) {
 
                 {/* Bottom Section: Transaction History */}
                 <motion.div variants={item}>
-                    <Card className="border-none shadow-2xl overflow-hidden rounded-[2.5rem]">
+                    <Card className="border-none shadow-2xl overflow-hidden rounded-2xl md:rounded-[2.5rem]">
                         <CardHeader className="bg-neutral-900 text-white dark:bg-neutral-950 p-8">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">

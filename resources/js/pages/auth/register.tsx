@@ -177,7 +177,7 @@ export default function Register(props) {
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full h-11 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(118,177,130,0.3)] shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
+                                className="mt-2 w-full h-11 rounded-xl bg-emerald-500 text-neutral-900 hover:bg-emerald-400 font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-[0_0_20px_rgba(16,185,129,0.1)] cursor-pointer"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
@@ -187,9 +187,9 @@ export default function Register(props) {
                         </div>
 
 
-                        <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-500">
+                        <div className="text-center text-[10px] uppercase tracking-widest font-bold text-neutral-500">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6} className="text-brand-medium hover:text-brand-light transition-colors">
+                            <TextLink href={login()} tabIndex={6} className="text-emerald-500 hover:text-emerald-400 transition-colors">
                                 Access Vault
                             </TextLink>
                         </div>

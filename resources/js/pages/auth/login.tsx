@@ -55,7 +55,7 @@ export default function Login({
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-brand-medium transition-colors"
+                                            className="ml-auto text-[10px] uppercase tracking-widest font-bold text-neutral-500 hover:text-emerald-500 transition-colors"
                                             tabIndex={5}
                                         >
                                             Forgot?
@@ -84,7 +84,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full h-12 rounded-none bg-brand-medium text-black hover:bg-brand-light font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(118,177,130,0.3)] shadow-[0_0_20px_rgba(118,177,130,0.1)] cursor-pointer"
+                                className="mt-2 w-full h-12 rounded-xl bg-emerald-500 text-neutral-900 hover:bg-emerald-400 font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-[0_0_20px_rgba(16,185,129,0.1)] cursor-pointer"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -95,9 +95,9 @@ export default function Login({
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-500">
+                            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-neutral-500">
                                 Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5} className="text-brand-medium hover:text-brand-light transition-colors">
+                                <TextLink href={register()} tabIndex={5} className="text-emerald-500 hover:text-emerald-400 transition-colors">
                                     Apply for Access
                                 </TextLink>
                             </div>

@@ -78,7 +78,7 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                 variants={container} 
                 initial="hidden" 
                 animate="show" 
-                className="flex flex-1 flex-col gap-10 p-4 md:p-8"
+                className="flex flex-1 flex-col gap-6 md:gap-10 p-4 md:p-8"
             >
                 {/* Header */}
                 <motion.div variants={item} className="flex flex-col gap-4">
@@ -86,18 +86,18 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                         <Zap className="h-5 w-5 fill-current" />
                         <span className="text-xs font-black uppercase tracking-[0.2em]">Bank Credits</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-neutral-900 md:text-6xl dark:text-neutral-50">
+                    <h1 className="text-3xl font-black tracking-tighter text-neutral-900 sm:text-4xl md:text-6xl dark:text-neutral-50">
                         Quick <span className="text-emerald-500">Credits.</span>
                     </h1>
-                    <p className="max-w-2xl text-neutral-500 dark:text-neutral-400">
+                    <p className="max-w-2xl text-sm md:text-base text-neutral-500 dark:text-neutral-400">
                         Get instant access to funds based on your credit score. No hidden fees, just straightforward banking.
                     </p>
                 </motion.div>
 
-                <div className="grid gap-8 lg:grid-cols-3">
+                <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
                     {/* Credit Score Gauge */}
                     <motion.div variants={item} className="lg:col-span-1">
-                        <Card className="relative h-full overflow-hidden border-none bg-neutral-900 text-white shadow-[0_30px_60px_-15px_rgba(16,185,129,0.3)] dark:bg-neutral-950 rounded-[2.5rem]">
+                        <Card className="relative h-full overflow-hidden border-none bg-neutral-900 text-white shadow-[0_30px_60px_-15px_rgba(16,185,129,0.3)] dark:bg-neutral-950 rounded-2xl md:rounded-[2.5rem]">
                             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent" />
                             <CardHeader className="relative z-10 pb-2">
                                 <CardTitle className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
@@ -176,7 +176,7 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                                     exit={{ opacity: 0, x: -20 }}
                                     className="h-full"
                                 >
-                                    <Card className="h-full border-none shadow-2xl bg-white dark:bg-neutral-900/50 relative overflow-hidden group rounded-[2.5rem]">
+                                    <Card className="h-full border-none shadow-2xl bg-white dark:bg-neutral-900/50 relative overflow-hidden group rounded-2xl md:rounded-[2.5rem]">
                                         <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                                             <Zap className="h-64 w-64" />
                                         </div>
@@ -242,7 +242,7 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                                     exit={{ opacity: 0, x: -20 }}
                                     className="h-full"
                                 >
-                                    <Card className="h-full border-none shadow-2xl rounded-[2.5rem]">
+                                    <Card className="h-full border-none shadow-2xl rounded-2xl md:rounded-[2.5rem]">
                                         <CardHeader>
                                             <CardTitle className="text-2xl font-black">Get Credit</CardTitle>
                                             <CardDescription>Instant funds based on your rating.</CardDescription>
@@ -308,7 +308,7 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
 
                 {/* Credit History */}
                 <motion.div variants={item}>
-                    <Card className="border-none shadow-xl overflow-hidden rounded-[2.5rem]">
+                    <Card className="border-none shadow-xl overflow-hidden rounded-2xl md:rounded-[2.5rem]">
                         <CardHeader className="border-b border-neutral-50 dark:border-neutral-800">
                             <CardTitle className="flex items-center gap-2">
                                 <History className="h-5 w-5 text-neutral-400" />
