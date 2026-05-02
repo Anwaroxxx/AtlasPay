@@ -19,9 +19,9 @@ return new class extends Migration
             $table->foreignId('user_id')
                     ->constrained('users');
 
-            $table->string("acount_number")->unique();
+            $table->string("account_number")->unique();
             // balance data
-            $table->decimal('blance', 15, 2)->default(0);
+            $table->decimal('balance', 15, 2)->default(0);
 
             // account type
             $table->string('type');

@@ -10,7 +10,6 @@ class Transaction extends Model
         'from_account_id',
         'to_account_id',
         'amount',
-        'type',
         'method',
         'category',
         'status'

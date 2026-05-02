@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(["user_id", "acount_number", "type", "status"])]
+#[Fillable(["user_id", "account_number", "type", "status"])]
 
 class Account extends Model
 {

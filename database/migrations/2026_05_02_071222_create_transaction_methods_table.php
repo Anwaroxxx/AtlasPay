@@ -11,18 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('transaction_methods', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('from_account_id')
-                    ->constrained("accounts");
-            
-            $table->foreignId('to_account_id')
-                    ->constrained("accounts");
-            
-            $table->decimal('amount',15,2);
             $table->string('method');
-            $table->string("status")->default("pending");
             $table->timestamps();
         });
     }
@@ -32,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('transaction_methods');
     }
 };

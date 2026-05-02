@@ -2,11 +2,12 @@
 
 namespace App\Actions\Fortify;
 
-use App\Account\AccountTypes;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
 use App\Models\Account;
+use App\Models\AccountTypes;
 use App\Models\User;
+use App\services\GenerateRibService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -26,7 +27,7 @@ class CreateNewUser implements CreatesNewUsers
         // dd($input);
         Validator::make($input, [
             ...$this->profileRules(),
-            'account' => ["required", Rule::in(AccountTypes::all())],
+            'account' => ["required", Rule::in(AccountTypes::pluck('name'))],
             'password' => $this->passwordRules(),
         ])->validate();
 
@@ -44,7 +45,14 @@ class CreateNewUser implements CreatesNewUsers
 
         Account::create([
             "user_id" => $user->id,
-            'acount_number' => Str::uuid(),
+            'account_number' => GenerateRibService::generateAccountId(),
+            'type' => 'wallet',
+            'status' => 'active'
+        ]);
+
+        Account::create([
+            "user_id" => $user->id,
+            'account_number' => GenerateRibService::generateAccountId(),
             'type' => $input["account"],
             'status' => 'active'
         ]);

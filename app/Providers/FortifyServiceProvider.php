@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Account\AccountTypes;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\AccountTypes;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -67,7 +67,7 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('auth/register', ["accounts"=> AccountTypes::all()]));
+        Fortify::registerView(fn () => Inertia::render('auth/register', ["accounts"=> AccountTypes::pluck('name')]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -28,6 +29,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Chat Route
     Route::post('/chat', [ChatController::class, 'ask'])->name('chat.ask');
+});
+
+
+
+Route::inertia("/test","test");
+
+Route::middleware(["auth"])->group(function (){
+    Route::post("/test/transfer",[TransactionController::class,'store'])->defaults("transfer", "transfer");
+    Route::post("/test/qr",[TransactionController::class,'store'])->defaults("transfer", "qr");
+    Route::post("/test/card",[TransactionController::class,'store'])->defaults("transfer", "cash");
+    // Route::post("/test/",[TransactionController::class,'store'])->defaults("transfer", "qr");
+    
 });
 
 require __DIR__.'/settings.php';
