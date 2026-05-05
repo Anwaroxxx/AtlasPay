@@ -45,7 +45,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Account::class);
     }
-
+    public function wallet()
+    {
+        return $this->hasOne(Account::class)->where("type","wallet");
+    }
     public function credits()
     {
         return $this->hasMany(Credit::class);
