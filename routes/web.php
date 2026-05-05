@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Savings Goals (AutoCut)
     Route::get('/savings', [SavingsGoalController::class, 'index'])->name('savings.index');
     Route::post('/savings', [SavingsGoalController::class, 'store'])->name('savings.store');
+    Route::post('/savings/{goal}/request-unlock', [SavingsGoalController::class, 'requestUnlock'])->name('savings.request-unlock');
     Route::post('/savings/{goal}/unlock', [SavingsGoalController::class, 'unlock'])->name('savings.unlock');
 
     // Daret (Savings Groups) Routes

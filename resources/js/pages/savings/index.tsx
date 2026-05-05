@@ -42,6 +42,8 @@ interface Props {
 
 export default function Savings({ goals }: Props) {
     const [isCreating, setIsCreating] = useState(false);
+    const [verifyingGoalId, setVerifyingGoalId] = useState<number | null>(null);
+    const [verificationCode, setVerificationCode] = useState('');
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -61,12 +63,28 @@ export default function Savings({ goals }: Props) {
         });
     };
 
-    const unlock = (goalId: number) => {
-        if (confirm('Are you sure you want to unlock this goal? Unlocking before the target date may impact your financial health score. Proceed?')) {
-            router.post(`/savings/${goalId}/unlock`, {}, {
-                onSuccess: () => toast.warning('Savings goal unlocked.')
-            });
-        }
+    const requestUnlock = (goalId: number) => {
+        router.post(`/savings/${goalId}/request-unlock`, {}, {
+            onSuccess: () => {
+                setVerifyingGoalId(goalId);
+                toast.info('Verification code dispatched to your Gmail.');
+            }
+        });
+    };
+
+    const confirmUnlock = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!verifyingGoalId) return;
+
+        router.post(`/savings/${verifyingGoalId}/unlock`, { code: verificationCode }, {
+            onSuccess: () => {
+                setVerifyingGoalId(null);
+                setVerificationCode('');
+            },
+            onError: (err: any) => {
+                if (err.code) toast.error(err.code);
+            }
+        });
     };
 
     const container = {
@@ -234,24 +252,45 @@ export default function Savings({ goals }: Props) {
                                             </div>
                                         </div>
 
-                                        <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                                                    <Zap className="h-4 w-4 fill-current" />
+                                        <div className="flex flex-col gap-4">
+                                            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                                        <Zap className="h-4 w-4 fill-current" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Monthly Saving</p>
+                                                        <p className="text-sm font-black tracking-tight">{goal.monthly_deduction.toLocaleString()} MAD</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Monthly Saving</p>
-                                                    <p className="text-sm font-black tracking-tight">{goal.monthly_deduction.toLocaleString()} MAD</p>
+                                                <div className="h-10 w-10 flex items-center justify-center text-primary/40">
+                                                    <ShieldCheck className="h-5 w-5" />
                                                 </div>
                                             </div>
-                                            {isLocked ? (
-                                                <Button onClick={() => unlock(goal.id)} variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-destructive/10 hover:text-destructive group/btn">
-                                                    <Lock className="h-4 w-4 group-hover/btn:hidden" />
-                                                    <Unlock className="h-4 w-4 hidden group-hover/btn:block" />
-                                                </Button>
-                                            ) : (
-                                                <div className="h-10 w-10 flex items-center justify-center text-success">
-                                                    <Unlock className="h-5 w-5" />
+
+                                            {isLocked && (
+                                                <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10 flex flex-col gap-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2 text-destructive">
+                                                            <AlertTriangle className="h-3.5 w-3.5" />
+                                                            <span className="text-[10px] font-black uppercase tracking-widest">Emergency Access</span>
+                                                        </div>
+                                                        <span className="text-[9px] font-black uppercase text-destructive/60 tracking-widest">2.0% Protocol Fee</span>
+                                                    </div>
+                                                    <Button 
+                                                        onClick={() => requestUnlock(goal.id)} 
+                                                        variant="destructive" 
+                                                        className="w-full h-10 rounded-xl bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground font-black text-[10px] uppercase tracking-[0.2em] transition-all"
+                                                    >
+                                                        <Unlock className="mr-2 h-3.5 w-3.5" /> Emergency Unlock
+                                                    </Button>
+                                                </div>
+                                            )}
+
+                                            {!isLocked && (
+                                                <div className="p-4 rounded-2xl bg-success/5 border border-success/10 flex items-center justify-center gap-2">
+                                                    <Unlock className="h-4 w-4 text-success" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-success">Vault Unlocked</span>
                                                 </div>
                                             )}
                                         </div>
@@ -271,6 +310,49 @@ export default function Savings({ goals }: Props) {
                         </div>
                     )}
                 </div>
+
+                {/* Verification Modal */}
+                <AnimatePresence>
+                    {verifyingGoalId && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="w-full max-w-md"
+                            >
+                                <Card className="border-2 border-destructive/20 shadow-elevated bg-card rounded-3xl overflow-hidden glass-card">
+                                    <CardHeader className="p-8 text-center space-y-2">
+                                        <div className="mx-auto h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-2">
+                                            <ShieldCheck className="h-8 w-8" />
+                                        </div>
+                                        <CardTitle className="text-2xl font-black uppercase tracking-tight">Security <span className="text-destructive italic">Check.</span></CardTitle>
+                                        <CardDescription className="text-[10px] font-black uppercase tracking-widest">A 4-digit authorization code was sent to your Gmail.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="p-8 pt-0">
+                                        <form onSubmit={confirmUnlock} className="space-y-6">
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block text-center">Enter Authorization Code</Label>
+                                                <Input 
+                                                    type="number" 
+                                                    placeholder="0000"
+                                                    value={verificationCode} 
+                                                    onChange={e => setVerificationCode(e.target.value)}
+                                                    className="h-16 text-center text-2xl font-black tracking-[0.5em] rounded-2xl bg-muted/20 border-destructive/20 focus:ring-destructive/20"
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <Button type="button" variant="outline" onClick={() => setVerifyingGoalId(null)} className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px]">Cancel</Button>
+                                                <Button type="submit" variant="destructive" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-destructive hover:bg-destructive shadow-lg">Confirm Liquidation</Button>
+                                            </div>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </>
     );

@@ -40,7 +40,7 @@ export function CustomSidebar() {
     return (
         <motion.aside
             animate={{ width: isCollapsed ? 80 : 280 }}
-            className="relative hidden md:flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-500 ease-in-out shrink-0 z-40"
+            className="sticky top-0 hidden md:flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-500 ease-in-out shrink-0 z-40"
         >
             {/* Logo Section */}
             <div className={`flex h-20 items-center px-6 ${isCollapsed ? 'justify-center px-0' : 'justify-between'}`}>
