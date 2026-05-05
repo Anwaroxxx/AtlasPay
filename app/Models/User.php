@@ -16,7 +16,7 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    protected $fillable = ['first_name', 'last_name', 'phone', 'email', 'password', 'address', 'goverment_id', 'credit_score'];
+    protected $fillable = ['first_name', 'last_name', 'phone', 'email', 'password', 'address', 'government_id', 'credit_score', 'profile_photo'];
 
     protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
 
@@ -55,4 +55,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function savingsGoals()
+    {
+        return $this->hasMany(SavingsGoal::class);
+    }
+
+    public function daretGroups()
+    {
+        return $this->belongsToMany(DaretGroup::class, 'daret_members');
+    }
 }
+
+

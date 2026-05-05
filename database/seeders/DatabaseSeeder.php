@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call(TransactionMethodsSeeder::class);
         $this->call(AccountTypesSeeder::class);
+        $this->call(DummyDataSeeder::class);
     }
 
 }

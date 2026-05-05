@@ -1,470 +1,307 @@
 import { Link, Head } from '@inertiajs/react';
-import { Float, MeshDistortMaterial, Sphere, PerspectiveCamera } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
-import { motion } from 'framer-motion';
-import Lenis from 'lenis';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
   ShieldCheck,
   Globe,
   ArrowRight,
-  Linkedin,
-  Twitter,
-  Instagram,
   Zap,
   Lock,
   Layers,
   Crown,
   Compass,
+  Activity,
+  Plus,
+  MousePointer2,
+  Sparkles
 } from 'lucide-react';
-import { useEffect, useRef, Suspense } from 'react';
-import CardSwap, { Card } from '@/components/CardSwap';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
-
-const Scene3D = () => {
-  return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} color="#76b182" intensity={2} />
-        <pointLight position={[-10, -10, -10]} color="#36694b" intensity={1} />
-        
-        <Suspense fallback={null}>
-          <Float speed={1.5} rotationIntensity={1} floatIntensity={2}>
-            <Sphere args={[1.5, 100, 100]} position={[2, 0, -2]}>
-              <MeshDistortMaterial
-                color="#36694b"
-                attach="material"
-                distort={0.4}
-                speed={2}
-                roughness={0.1}
-                metalness={1}
-                transparent
-                opacity={0.3}
-              />
-            </Sphere>
-          </Float>
-
-          <Float speed={2} rotationIntensity={2} floatIntensity={1}>
-            <mesh position={[-2, 1, -3]}>
-              <octahedronGeometry args={[1, 0]} />
-              <meshStandardMaterial color="#76b182" wireframe opacity={0.1} transparent />
-            </mesh>
-          </Float>
-        </Suspense>
-      </Canvas>
-    </div>
-  );
-};
-
-// --- Custom Components ---
-
-const LuxuryLink = ({ children, href }: { children: React.ReactNode; href: string }) => (
-  <Link 
-    href={href} 
-    className="relative group text-xs uppercase tracking-[0.4em] font-bold text-gray-400 hover:text-emerald-400 transition-colors"
-  >
-    {children}
-    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-emerald-500 transition-all duration-300 group-hover:w-full" />
-  </Link>
-);
-
-const SectionHeading = ({ title, subtitle }: { title: string; subtitle: string }) => (
-  <div className="space-y-4 mb-20 overflow-hidden">
-    <motion.div
-      initial={{ y: 50, opacity: 0 }}
-      whileInView={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: "circOut" }}
-    >
-      <div className="flex items-center gap-3 text-emerald-500 mb-4">
-        <div className="h-[1px] w-12 bg-emerald-500/30" />
-        <span className="text-[10px] uppercase tracking-[0.5em] font-bold">{subtitle}</span>
-      </div>
-      <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold tracking-tighter leading-none">
-        {title}
-      </h2>
-    </motion.div>
-  </div>
-);
-
-
-const personas = [];
+import CardSwap, { Card } from '@/components/CardSwap';
 
 const features = [
-  { icon: Lock, title: 'Absolute Sovereignty', description: 'Your assets are protected by military-grade encryption and sovereign-level protocols.' },
-  { icon: Zap, title: 'Quantum Precision', description: 'Real-time settlement architecture designed for the speed of modern global finance.' },
-  { icon: ShieldCheck, title: 'Immutable Trust', description: 'Regulated by Bank Al-Maghrib with transparent, audited vault management.' },
+  { icon: Lock, title: 'Absolute Security', description: 'Military-grade encryption protocols and sovereign-level protection for all assets.' },
+  { icon: Zap, title: 'Instant Settlement', description: 'Real-time transaction architecture designed for the speed of modern global finance.' },
+  { icon: ShieldCheck, title: 'Regulatory Trust', description: 'Fully compliant and audited vault management with transparent reporting.' },
 ];
 
 export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => lenis.destroy();
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#010301] text-white selection:bg-brand-medium/30 overflow-x-hidden">
+    <div ref={containerRef} className="min-h-screen bg-[#010301] text-white selection:bg-primary/30 overflow-x-hidden font-sans">
       <Head title="AtlasPay — The Sovereign Standard" />
       
-      <Scene3D />
-      
-      {/* Immersive Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,_transparent_0%,_#010301_100%)] opacity-80" />
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
+         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-success/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,_transparent_0%,_#010301_80%)]" />
+      </div>
       <div className="fixed inset-0 z-0 pointer-events-none moroccan-pattern opacity-[0.03]" />
-
-      {/* --- Navigation --- */}
-      <nav className="fixed top-0 left-0 right-0 z-[100] py-6 px-6 md:px-12 backdrop-blur-md bg-black/10 border-b border-white/5">
-        <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full border border-brand-medium/30 flex items-center justify-center bg-[#010301]">
-              <div className="w-6 h-6 rounded-full bg-brand-medium flex items-center justify-center text-black font-serif font-bold italic text-sm">A</div>
+      
+      {/* --- Smart Floating Navbar --- */}
+      <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center py-8 px-6 transition-all duration-500">
+        <motion.nav 
+          animate={{ 
+            width: isScrolled ? 'auto' : '100%',
+            y: isScrolled ? 10 : 0,
+          }}
+          className={`max-w-screen-2xl flex items-center justify-between backdrop-blur-2xl border transition-all duration-500 ${
+            isScrolled 
+            ? 'bg-white/[0.03] border-white/10 rounded-full px-8 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)]' 
+            : 'bg-transparent border-transparent px-8 py-4 w-full'
+          }`}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-elevated group cursor-pointer">
+              <Zap className="w-6 h-6 text-white fill-current group-hover:scale-110 transition-transform" />
             </div>
-            <span className="text-xl font-serif font-bold tracking-tighter uppercase italic">AtlasPay</span>
-          </motion.div>
+            {!isScrolled && (
+               <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-2xl font-display font-black tracking-tighter uppercase italic">AtlasPay</motion.span>
+            )}
+          </div>
 
-          <div className="hidden lg:flex items-center gap-10">
-            <LuxuryLink href="#why-us">Why Us</LuxuryLink>
-            <LuxuryLink href="#collections">Collections</LuxuryLink>
-            <LuxuryLink href="#elite">Elite Services</LuxuryLink>
-            <LuxuryLink href="#sovereignty">Sovereignty</LuxuryLink>
+          <div className={`flex items-center gap-8 ${isScrolled ? 'mx-8' : ''}`}>
+            {['Vault', 'Elite', 'Archive'].map((item) => (
+              <a 
+                key={item} 
+                href={`#${item.toLowerCase()}`} 
+                className="text-[10px] uppercase tracking-[0.3em] font-black text-white/50 hover:text-primary transition-colors relative group"
+              >
+                {item}
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" />
+              </a>
+            ))}
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/login" className="text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-brand-medium transition-colors">
-              Access Vault
+            <Link href="/login" className="text-[10px] uppercase tracking-widest font-black text-white/40 hover:text-white transition-colors">
+              Access
             </Link>
             <Link href="/register">
-              <Button className="bg-brand-medium hover:bg-brand-light text-black font-bold px-6 md:px-8 h-10 md:h-12 rounded-none uppercase tracking-widest text-[9px] md:text-[10px] shadow-[0_0_30px_rgba(118,177,130,0.2)] hover:shadow-[0_0_40px_rgba(118,177,130,0.4)] transition-all hover:scale-[1.02] cursor-pointer">
-                Open Account
+              <Button className="bg-primary hover:bg-success text-white font-black px-8 h-11 rounded-full uppercase tracking-widest text-[9px] shadow-elevated transition-all hover:scale-[1.05] border-none">
+                Get Started
               </Button>
             </Link>
           </div>
-        </div>
-      </nav>
+        </motion.nav>
+      </div>
 
       <main className="relative z-10">
-        {/* --- Hero: The Vogue Entry --- */}
+        {/* --- Hero --- */}
         <section className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20">
           <div className="max-w-screen-2xl mx-auto w-full grid lg:grid-cols-12 gap-16 items-center">
             <div className="lg:col-span-7 space-y-12">
               <motion.div 
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 1, ease: "circOut" }}
-                className="space-y-6"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+                className="space-y-8"
               >
-                <div className="flex items-center gap-3 text-brand-medium">
-                  <div className="h-2 w-2 rounded-full bg-brand-medium animate-ping" />
-                  <span className="text-[10px] uppercase tracking-[0.6em] font-bold">Kingdom Collection 2026</span>
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary">
+                  <Sparkles className="w-4 h-4 animate-pulse" />
+                  <span className="text-[9px] uppercase tracking-[0.5em] font-black">Kingdom Collection 2026</span>
                 </div>
-                <h1 className="text-5xl md:text-7xl lg:text-9xl font-serif font-bold leading-[0.9] tracking-tighter text-glow">
+                <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-black leading-[0.82] tracking-tighter uppercase">
                   Wealth <br />
-                  <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-brand-medium to-brand-light">Transcended.</span>
+                  <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-primary via-success to-emerald-400">Transcended.</span>
                 </h1>
+                <p className="text-xl text-white/50 font-medium leading-relaxed max-w-xl">
+                  Redefining the architecture of Moroccan finance. A seamless fusion of ancestral sovereignty and digital precision.
+                </p>
               </motion.div>
 
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 1 }}
-                className="max-w-xl space-y-10"
+                className="flex flex-col sm:flex-row gap-8 items-start sm:items-center"
               >
-                <p className="text-xl text-gray-400 font-light leading-relaxed">
-                  Redefining the architecture of Moroccan finance. A seamless fusion of ancestral sovereignty and digital precision.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-center">
-                  <Link href="/register">
-                    <Button className="h-16 md:h-20 px-10 md:px-16 bg-white text-black hover:bg-brand-light rounded-none text-xs md:text-sm font-bold uppercase tracking-[0.3em] transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,255,255,0.15)] cursor-pointer">
-                      Start Journey
-                    </Button>
-                  </Link>
-                  <Link href="#collections" className="flex items-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:text-brand-medium transition-colors">
-                    Explore Vault <ArrowRight className="w-4 h-4" />
-                  </Link>
+                <Link href="/register">
+                  <Button className="h-20 px-16 bg-white text-black hover:bg-primary hover:text-white rounded-full text-xs font-black uppercase tracking-[0.3em] transition-all hover:scale-[1.05] shadow-[0_20px_80px_rgba(255,255,255,0.1)] border-none">
+                    Begin Journey
+                  </Button>
+                </Link>
+                <div className="flex flex-col gap-2">
+                   <div className="flex -space-x-3">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-10 w-10 rounded-full border-2 border-[#010301] bg-neutral-800 overflow-hidden ring-1 ring-white/5 transition-transform hover:scale-110 hover:z-10">
+                           <img src={`https://i.pravatar.cc/100?u=${i}`} alt="User" className="w-full h-full grayscale hover:grayscale-0 transition-all" />
+                        </div>
+                      ))}
+                   </div>
+                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+                     Trusted by <span className="text-white">+2.5M visionaries</span>
+                   </div>
                 </div>
               </motion.div>
             </div>
 
-            <div className="lg:col-span-5 relative flex items-center justify-center lg:justify-end">
+            <div className="lg:col-span-5 relative group">
               <motion.div 
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.5, ease: "circOut" }}
-                className="w-full relative group max-w-[500px]"
+                initial={{ scale: 0.8, opacity: 0, rotateY: 30 }}
+                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
+                className="w-full relative [perspective:2000px]"
               >
-                <div className="absolute inset-0 bg-brand-medium/20 blur-[120px] rounded-full group-hover:bg-brand-medium/30 transition-all duration-700" />
-                <img 
+                <div className="absolute inset-0 bg-primary/20 blur-[150px] rounded-full group-hover:bg-primary/30 transition-all duration-700" />
+                <motion.img 
+                  animate={{ y: [0, -20, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   src="/images/card-platinum.png" 
-                  alt="Sovereign Platinum" 
-                  className="relative w-full h-auto drop-shadow-[0_80px_120px_rgba(0,0,0,0.9)] transition-transform duration-1000 group-hover:scale-105 group-hover:-rotate-3"
+                  alt="Platinum Card" 
+                  className="relative w-full h-auto drop-shadow-[0_80px_120px_rgba(0,0,0,1)] rotate-[-12deg] group-hover:rotate-0 transition-all duration-1000 ease-out cursor-pointer"
                 />
               </motion.div>
             </div>
           </div>
 
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2, duration: 1 }}
+            style={{ opacity }}
             className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
           >
-            <span className="text-[10px] uppercase tracking-[0.4em] text-gray-500 font-bold">Scroll to Explore</span>
-            <div className="w-[1px] h-12 bg-gradient-to-b from-brand-medium to-transparent" />
+            <div className="w-[1px] h-16 bg-gradient-to-b from-primary/50 via-primary to-transparent" />
+            <MousePointer2 className="w-4 h-4 text-primary animate-bounce" />
           </motion.div>
         </section>
 
-        {/* --- Why Us: The Architectural Standard --- */}
-        <section id="why-us" className="py-40 px-6 md:px-12 bg-[#020402] border-y border-white/5">
-           <div className="max-w-screen-2xl mx-auto grid lg:grid-cols-12 gap-24 items-center">
-              <div className="lg:col-span-6 space-y-16">
-                 <SectionHeading title="The Architectural Standard." subtitle="Why AtlasPay" />
-                 
-                 <div className="space-y-12">
-                    {features.map((f, i) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.2 }}
-                        className="flex gap-8 group"
-                      >
-                         <div className="flex-shrink-0 w-16 h-16 border border-white/5 flex items-center justify-center group-hover:border-brand-medium/50 transition-colors">
-                            <f.icon className="w-6 h-6 text-brand-medium" />
-                         </div>
-                         <div className="space-y-3">
-                            <h4 className="text-xl font-serif font-bold">{f.title}</h4>
-                            <p className="text-gray-500 font-light leading-relaxed max-w-md">{f.description}</p>
-                         </div>
-                      </motion.div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="lg:col-span-6 relative flex items-center justify-center min-h-[600px]">
-                 <div className="w-full relative max-w-[550px]">
-                    <div className="absolute inset-0 bg-brand-medium/10 blur-[100px] rounded-full" />
-                    <div className="relative z-10 w-full aspect-[4/3]">
-                       <CardSwap width="100%" height="100%" cardDistance={40} verticalDistance={50}>
-                          <Card className="p-4 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-white/5 shadow-2xl">
-                             <img src="/images/card-platinum.png" className="w-full h-full object-contain" alt="Platinum" />
-                          </Card>
-                          <Card className="p-4 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-white/5 shadow-2xl">
-                             <img src="/images/card-gold.png" className="w-full h-full object-contain" alt="Gold" />
-                          </Card>
-                          <Card className="p-4 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-white/5 shadow-2xl">
-                             <img src="/images/card-emerald.png" className="w-full h-full object-contain" alt="Emerald" />
-                          </Card>
-                       </CardSwap>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* --- The Grid: Collections --- */}
-        <section id="collections" className="py-40 px-6 md:px-12 border-b border-white/5">
-          <div className="max-w-screen-2xl mx-auto">
-            <SectionHeading title="The Curated Collections." subtitle="Refined Assets" />
-
-            <div className="grid lg:grid-cols-3 gap-0 border border-white/5">
+        {/* --- Stats Row --- */}
+        <section className="py-24 border-y border-white/5 relative">
+          <div className="absolute inset-0 bg-white/[0.01] backdrop-blur-3xl" />
+          <div className="max-w-screen-2xl mx-auto px-6 md:px-12 relative z-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:p-8">
                {[
-                 { id: 'emerald', name: 'Emerald',  tier: 'Sovereign', img: '/images/card-emerald.png',  icon: Crown   },
-                 { id: 'gold',    name: 'Riad Gold', tier: 'Privilege', img: '/images/card-gold.png',     icon: Compass },
-                 { id: 'platinum',name: 'Makhzen',   tier: 'Absolute',  img: '/images/card-platinum.png', icon: Zap     }
-               ].map((card) => (
-                 <motion.div 
-                   key={card.id}
-                   whileHover={{ backgroundColor: "rgba(118, 177, 130, 0.02)" }}
-                   className="p-16 border-white/5 border-l first:border-l-0 flex flex-col space-y-12 transition-all duration-500 group"
-                 >
-                    <div className="flex justify-between items-start">
-                       <div className="space-y-1">
-                          <div className="text-[10px] text-brand-medium font-bold uppercase tracking-widest">{card.tier}</div>
-                          <h3 className="text-4xl font-serif italic">{card.name}</h3>
-                       </div>
-                       <card.icon className="w-6 h-6 text-gray-600 group-hover:text-brand-medium transition-colors" />
+                 { label: 'Network Volume', val: '$12.4B', icon: Activity },
+                 { label: 'Settlement', val: '0.04ms', icon: Zap },
+                 { label: 'Encryption', val: 'AES-256', icon: Lock },
+                 { label: 'Availability', val: '99.99%', icon: Globe },
+               ].map((stat) => (
+                 <div key={stat.label} className="space-y-4 group cursor-help">
+                    <div className="flex items-center gap-3 text-primary/40 group-hover:text-primary transition-colors">
+                       <stat.icon className="w-5 h-5" />
+                       <span className="text-[10px] font-black uppercase tracking-[0.4em]">{stat.label}</span>
                     </div>
-                    
-                    <div className="relative aspect-[1.6/1] w-full py-8 overflow-visible">
-                       <img 
-                          src={card.img} 
-                          className="w-full h-full object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:scale-110 group-hover:-translate-y-4"
-                          alt={card.name}
-                       />
-                    </div>
-
-                    <ul className="space-y-4 text-sm text-gray-500 font-light">
-                       <li className="flex items-center gap-3"><Layers className="w-3 h-3 text-brand-medium" /> Biometric Authentication</li>
-                       <li className="flex items-center gap-3"><Globe className="w-3 h-3 text-brand-medium" /> Worldwide Concierge</li>
-                       <li className="flex items-center gap-3"><ShieldCheck className="w-3 h-3 text-brand-medium" /> Limitless Remittance</li>
-                    </ul>
-
-                    <Button variant="ghost" className="w-full h-16 border border-white/5 rounded-none group-hover:bg-white group-hover:text-black transition-all text-[10px] uppercase tracking-widest font-bold">
-                       Inquire Now
-                    </Button>
-                 </motion.div>
+                    <div className="text-5xl font-display font-black tracking-tighter group-hover:text-glow transition-all">{stat.val}</div>
+                 </div>
                ))}
             </div>
           </div>
         </section>
 
-        {/* --- Sovereign Network: Social Proof --- */}
-        <section id="elite" className="py-40 border-b border-white/5">
-           <div className="max-w-screen-2xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-32 items-center">
-              <div className="lg:w-1/2 space-y-12">
-                 <h2 className="text-4xl md:text-6xl lg:text-8xl font-serif font-bold tracking-tight leading-none">
-                   The Sovereign <br /> <span className="italic text-brand-medium">Network.</span>
-                 </h2>
-                 <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-lg">
-                   An exclusive ecosystem of 2.5 million visionaries. We don't just process transactions; we curate financial destinies.
-                 </p>
-                 <div className="grid grid-cols-2 gap-12 border-t border-white/5 pt-12">
-                    <div className="space-y-2">
-                       <div className="text-4xl font-serif font-bold tracking-tighter">$12B+</div>
-                       <div className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">Volume Annual</div>
+        {/* --- Card Swap Section --- */}
+        <section id="vault" className="py-48 px-6 md:px-12 relative">
+           <div className="max-w-screen-2xl mx-auto grid lg:grid-cols-12 gap-32 items-center">
+              <div className="lg:col-span-6 space-y-16">
+                 <div className="space-y-8">
+                    <div className="flex items-center gap-4">
+                      <div className="h-0.5 w-16 bg-primary" />
+                      <span className="text-[10px] uppercase tracking-[0.6em] font-black text-primary">The Collection</span>
                     </div>
-                    <div className="space-y-2">
-                       <div className="text-4xl font-serif font-bold tracking-tighter">99.9%</div>
-                       <div className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">Uptime Guarantee</div>
-                    </div>
+                    <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter uppercase leading-[0.9]">
+                      Curated <br /> <span className="italic text-primary">Destinies.</span>
+                    </h2>
+                    <p className="text-white/40 text-xl leading-relaxed max-w-lg font-medium">
+                      Choose the tier that matches your ambition. Each card is a gateway to exclusive sovereign services and global access.
+                    </p>
                  </div>
-              </div>
 
-              <div className="lg:w-1/2 relative">
-                 <div className="grid grid-cols-2 gap-6 relative">
-                    {personas.map((p, i) => (
+                 <div className="grid gap-6">
+                    {features.map((f, i) => (
                       <motion.div 
-                        key={i}
-                        whileHover={{ y: -10, boxShadow: "0 20px 40px rgba(118, 177, 130, 0.1)" }}
-                        className="p-10 glass-card border border-white/5 space-y-6 group transition-colors hover:border-brand-medium/20"
+                        key={i} 
+                        whileHover={{ x: 10 }}
+                        className="flex gap-8 group"
                       >
-                         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 grayscale group-hover:grayscale-0 transition-all duration-700">
-                            <img src={p.image} className="w-full h-full object-cover" />
+                         <div className="h-16 w-16 rounded-[1.5rem] border border-white/5 bg-white/[0.02] flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/5 transition-all">
+                            <f.icon className="w-7 h-7 text-primary" />
                          </div>
-                         <div className="space-y-1">
-                            <div className="font-serif font-bold italic">{p.name}</div>
-                            <div className="text-[10px] text-brand-medium uppercase tracking-widest">{p.role}</div>
+                         <div className="space-y-2">
+                            <h4 className="text-xl font-black uppercase tracking-tight">{f.title}</h4>
+                            <p className="text-base text-white/30 font-medium leading-relaxed">{f.description}</p>
                          </div>
-                         <p className="text-xs text-gray-500 italic leading-relaxed">"{p.quote}"</p>
                       </motion.div>
                     ))}
                  </div>
-                 {/* Decorative background for the personas */}
-                 <div className="absolute -inset-10 bg-brand-medium/5 blur-3xl -z-10 rounded-full" />
+              </div>
+
+              <div className="lg:col-span-6 flex justify-center lg:justify-end min-h-[650px] relative">
+                 <div className="w-full max-w-[600px] relative">
+                    <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full" />
+                    <CardSwap width="100%" height="100%" cardDistance={50} verticalDistance={60}>
+                       <Card className="p-4 bg-gradient-to-br from-neutral-900 to-black border-white/5 shadow-2xl rounded-3xl overflow-hidden group/card">
+                          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                          <img src="/images/card-platinum.png" className="w-full h-full object-contain relative z-10" alt="Platinum" />
+                       </Card>
+                       <Card className="p-4 bg-gradient-to-br from-neutral-900 to-black border-white/5 shadow-2xl rounded-3xl overflow-hidden group/card">
+                          <div className="absolute inset-0 bg-success/5 opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                          <img src="/images/card-gold.png" className="w-full h-full object-contain relative z-10" alt="Gold" />
+                       </Card>
+                       <Card className="p-4 bg-gradient-to-br from-neutral-900 to-black border-white/5 shadow-2xl rounded-3xl overflow-hidden group/card">
+                          <div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                          <img src="/images/card-emerald.png" className="w-full h-full object-contain relative z-10" alt="Emerald" />
+                       </Card>
+                    </CardSwap>
+                 </div>
               </div>
            </div>
         </section>
 
-        {/* --- Footer: The Final Statement --- */}
-        <footer className="pt-40 pb-20 px-6 md:px-12 bg-[#010301]">
-           <div className="max-w-screen-2xl mx-auto space-y-32">
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-20">
-                 <div className="space-y-12">
-                    <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 rounded-full border border-brand-medium/30 flex items-center justify-center text-brand-medium font-serif font-bold italic">A</div>
-                       <span className="text-2xl font-serif font-bold tracking-tighter uppercase italic">AtlasPay</span>
-                    </div>
-                    <p className="text-gray-500 font-light text-sm leading-relaxed">
-                       Boulevard Al Messora Al khedra, Casablanca CFC, Morocco. <br />
-                       Regulated by the High Commission of Bank Al-Maghrib.
-                    </p>
-                    <div className="flex gap-6">
-                       {[Linkedin, Twitter, Instagram].map((Icon) => (
-                         <Link key={Icon.name} href="#" className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center text-gray-500 hover:text-brand-medium hover:border-brand-medium transition-all">
-                            <Icon className="w-5 h-5" />
-                         </Link>
-                       ))}
-                    </div>
-                 </div>
-
-                 <div className="space-y-8">
-                    <h5 className="text-[10px] uppercase tracking-[0.4em] font-bold text-brand-medium">The Vault</h5>
-                    <ul className="space-y-4 text-sm text-gray-500 font-light">
-                       <li><Link href="#" className="hover:text-white">Emerald Sovereign</Link></li>
-                       <li><Link href="#" className="hover:text-white">Riad Privilege</Link></li>
-                       <li><Link href="#" className="hover:text-white">Absolute Makhzen</Link></li>
-                       <li><Link href="#" className="hover:text-white">Vault Security</Link></li>
-                    </ul>
-                 </div>
-
-                 <div className="space-y-8">
-                    <h5 className="text-[10px] uppercase tracking-[0.4em] font-bold text-brand-medium">Elite Hub</h5>
-                    <ul className="space-y-4 text-sm text-gray-500 font-light">
-                       <li><Link href="#" className="hover:text-white">Private Office</Link></li>
-                       <li><Link href="#" className="hover:text-white">Diaspora Elite</Link></li>
-                       <li><Link href="#" className="hover:text-white">Asset Concierge</Link></li>
-                       <li><Link href="#" className="hover:text-white">Innovation Lab</Link></li>
-                    </ul>
-                 </div>
-
-                 <div className="space-y-10">
-                    <div className="p-10 border border-white/5 bg-white/[0.01] space-y-4">
-                       <Lock className="w-6 h-6 text-brand-medium" />
-                       <div className="text-xs uppercase tracking-widest font-bold">Encrypted Connection</div>
-                       <p className="text-[10px] text-gray-600 leading-relaxed uppercase tracking-widest">
-                          Your financial data is protected by military-grade SOC2 Type II protocols and sovereign encryption.
-                       </p>
-                    </div>
-                 </div>
+        {/* --- Final Statement --- */}
+        <section className="py-60 px-6 relative overflow-hidden">
+           <div className="absolute inset-0 bg-primary/5 blur-[150px] -z-10" />
+           <div className="max-w-5xl mx-auto text-center space-y-16">
+              <div className="space-y-6">
+                 <h2 className="text-7xl md:text-9xl font-display font-black tracking-tighter uppercase leading-[0.85]">
+                   Secure your <br /> <span className="text-primary italic">Sovereignty.</span>
+                 </h2>
+                 <p className="text-xl text-white/30 font-medium tracking-wide">Join the exclusive network of Moroccan elite banking.</p>
               </div>
+              
+              <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+                 <Link href="/register">
+                   <Button className="h-24 px-20 bg-primary text-white rounded-full text-sm font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(54,105,75,0.4)] transition-all hover:scale-105 hover:bg-success border-none">
+                     Create Free Account
+                   </Button>
+                 </Link>
+                 <Link href="/login" className="group">
+                    <span className="text-xs font-black uppercase tracking-widest text-white/40 group-hover:text-white transition-colors">
+                      Already a member? <span className="text-primary ml-2 group-hover:underline">Login</span>
+                    </span>
+                 </Link>
+              </div>
+           </div>
+        </section>
 
-              <div className="flex flex-col md:flex-row justify-between items-center gap-10 pt-16 border-t border-white/5">
-                 <div className="flex flex-wrap justify-center gap-12 text-[10px] text-gray-600 uppercase tracking-[0.5em] font-bold">
-                    <Link href="#">Privacy Vault</Link>
-                    <Link href="#">Sovereign Terms</Link>
-                    <Link href="#">Compliance</Link>
-                 </div>
-                 <div className="text-[10px] text-gray-700 uppercase tracking-[0.6em] font-bold italic">
-                    © 2026 ATLASPAY BANKING GROUP.
-                 </div>
+        {/* --- Footer --- */}
+        <footer className="py-24 px-6 border-t border-white/5 bg-black/40">
+           <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 md:p-8">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Zap className="w-5 h-5 fill-current" />
+                </div>
+                <span className="text-2xl font-display font-black tracking-tighter uppercase italic">AtlasPay</span>
+              </div>
+              <div className="flex gap-16 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
+                <a href="#" className="hover:text-primary transition-colors">Vault Privacy</a>
+                <a href="#" className="hover:text-primary transition-colors">Sovereign Terms</a>
+                <a href="#" className="hover:text-primary transition-colors">Global Compliance</a>
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-[0.5em] text-white/10">
+                © 2026 ATLASPAY BANKING GROUP
               </div>
            </div>
         </footer>
       </main>
-
-      <style>{`
-        :root {
-          --brand-medium: #76b182;
-          --brand-light: #c9e6c3;
-          --brand-dark: #36694b;
-        }
-        .text-brand-medium { color: var(--brand-medium); }
-        .bg-brand-medium { background-color: var(--brand-medium); }
-        .border-brand-medium { border-color: var(--brand-medium); }
-        .from-brand-medium { --tw-gradient-from: var(--brand-medium) !important; --tw-gradient-to: rgb(118 177 130 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
-        .to-brand-light { --tw-gradient-to: var(--brand-light) !important; }
-        .hover\\:text-brand-medium:hover { color: var(--brand-medium); }
-        .hover\\:bg-brand-light:hover { background-color: var(--brand-light); }
-        .hover\\:border-brand-medium:hover { border-color: var(--brand-medium); }
-        .selection\\:bg-brand-medium\\/30 *::selection { background-color: rgb(118 177 130 / 0.3); }
-
-        .moroccan-pattern {
-          background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L61.226 34.549H97.553L68.163 55.902L79.389 90.451L50 69.098L20.611 90.451L31.837 55.902L2.447 34.549H38.774L50 0Z' fill='%2376b182' fill-opacity='0.05'/%3E%3C/svg%3E");
-        }
-        .text-glow {
-          text-shadow: 0 0 30px rgba(118, 177, 130, 0.2);
-        }
-        .glass-card {
-          background: rgba(255, 255, 255, 0.02);
-          backdrop-filter: blur(20px);
-        }
-      `}</style>
     </div>
   );
 }
+

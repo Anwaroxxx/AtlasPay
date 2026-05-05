@@ -44,7 +44,7 @@ class CreditController extends Controller
         }
 
         try {
-            $interestRate = 0.05;
+            $interestRate = 0.08;
             $totalToPay = $request->amount * (1 + $interestRate);
 
             DB::transaction(function () use ($user, $request, $totalToPay, $interestRate) {

@@ -27,7 +27,26 @@ export function BankBot() {
         { role: 'bot', content: "Hi! I'm your **Bank Assistant**. How can I help you with your account or credits today?" }
     ]);
     const [isLoading, setIsLoading] = useState(false);
+    const [proactiveMsg, setProactiveMsg] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const insights = [
+            "Need to join a Daret? Check the Social tab!",
+            "Your credit score is looking healthy today.",
+            "Want to save for a goal? Use the Auto-Cut feature.",
+            "I can help you analyze your spending patterns."
+        ];
+        
+        const timer = setTimeout(() => {
+            if (!isOpen) {
+                setProactiveMsg(insights[Math.floor(Math.random() * insights.length)]);
+                setTimeout(() => setProactiveMsg(null), 8000);
+            }
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [isOpen]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -68,14 +87,14 @@ export function BankBot() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end pointer-events-none">
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-[100] flex flex-col items-end pointer-events-none">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: 50, scale: 0.9, filter: 'blur(10px)' }}
                         animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: 50, scale: 0.9, filter: 'blur(10px)' }}
-                        className="mb-6 w-[350px] md:w-[400px] overflow-hidden rounded-[2.5rem] border border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 pointer-events-auto"
+                        className="mb-6 w-[350px] md:w-[400px] overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 pointer-events-auto"
                     >
                         {/* Header */}
                         <div className="relative flex items-center justify-between bg-emerald-500 p-5 text-neutral-900">
@@ -153,6 +172,23 @@ export function BankBot() {
                 )}
             </AnimatePresence>
 
+            <AnimatePresence>
+                {proactiveMsg && !isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: 20, scale: 0.8 }}
+                        className="mb-4 mr-2 max-w-[200px] rounded-2xl bg-neutral-900 p-4 text-[10px] font-bold text-emerald-500 shadow-2xl border border-emerald-500/20 pointer-events-auto"
+                    >
+                        <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="h-3 w-3" />
+                            <span className="uppercase tracking-[0.2em]">Assistant</span>
+                        </div>
+                        <p className="text-white leading-relaxed">{proactiveMsg}</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Toggle Button */}
             <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -165,3 +201,4 @@ export function BankBot() {
         </div>
     );
 }
+

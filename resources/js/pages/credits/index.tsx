@@ -11,13 +11,28 @@ import {
     ShieldCheck,
     Zap,
     Info,
-    History
+    History,
+    ChevronDown,
+    BrainCircuit,
+    AlertCircle,
+    ArrowUpCircle,
+    ArrowDownCircle,
+    CircleDashed,
+    Target
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+    RadialBarChart, 
+    RadialBar, 
+    ResponsiveContainer, 
+    PolarAngleAxis,
+    Tooltip
+} from 'recharts';
 
 interface Credit {
     id: number;
@@ -36,6 +51,12 @@ interface Props {
     creditScore: number;
     maxCreditAmount: number;
 }
+
+const scoreTips = [
+    { title: "Account Balance", desc: "Maintain a balance above 2,000 MAD for better credit eligibility.", impact: "+45 pts" },
+    { title: "On-time Payments", desc: "Pay your credit installments before the due date to boost your score.", impact: "+30 pts" },
+    { title: "Regular Activity", desc: "Use AtlasPay for your daily transactions to show consistent account usage.", impact: "+15 pts" }
+];
 
 export default function Credits({ credits, activeCredit, creditScore, maxCreditAmount }: Props) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -62,174 +83,187 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
         }
     };
 
-    const item = {
+    const item: any = {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
     };
 
-    const scorePercentage = (creditScore / 1000) * 100;
-    const scoreColor = creditScore >= 700 ? 'text-emerald-500' : creditScore >= 500 ? 'text-amber-500' : 'text-rose-500';
+    const radialData = [{ name: 'Score', value: creditScore, fill: creditScore >= 700 ? 'var(--color-success)' : creditScore >= 500 ? 'var(--color-warning)' : 'var(--color-destructive)' }];
+
+    const totalBorrowed = credits.reduce((acc, c) => acc + c.amount, 0);
+    const totalOwed = activeCredit ? (activeCredit.total_to_pay - activeCredit.repaid_amount) : 0;
 
     return (
         <>
-            <Head title="Credits" />
+            <Head title="Credits & Loans" />
             
             <motion.div 
                 variants={container} 
                 initial="hidden" 
                 animate="show" 
-                className="flex flex-1 flex-col gap-6 md:gap-10 p-4 md:p-8"
+                className="flex flex-1 flex-col gap-8 p-6 md:p-6 md:p-8 max-w-7xl mx-auto w-full"
             >
                 {/* Header */}
-                <motion.div variants={item} className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2 text-emerald-500">
-                        <Zap className="h-5 w-5 fill-current" />
-                        <span className="text-xs font-black uppercase tracking-[0.2em]">Bank Credits</span>
+                <motion.div variants={item} className="space-y-4">
+                    <div className="flex items-center gap-2 text-primary">
+                        <div className="p-1.5 rounded-lg bg-primary/10">
+                            <Zap className="h-5 w-5 fill-current" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Credit Management</span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tighter text-neutral-900 sm:text-4xl md:text-6xl dark:text-neutral-50">
-                        Quick <span className="text-emerald-500">Credits.</span>
+                    <h1 className="font-display text-4xl font-black tracking-tighter md:text-6xl uppercase leading-none">
+                        Credit <span className="text-primary italic">Access.</span>
                     </h1>
-                    <p className="max-w-2xl text-sm md:text-base text-neutral-500 dark:text-neutral-400">
-                        Get instant access to funds based on your credit score. No hidden fees, just straightforward banking.
+                    <p className="max-w-2xl text-muted-foreground text-sm md:text-base font-medium">
+                        Apply for credit instantly based on your account activity. Transparent rates and flexible repayment options.
                     </p>
                 </motion.div>
 
-                <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-                    {/* Credit Score Gauge */}
-                    <motion.div variants={item} className="lg:col-span-1">
-                        <Card className="relative h-full overflow-hidden border-none bg-neutral-900 text-white shadow-[0_30px_60px_-15px_rgba(16,185,129,0.3)] dark:bg-neutral-950 rounded-2xl md:rounded-[2.5rem]">
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent" />
-                            <CardHeader className="relative z-10 pb-2">
-                                <CardTitle className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
-                                    <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                                    Your Credit Rating
+                <div className="grid gap-8 lg:grid-cols-12">
+                    {/* Credit Score Gauge & Tips */}
+                    <motion.div variants={item} className="lg:col-span-4 space-y-8">
+                        <Card className="relative overflow-hidden border-none bg-neutral-900 text-white shadow-elevated rounded-3xl dark:bg-black">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
+                            <div className="absolute inset-0 moroccan-pattern opacity-[0.03]" />
+                            
+                            <CardHeader className="relative z-10 p-8 pb-0">
+                                <CardTitle className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                                    <ShieldCheck className="h-4 w-4 text-primary" />
+                                    Credit Score
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="relative z-10 flex flex-col items-center justify-center py-10">
-                                <div className="relative flex h-52 w-52 items-center justify-center">
-                                    <svg className="h-full w-full transform -rotate-90">
-                                        <circle
-                                            cx="104"
-                                            cy="104"
-                                            r="90"
-                                            fill="transparent"
-                                            stroke="rgba(255,255,255,0.05)"
-                                            strokeWidth="16"
-                                        />
-                                        <motion.circle
-                                            cx="104"
-                                            cy="104"
-                                            r="90"
-                                            fill="transparent"
-                                            stroke="currentColor"
-                                            strokeWidth="16"
-                                            strokeDasharray={565}
-                                            initial={{ strokeDashoffset: 565 }}
-                                            animate={{ strokeDashoffset: 565 - (565 * scorePercentage) / 100 }}
-                                            transition={{ duration: 2, ease: "circOut" }}
-                                            strokeLinecap="round"
-                                            className={scoreColor}
-                                        />
-                                    </svg>
-                                    <div className="absolute flex flex-col items-center justify-center">
-                                        <motion.span 
-                                            initial={{ scale: 0.5, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            className="text-6xl font-black tracking-tighter"
+                            
+                            <CardContent className="relative z-10 p-8 flex flex-col items-center">
+                                <div className="h-64 w-full relative">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadialBarChart 
+                                            cx="50%" 
+                                            cy="50%" 
+                                            innerRadius="70%" 
+                                            outerRadius="100%" 
+                                            barSize={12} 
+                                            data={radialData} 
+                                            startAngle={180} 
+                                            endAngle={0}
                                         >
-                                            {creditScore}
-                                        </motion.span>
-                                        <span className="text-[10px] font-bold text-neutral-500 uppercase">Score</span>
+                                            <PolarAngleAxis
+                                                type="number"
+                                                domain={[0, 1000]}
+                                                angleAxisId={0}
+                                                tick={false}
+                                            />
+                                            <RadialBar
+                                                background
+                                                dataKey="value"
+                                                cornerRadius={30}
+                                                animationDuration={1500}
+                                            />
+                                        </RadialBarChart>
+                                    </ResponsiveContainer>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center pt-8">
+                                        <span className="text-7xl font-black tracking-tight">{creditScore}</span>
+                                        <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest">Points</span>
                                     </div>
                                 </div>
                                 
-                                <div className="mt-10 w-full space-y-4">
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-[10px] uppercase text-neutral-500 font-bold">Max Limit</p>
-                                            <p className="text-2xl font-black text-emerald-400">{maxCreditAmount.toLocaleString()} <span className="text-xs font-normal">MAD</span></p>
+                                <div className="w-full mt-4 space-y-4">
+                                    <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                                        <div className="space-y-0.5">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">Credit Limit</p>
+                                            <p className="text-xl font-black text-primary">{maxCreditAmount.toLocaleString()} MAD</p>
                                         </div>
-                                        <Badge className="bg-emerald-500/10 text-emerald-500 border-none px-3 py-1">
-                                            {creditScore >= 700 ? 'EXCELLENT' : creditScore >= 500 ? 'GOOD' : 'REBUILDING'}
+                                        <Badge className={`font-black text-[9px] border-none px-3 py-1 ${creditScore >= 700 ? 'bg-success text-white' : 'bg-warning text-black'}`}>
+                                            {creditScore >= 700 ? 'EXCELLENT' : 'GOOD'}
                                         </Badge>
                                     </div>
-                                    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                                        <motion.div 
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${scorePercentage}%` }}
-                                            className={`h-full rounded-full ${scoreColor} bg-current`} 
-                                        />
-                                    </div>
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border border-border shadow-soft rounded-3xl bg-card p-8 glass-card">
+                            <CardHeader className="p-0 mb-6">
+                                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                                    <BrainCircuit className="h-4 w-4 text-primary" />
+                                    How to Improve
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0 space-y-4">
+                                {scoreTips.map((tip, i) => (
+                                    <div key={i} className="group p-4 rounded-2xl bg-muted/20 border border-border/50 hover:border-primary/30 transition-all">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <p className="text-xs font-black uppercase tracking-tight">{tip.title}</p>
+                                            <span className="text-[10px] font-black text-success">{tip.impact}</span>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground leading-relaxed font-medium">{tip.desc}</p>
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     </motion.div>
 
                     {/* Active Credit or Request Form */}
-                    <motion.div variants={item} className="lg:col-span-2">
+                    <motion.div variants={item} className="lg:col-span-8 space-y-8">
                         <AnimatePresence mode="wait">
                             {activeCredit ? (
                                 <motion.div
                                     key="active"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
                                     className="h-full"
                                 >
-                                    <Card className="h-full border-none shadow-2xl bg-white dark:bg-neutral-900/50 relative overflow-hidden group rounded-2xl md:rounded-[2.5rem]">
-                                        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-                                            <Zap className="h-64 w-64" />
+                                    <Card className="h-full border-none shadow-elevated bg-card relative overflow-hidden group rounded-3xl glass-card">
+                                        <div className="absolute top-0 right-0 p-6 md:p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                            <Zap className="h-80 w-80" />
                                         </div>
-                                        <CardHeader>
+                                        <CardHeader className="p-6 pb-0">
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <CardTitle className="text-2xl font-black">Active Credit</CardTitle>
-                                                    <CardDescription>Details of your current loan.</CardDescription>
+                                                    <CardTitle className="text-3xl font-black tracking-tight uppercase">Active <span className="text-primary italic">Credit.</span></CardTitle>
+                                                    <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1">Current Repayment Status</CardDescription>
                                                 </div>
-                                                <Badge className="bg-emerald-500 text-neutral-900 font-black animate-pulse">
-                                                    ACTIVE
-                                                </Badge>
+                                                <div className="h-3 w-3 rounded-full bg-primary" />
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="space-y-8">
+                                        <CardContent className="p-6 space-y-10">
                                             <div className="grid gap-6 md:grid-cols-3">
-                                                <div className="p-4 rounded-3xl bg-neutral-50 dark:bg-neutral-800/50 space-y-1">
-                                                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Left to Pay</p>
-                                                    <p className="text-2xl font-black">{(activeCredit.total_to_pay - activeCredit.repaid_amount).toLocaleString()} <span className="text-xs font-normal">MAD</span></p>
+                                                <div className="p-6 rounded-2xl bg-muted/30 border border-border/50 space-y-2">
+                                                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Amount Owed</p>
+                                                    <p className="text-3xl font-black tracking-tight">{(activeCredit.total_to_pay - activeCredit.repaid_amount).toLocaleString()} <span className="text-xs font-normal">MAD</span></p>
                                                 </div>
-                                                <div className="p-4 rounded-3xl bg-neutral-50 dark:bg-neutral-800/50 space-y-1">
-                                                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Due Date</p>
-                                                    <p className="text-lg font-bold flex items-center gap-2">
-                                                        <Clock className="h-4 w-4 text-emerald-500" />
+                                                <div className="p-6 rounded-2xl bg-muted/30 border border-border/50 space-y-2">
+                                                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Due Date</p>
+                                                    <p className="text-xl font-black flex items-center gap-3">
+                                                        <Clock className="h-5 w-5 text-primary" />
                                                         {new Date(activeCredit.due_date).toLocaleDateString()}
                                                     </p>
                                                 </div>
-                                                <div className="p-4 rounded-3xl bg-neutral-50 dark:bg-neutral-800/50 space-y-1">
-                                                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Interest</p>
-                                                    <p className="text-lg font-bold text-emerald-500">{activeCredit.interest_rate}% Fixed</p>
+                                                <div className="p-6 rounded-2xl bg-muted/30 border border-border/50 space-y-2">
+                                                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Interest Rate</p>
+                                                    <p className="text-xl font-black text-primary uppercase tracking-tight">{activeCredit.interest_rate}% Fixed</p>
                                                 </div>
                                             </div>
                                             
-                                            <div className="space-y-3">
-                                                <div className="flex justify-between items-end">
-                                                    <span className="text-xs font-black uppercase tracking-widest text-neutral-500">Repayment Progress</span>
-                                                    <span className="text-2xl font-black">{Math.round((activeCredit.repaid_amount / activeCredit.total_to_pay) * 100)}%</span>
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-end px-2">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Repayment Progress</span>
+                                                    <span className="text-3xl font-black tracking-tighter">{Math.round((activeCredit.repaid_amount / activeCredit.total_to_pay) * 100)}%</span>
                                                 </div>
-                                                <div className="h-4 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden p-1">
+                                                <div className="h-6 w-full rounded-full bg-muted/50 border border-border/50 overflow-hidden p-1.5">
                                                     <motion.div 
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${(activeCredit.repaid_amount / activeCredit.total_to_pay) * 100}%` }}
-                                                        className="h-full rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                                                        className="h-full rounded-full bg-primary"
                                                     />
                                                 </div>
                                             </div>
 
                                             <Button 
                                                 onClick={() => repay(activeCredit.id)}
-                                                className="w-full h-14 rounded-2xl bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-900 font-black text-lg"
+                                                className="w-full h-20 rounded-2xl bg-primary text-primary-foreground font-black text-xl uppercase tracking-widest shadow-elevated group"
                                                 disabled={processing}
                                             >
-                                                Pay Back Now
+                                                Pay Installment <ArrowRight className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-2" />
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -237,65 +271,75 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                             ) : (
                                 <motion.div
                                     key="apply"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
                                     className="h-full"
                                 >
-                                    <Card className="h-full border-none shadow-2xl rounded-2xl md:rounded-[2.5rem]">
-                                        <CardHeader>
-                                            <CardTitle className="text-2xl font-black">Get Credit</CardTitle>
-                                            <CardDescription>Instant funds based on your rating.</CardDescription>
+                                    <Card className="h-full border-none shadow-elevated rounded-3xl bg-card p-2">
+                                        <CardHeader className="p-8 pb-4">
+                                            <CardTitle className="text-3xl font-black uppercase tracking-tight">Request <span className="text-primary italic">Credit.</span></CardTitle>
+                                            <CardDescription className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Get instant funding for your needs</CardDescription>
                                         </CardHeader>
-                                        <CardContent>
-                                            <form onSubmit={submit} className="space-y-6">
-                                                <div className="grid gap-6 md:grid-cols-2">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-xs font-black uppercase tracking-widest text-neutral-400">Amount (MAD)</Label>
+                                        <CardContent className="p-8 pt-4">
+                                            <form onSubmit={submit} className="space-y-8">
+                                                <div className="grid gap-8 md:grid-cols-2">
+                                                    <div className="space-y-3">
+                                                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Loan Amount (MAD)</Label>
                                                         <div className="relative group">
-                                                            <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400 group-focus-within:text-emerald-500 transition-colors" />
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors flex items-center justify-center font-black">DH</div>
                                                             <Input
                                                                 type="number"
                                                                 placeholder="0.00"
-                                                                className="h-14 pl-12 rounded-2xl border-neutral-100 bg-neutral-50 focus:ring-emerald-500/20 text-xl font-black"
+                                                                className="h-16 pl-14 pr-6 rounded-2xl bg-muted/20 border-border/50 text-2xl font-black focus:ring-primary/10 transition-all"
                                                                 value={data.amount}
                                                                 onChange={e => setData('amount', e.target.value)}
                                                             />
                                                         </div>
-                                                        {errors.amount && <p className="text-xs text-rose-500 font-bold">{errors.amount}</p>}
+                                                        {errors.amount && <p className="text-xs text-destructive font-black px-1">{errors.amount}</p>}
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-xs font-black uppercase tracking-widest text-neutral-400">Duration</Label>
-                                                        <select
-                                                            className="h-14 w-full rounded-2xl border-neutral-100 bg-neutral-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                                            value={data.duration_months}
-                                                            onChange={e => setData('duration_months', e.target.value)}
+                                                    <div className="space-y-3">
+                                                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Repayment Term</Label>
+                                                        <Select 
+                                                            value={data.duration_months} 
+                                                            onValueChange={(v) => setData('duration_months', v)}
                                                         >
-                                                            <option value="1">1 Month</option>
-                                                            <option value="3">3 Months</option>
-                                                            <option value="6">6 Months</option>
-                                                            <option value="12">12 Months</option>
-                                                        </select>
+                                                            <SelectTrigger className="h-16 rounded-2xl bg-muted/20 border-border/50 text-sm font-black px-6 uppercase tracking-widest">
+                                                                <SelectValue placeholder="Select Duration" />
+                                                            </SelectTrigger>
+                                                            <SelectContent className="rounded-2xl">
+                                                                <SelectItem value="1">1 Month</SelectItem>
+                                                                <SelectItem value="3">3 Months</SelectItem>
+                                                                <SelectItem value="6">6 Months</SelectItem>
+                                                                <SelectItem value="12">12 Months</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
                                                     </div>
                                                 </div>
 
-                                                <div className="rounded-[2rem] bg-emerald-500/5 p-6 border border-emerald-500/10 flex items-center justify-between">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="h-12 w-12 rounded-2xl bg-emerald-500 text-neutral-900 flex items-center justify-center">
-                                                            <Info className="h-6 w-6" />
+                                                <div className="rounded-2xl bg-primary/5 p-8 border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-all hover:bg-primary/10">
+                                                    <div className="flex items-center gap-5">
+                                                        <div className="h-16 w-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+                                                            <Info className="h-8 w-8" />
                                                         </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black uppercase text-neutral-500">Total to Repay</p>
-                                                            <p className="text-2xl font-black text-emerald-600">
-                                                                {data.amount ? (Number(data.amount) * 1.05).toLocaleString() : '0'} <span className="text-xs font-normal">MAD</span>
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Repayment Amount</p>
+                                                            <p className="text-3xl font-black text-primary tracking-tight">
+                                                                {data.amount ? (Number(data.amount) * 1.08).toLocaleString() : '0'} <span className="text-xs font-normal">MAD</span>
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <Badge className="bg-emerald-500 text-neutral-900 font-black">5% FIXED RATE</Badge>
+                                                    <div className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest shadow-soft">
+                                                        8% Fixed Interest Rate
+                                                    </div>
                                                 </div>
 
-                                                <Button type="submit" className="w-full h-14 rounded-2xl bg-emerald-500 text-neutral-900 hover:bg-emerald-400 font-black text-lg shadow-[0_15px_30px_-5px_rgba(16,185,129,0.4)]" disabled={processing || !data.amount}>
-                                                    Get Funds Now <ArrowRight className="ml-2 h-5 w-5" />
+                                                <Button 
+                                                    type="submit" 
+                                                    className="w-full h-20 rounded-3xl bg-primary text-primary-foreground font-black text-xl uppercase tracking-[0.2em] shadow-elevated group" 
+                                                    disabled={processing || !data.amount}
+                                                >
+                                                    Apply Now <ArrowRight className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-3" />
                                                 </Button>
                                             </form>
                                         </CardContent>
@@ -303,64 +347,104 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {/* Balance Summary */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <Card className="border border-border shadow-soft rounded-3xl bg-card p-8 flex items-center justify-between group hover:border-primary/30 transition-colors">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Current Debt</p>
+                                    <p className="text-3xl font-black tracking-tighter text-destructive">{totalOwed.toLocaleString()} <span className="text-xs font-normal">MAD</span></p>
+                                    <p className="text-[8px] font-bold uppercase text-muted-foreground/40 italic">Active Liabilities</p>
+                                </div>
+                                <div className="h-16 w-16 rounded-3xl bg-destructive/10 text-destructive flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <ArrowUpCircle className="h-8 w-8" />
+                                </div>
+                            </Card>
+                            <Card className="border border-border shadow-soft rounded-3xl bg-card p-8 flex items-center justify-between group hover:border-success/30 transition-colors">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Total Borrowed</p>
+                                    <p className="text-3xl font-black tracking-tighter text-success">{totalBorrowed.toLocaleString()} <span className="text-xs font-normal">MAD</span></p>
+                                    <p className="text-[8px] font-bold uppercase text-muted-foreground/40 italic">Credit History</p>
+                                </div>
+                                <div className="h-16 w-16 rounded-3xl bg-success/10 text-success flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <ArrowDownCircle className="h-8 w-8" />
+                                </div>
+                            </Card>
+                        </div>
                     </motion.div>
                 </div>
 
                 {/* Credit History */}
                 <motion.div variants={item}>
-                    <Card className="border-none shadow-xl overflow-hidden rounded-2xl md:rounded-[2.5rem]">
-                        <CardHeader className="border-b border-neutral-50 dark:border-neutral-800">
-                            <CardTitle className="flex items-center gap-2">
-                                <History className="h-5 w-5 text-neutral-400" />
-                                Credit History
-                            </CardTitle>
+                    <Card className="border-none shadow-elevated overflow-hidden rounded-3xl bg-card">
+                        <CardHeader className="p-6 border-b border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <CardTitle className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight">
+                                    <History className="h-6 w-6 text-primary" />
+                                    Credit <span className="text-primary italic">History.</span>
+                                </CardTitle>
+                                <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1">Previous and active credit records</CardDescription>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
+                                    <CircleDashed className="h-3.5 w-3.5 text-primary" /> Records Updated
+                                </div>
+                            </div>
                         </CardHeader>
                         <CardContent className="p-0 overflow-x-auto">
-                            <table className="w-full text-left text-sm text-neutral-500">
-                                <thead className="bg-neutral-50 text-[10px] uppercase font-black tracking-widest text-neutral-400 dark:bg-neutral-950/50">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-muted/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border">
                                     <tr>
-                                        <th className="px-8 py-5">Amount</th>
-                                        <th className="px-8 py-5">Total Due</th>
-                                        <th className="px-8 py-5 text-center">Status</th>
-                                        <th className="px-8 py-5">Due Date</th>
-                                        <th className="px-8 py-5 text-right">Requested On</th>
+                                        <th className="px-10 py-6">Amount</th>
+                                        <th className="px-10 py-6">Total to Pay</th>
+                                        <th className="px-10 py-6 text-center">Status</th>
+                                        <th className="px-10 py-6">Due Date</th>
+                                        <th className="px-10 py-6 text-right">Request Date</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-border">
                                     {credits.map((credit) => (
-                                        <tr key={credit.id} className="border-b border-neutral-50 hover:bg-neutral-50/50 dark:border-neutral-900 dark:hover:bg-neutral-800/30 transition-colors">
-                                            <td className="px-8 py-6 font-black text-neutral-900 dark:text-neutral-50 text-lg">
-                                                {credit.amount.toLocaleString()} <span className="text-[10px] font-normal text-neutral-500">MAD</span>
+                                        <tr key={credit.id} className="group hover:bg-primary/5 transition-colors">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${credit.status === 'paid' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
+                                                        <Target className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-black text-xl tracking-tight leading-none mb-1">{credit.amount.toLocaleString()} <span className="text-[10px] font-normal text-muted-foreground">MAD</span></p>
+                                                        <p className="text-[8px] font-black uppercase tracking-widest opacity-40">ID: #{credit.id}</p>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td className="px-8 py-6 font-bold">
+                                            <td className="px-10 py-8 font-bold text-muted-foreground">
                                                 {credit.total_to_pay.toLocaleString()} MAD
                                             </td>
-                                            <td className="px-8 py-6 text-center">
-                                                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
-                                                    credit.status === 'paid' ? 'bg-emerald-500/10 text-emerald-600' :
-                                                    credit.status === 'active' ? 'bg-blue-500/10 text-blue-600' :
-                                                    'bg-rose-500/10 text-rose-600'
+                                            <td className="px-10 py-8 text-center">
+                                                <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border ${
+                                                    credit.status === 'paid' ? 'bg-success/10 text-success border-success/20' :
+                                                    credit.status === 'active' ? 'bg-primary/10 text-primary border-primary/20' :
+                                                    'bg-destructive/10 text-destructive border-destructive/20'
                                                 }`}>
                                                     <div className={`h-1.5 w-1.5 rounded-full ${
-                                                        credit.status === 'paid' ? 'bg-emerald-500' :
-                                                        credit.status === 'active' ? 'bg-blue-500 animate-pulse' :
-                                                        'bg-rose-500'
+                                                        credit.status === 'paid' ? 'bg-success' :
+                                                        credit.status === 'active' ? 'bg-primary' :
+                                                        'bg-destructive'
                                                     }`} />
                                                     {credit.status}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6 text-xs font-medium">
+                                            <td className="px-10 py-8 text-xs font-bold text-muted-foreground">
                                                 {new Date(credit.due_date).toLocaleDateString()}
                                             </td>
-                                            <td className="px-8 py-6 text-right text-xs text-neutral-400 font-mono">
+                                            <td className="px-10 py-8 text-right text-xs text-muted-foreground/50 font-mono">
                                                 {new Date(credit.created_at).toLocaleDateString()}
                                             </td>
                                         </tr>
                                     ))}
                                     {credits.length === 0 && (
                                         <tr>
-                                            <td colSpan={5} className="px-8 py-20 text-center text-neutral-400 italic text-sm">
-                                                No previous credits found.
+                                            <td colSpan={5} className="px-10 py-32 text-center text-muted-foreground italic font-medium opacity-50">
+                                                No previous credit records found.
                                             </td>
                                         </tr>
                                     )}
@@ -377,8 +461,9 @@ export default function Credits({ credits, activeCredit, creditScore, maxCreditA
 Credits.layout = {
     breadcrumbs: [
         {
-            title: 'Credits',
+            title: 'Credits & Loans',
             href: '/credits',
         },
     ],
 };
+

@@ -15,65 +15,94 @@ class GroqService
         $this->apiKey = env('GROQ_API_KEY');
     }
 
-    public function analyzeSpending(array $transactions, array $budgets): string
+    public function chat(array $messages, string $systemPrompt = ''): string
     {
         if (empty($this->apiKey)) {
-            return "GROQ_API_KEY is not configured. Please add it to your .env file.";
+            return "GROQ_API_KEY is not configured.";
         }
 
-        $prompt = $this->buildPrompt($transactions, $budgets);
+        $allMessages = [];
+        if ($systemPrompt) {
+            $allMessages[] = ['role' => 'system', 'content' => $systemPrompt];
+        }
+        $allMessages = array_merge($allMessages, $messages);
 
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->baseUrl, [
-                'model' => 'mixtral-8x7b-32768', // Or another Groq model
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'You are a professional financial advisor AI. Analyze the user\'s spending patterns and provide actionable insights, warnings, and suggestions. Keep your response concise, professional, and formatted in markdown.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $prompt
-                    ]
-                ],
+            ])->withoutVerifying()
+            ->post($this->baseUrl, [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => $allMessages,
                 'temperature' => 0.7,
             ]);
 
-            if ($response->successful()) {
-                return $response->json('choices.0.message.content');
-            }
-
-            Log::error('Groq API Error: ' . $response->body());
-            return "Sorry, I couldn't analyze your spending at this moment.";
-
+            return $response->successful() ? $response->json('choices.0.message.content') : "Error: " . $response->body();
         } catch (\Exception $e) {
-            Log::error('Groq Exception: ' . $e->getMessage());
-            return "An error occurred while connecting to the AI service.";
+            return "Exception: " . $e->getMessage();
         }
     }
 
-    protected function buildPrompt(array $transactions, array $budgets): string
+    public function analyzeSpending(array $transactions, array $budgets): array
     {
-        $prompt = "Here is the user's financial data for the current month:\n\n";
-        
-        $prompt .= "### Transactions by Category:\n";
-        foreach ($transactions as $cat => $amount) {
-            $prompt .= "- $cat: $amount MAD\n";
+        if (empty($this->apiKey)) {
+            return [
+                'summary' => 'API Key missing.',
+                'critical_insight' => 'Please configure Groq.',
+                'recommendations' => []
+            ];
         }
 
-        if (!empty($budgets)) {
-            $prompt .= "\n### Budgets vs Actual Spending:\n";
-            foreach ($budgets as $cat => $budget) {
-                $actual = $transactions[$cat] ?? 0;
-                $prompt .= "- $cat: Budget: $budget MAD, Actual: $actual MAD\n";
+        $data = "Categories: " . json_encode($transactions) . " | Budgets: " . json_encode($budgets);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->withoutVerifying()
+            ->post($this->baseUrl, [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are SmartBanking AI. Analyze the data and return ONLY a JSON object.
+                        Format:
+                        {
+                          "summary": "1-2 sharp sentences about the month",
+                          "critical_insight": "One major warning or highlight",
+                          "recommendations": ["tip 1", "tip 2"]
+                        }'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $data
+                    ]
+                ],
+                'temperature' => 0.6,
+            ]);
+
+            if ($response->successful()) {
+                $clean = trim(str_replace(['```json', '```'], '', $response->json('choices.0.message.content')));
+                return json_decode($clean, true) ?: [
+                    'summary' => $response->json('choices.0.message.content'),
+                    'critical_insight' => 'Analysis complete.',
+                    'recommendations' => ['Review your spending manually.']
+                ];
             }
+
+            return [
+                'summary' => 'Analysis unavailable.',
+                'critical_insight' => 'Network error.',
+                'recommendations' => []
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'summary' => 'Analysis exception.',
+                'critical_insight' => $e->getMessage(),
+                'recommendations' => []
+            ];
         }
-
-        $prompt .= "\nPlease provide:\n1. A summary of the spending patterns.\n2. Identification of any overspending or near-limit categories.\n3. Three specific, actionable tips to improve their financial health.";
-
-        return $prompt;
     }
 }

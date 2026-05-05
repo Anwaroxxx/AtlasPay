@@ -38,7 +38,7 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'password' => $input['password'],
             'address' => $input['address'],
-            'goverment_id' => $input["goverment_id"]
+            'government_id' => $input["government_id"]
         ]);
 
         // creating an account 
@@ -61,3 +61,4 @@ class CreateNewUser implements CreatesNewUsers
         return $user ;
     }
 }
+

@@ -1,5 +1,13 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { 
+    LayoutGrid, 
+    Target, 
+    RotateCcw, 
+    BrainCircuit, 
+    History,
+    CreditCard,
+    Wallet,
+    Link
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -15,6 +23,8 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
+import { Link as InertiaLink } from '@inertiajs/react';
+import { FolderGit2, BookOpen } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -22,17 +32,47 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Transactions',
+        href: '/reports/transactions',
+        icon: History,
+    },
+    {
+        title: 'Send Money',
+        href: '/transfer',
+        icon: Wallet,
+    },
+    {
+        title: 'Savings',
+        href: '/savings',
+        icon: Target,
+    },
+    {
+        title: 'Daret Groups',
+        href: '/daret',
+        icon: RotateCcw,
+    },
+    {
+        title: 'Credits & Loans',
+        href: '/credits',
+        icon: CreditCard,
+    },
+    {
+        title: 'SmartBanking AI',
+        href: '/anwar',
+        icon: BrainCircuit,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/ayoub-ennaciri/bank-chafara',
         icon: FolderGit2,
     },
     {
         title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        href: 'https://laravel.com/docs',
         icon: BookOpen,
     },
 ];
@@ -44,9 +84,9 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <InertiaLink href={dashboard()} prefetch>
                                 <AppLogo />
-                            </Link>
+                            </InertiaLink>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

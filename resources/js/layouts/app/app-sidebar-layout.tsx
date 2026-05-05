@@ -1,31 +1,25 @@
 import { CustomSidebar } from '@/components/custom-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import type { AppLayoutProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { 
-    Menu, 
-    X, 
     LayoutGrid, 
     ArrowUpRight, 
     Activity, 
     CreditCard, 
-    User, 
-    Settings, 
-    LogOut,
-    Zap 
+    Plus,
+    Users,
+    Bot,
+    Search,
+    Bell,
+    Zap
 } from 'lucide-react';
-
-const mobileNavItems = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
-    { title: 'Transfer', href: '/transfer', icon: ArrowUpRight },
-    { title: 'Transactions', href: '/reports/transactions', icon: Activity },
-    { title: 'Credits', href: '/credits', icon: CreditCard },
-    { title: 'My Profile', href: '/settings/profile', icon: User },
-    { title: 'Security', href: '/settings/security', icon: Settings },
-];
+import { ThemeToggle } from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import i18n from '@/i18n';
 
 export default function AppSidebarLayout({
     children,
@@ -33,107 +27,94 @@ export default function AppSidebarLayout({
 }: AppLayoutProps) {
     const { props, url } = usePage();
     const sidebarOpen = (props as any).sidebarOpen ?? true;
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const auth = (props as any).auth;
+    const currentLocale = (props as any).locale || 'en';
+    const [notifications, setNotifications] = useState<any[]>([]);
+
+    useEffect(() => {
+        i18n.changeLanguage(currentLocale);
+    }, [currentLocale]);
+
+    useEffect(() => {
+        if (auth?.user) {
+            // Listen for transactions
+            (window as any).Echo?.private(`App.Models.User.${auth.user.id}`)
+                .listen('.transaction.created', (e: any) => {
+                    toast.success(e.isIncoming ? `Money Received!` : `Money Sent!`, {
+                        description: `${Number(e.transaction.amount).toLocaleString()} MAD - ${e.transaction.description}`,
+                    });
+                    setNotifications(prev => [e, ...prev]);
+                });
+
+            // Listen for Daret invitations
+            (window as any).Echo?.private(`App.Models.User.${auth.user.id}`)
+                .listen('.daret.invitation', (e: any) => {
+                    toast.success(`New Daret Invitation!`, {
+                        description: `${e.group.creator.first_name} invited you to join "${e.group.name}"`,
+                        action: {
+                            label: 'View',
+                            onClick: () => (window as any).Inertia.visit('/daret')
+                        }
+                    });
+                    setNotifications(prev => [e, ...prev]);
+                });
+        }
+
+        return () => {
+            if (auth?.user) {
+                (window as any).Echo?.leave(`App.Models.User.${auth.user.id}`);
+            }
+        };
+    }, [auth?.user]);
 
     return (
         <SidebarProvider defaultOpen={sidebarOpen}>
-            <div className="flex min-h-screen w-full bg-white dark:bg-neutral-950">
-                <CustomSidebar />
+            <div dir={currentLocale === 'ar' ? 'rtl' : 'ltr'} className="flex min-h-screen w-full bg-background text-foreground transition-colors duration-500">
+                {/* Desktop sidebar — hidden on mobile */}
+                <div className="hidden md:block">
+                    <CustomSidebar />
+                </div>
                 
-                {/* Mobile Menu Overlay */}
-                <AnimatePresence>
-                    {mobileMenuOpen && (
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm md:hidden"
-                                onClick={() => setMobileMenuOpen(false)}
-                            />
-                            <motion.div
-                                initial={{ x: -300, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                exit={{ x: -300, opacity: 0 }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className="fixed left-0 top-0 z-[70] h-full w-72 bg-white dark:bg-[#050505] shadow-2xl md:hidden flex flex-col"
-                            >
-                                {/* Mobile Logo */}
-                                <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-900">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-900 text-emerald-500">
-                                            <Zap className="h-4 w-4 fill-current" />
-                                        </div>
-                                        <span className="text-lg font-black tracking-tighter text-neutral-900 dark:text-white">Atlas<span className="text-emerald-500">Pay</span></span>
-                                    </div>
-                                    <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                        <X className="h-5 w-5 text-neutral-400" />
-                                    </button>
-                                </div>
-
-                                {/* Mobile Nav */}
-                                <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-                                    {mobileNavItems.map((item) => {
-                                        const isActive = url.startsWith(item.href);
-                                        return (
-                                            <Link
-                                                key={item.title}
-                                                href={item.href}
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
-                                                    isActive
-                                                    ? 'bg-emerald-500 text-neutral-900 font-bold shadow-lg'
-                                                    : 'text-neutral-500 hover:bg-neutral-50 dark:hover:bg-white/5'
-                                                }`}
-                                            >
-                                                <item.icon className="h-5 w-5 shrink-0" />
-                                                <span className="text-sm font-bold">{item.title}</span>
-                                            </Link>
-                                        );
-                                    })}
-                                </nav>
-
-                                {/* Mobile Logout */}
-                                <div className="p-4 border-t border-neutral-100 dark:border-neutral-900">
-                                    <Link
-                                        href="/logout"
-                                        method="post"
-                                        as="button"
-                                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-50 dark:bg-neutral-900 py-3 text-xs font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
-                                    >
-                                        <LogOut className="h-4 w-4" />
-                                        Sign Out
-                                    </Link>
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-
                 <main className="flex flex-1 flex-col overflow-hidden min-w-0">
-                    {/* Mobile Header Bar */}
-                    <div className="flex md:hidden items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-900 bg-white dark:bg-neutral-950 sticky top-0 z-50">
-                        <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-                            <Menu className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                        </button>
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-900 text-emerald-500">
-                                <Zap className="h-4 w-4 fill-current" />
+                    {/* Compact top toolbar — search, notifications, theme */}
+                    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl md:px-6">
+                        {/* Mobile logo */}
+                        <div className="flex items-center gap-2 md:hidden">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                                <Zap className="h-3.5 w-3.5 fill-current" />
                             </div>
-                            <span className="text-sm font-black tracking-tighter text-neutral-900 dark:text-white">Atlas<span className="text-emerald-500">Pay</span></span>
+                            <span className="font-display text-sm font-bold tracking-tight uppercase">AtlasPay</span>
                         </div>
-                        <div className="w-9" /> {/* Spacer for centering */}
-                    </div>
+                        {/* Empty spacer on desktop */}
+                        <div className="hidden md:block" />
 
-                    <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+                        <div className="flex items-center gap-2">
+                            <button className="hidden md:inline-flex h-9 items-center gap-2 rounded-full border border-border bg-card px-3 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                                <Search className="h-3.5 w-3.5" />
+                                <span>Search...</span>
+                                <kbd className="ml-4 rounded bg-muted px-1.5 py-0.5 text-[10px]">⌘K</kbd>
+                            </button>
+                            
+                            <LanguageSwitcher />
+
+                            <button className="relative grid h-9 w-9 place-items-center rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors" aria-label="Notifications">
+                                <Bell className="h-4 w-4" />
+                                {notifications.length > 0 && (
+                                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive animate-pulse border-2 border-background" />
+                                )}
+                            </button>
+                            <ThemeToggle />
+                        </div>
+                    </header>
+
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-none pb-24 md:pb-0">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={url}
-                                initial={{ opacity: 0, y: 15 }}
+                                initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -15 }}
-                                transition={{ duration: 0.3, ease: 'easeOut' }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                                 className="min-h-full"
                             >
                                 {children}
@@ -141,9 +122,42 @@ export default function AppSidebarLayout({
                         </AnimatePresence>
                     </div>
                 </main>
+
+                {/* Mobile Bottom Nav Bar */}
+                <div className="md:hidden fixed inset-x-0 bottom-0 z-50 pointer-events-none">
+                    <div className="px-3 pb-3 pt-1 pointer-events-auto">
+                        <motion.div 
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="w-full bg-card/90 backdrop-blur-2xl border border-border/50 rounded-2xl p-1.5 flex items-center justify-around shadow-elevated"
+                        >
+                            <Link href="/dashboard" className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-colors ${url.startsWith('/dashboard') ? 'text-primary bg-primary/10 font-bold' : 'text-muted-foreground'}`}>
+                                <LayoutGrid className="h-5 w-5" />
+                                <span className="text-[9px] font-bold">Home</span>
+                            </Link>
+                            <Link href="/reports/transactions" className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-colors ${url.startsWith('/reports') ? 'text-primary bg-primary/10 font-bold' : 'text-muted-foreground'}`}>
+                                <Activity className="h-5 w-5" />
+                                <span className="text-[9px] font-bold">History</span>
+                            </Link>
+                            
+                            <div className="relative -mt-8 px-1">
+                                <Link href="/transfer" className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg border-4 border-background transition-transform active:scale-90">
+                                    <Plus className="h-7 w-7" strokeWidth={3} />
+                                </Link>
+                            </div>
+
+                            <Link href="/daret" className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-colors ${url.startsWith('/daret') ? 'text-primary bg-primary/10 font-bold' : 'text-muted-foreground'}`}>
+                                <Users className="h-5 w-5" />
+                                <span className="text-[9px] font-bold">Daret</span>
+                            </Link>
+                            <Link href="/ai" className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-colors ${url.startsWith('/ai') ? 'text-primary bg-primary/10 font-bold' : 'text-muted-foreground'}`}>
+                                <Bot className="h-5 w-5" />
+                                <span className="text-[9px] font-bold">AI</span>
+                            </Link>
+                        </motion.div>
+                    </div>
+                </div>
             </div>
         </SidebarProvider>
     );
 }
-
-

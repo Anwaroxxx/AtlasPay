@@ -28,7 +28,7 @@ return new class extends Migration
 
             // personal info
             $table->string('address');
-            $table->string('goverment_id');
+            $table->string('government_id');
             $table->integer('credit_score')->default(500);
             $table->string('path_to_document')->nullable();
 
@@ -62,3 +62,4 @@ return new class extends Migration
         Schema::dropIfExists('sessions');
     }
 };
+

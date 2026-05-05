@@ -21,7 +21,7 @@ trait ProfileValidationRules
             'phone' => $this->phoneRules(),
             'email' => $this->emailRules($userId),
             'address' => $this->nameRules(),
-            'goverment_id' => $this->nameRules()
+            'government_id' => $this->nameRules()
         ];
     }
 
@@ -63,3 +63,4 @@ trait ProfileValidationRules
         ];
     }
 }
+

@@ -23,7 +23,7 @@ class ChatController extends Controller
         
         try {
             $accounts = $user->accounts()->get();
-            $totalBalance = $accounts->sum('blance');
+            $totalBalance = $accounts->sum('balance');
             $activeCredit = $user->credits()->where('status', 'active')->first();
             $budgets = $user->budgets()->where('month', now()->month)->get();
             $creditScore = $user->credit_score;
@@ -37,30 +37,16 @@ class ChatController extends Controller
             
             Rules:
             - Be natural, friendly, and use normal grammar.
-            - Do not be overly formal or use 'Architect/Audit' jargon.
             - Help users with their questions about their account and credits.
             - Use MAD for currency.";
 
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'mixtral-8x7b-32768',
-                'messages' => [
-                    ['role' => 'system', 'content' => $context],
-                    ['role' => 'user', 'content' => $request->message]
-                ],
-                'temperature' => 0.7,
+            $answer = $groqService->chat([
+                ['role' => 'user', 'content' => $request->message]
+            ], $context);
+
+            return response()->json([
+                'answer' => $answer
             ]);
-
-            if ($response->successful()) {
-                return response()->json([
-                    'answer' => $response->json('choices.0.message.content')
-                ]);
-            }
-
-            Log::error('Groq API Error: ' . $response->body());
-            return response()->json(['error' => 'AI Service is currently busy. Please try again later.'], 503);
 
         } catch (\Exception $e) {
             Log::error('Chat AI Exception: ' . $e->getMessage());

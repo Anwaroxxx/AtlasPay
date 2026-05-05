@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Account;
 use App\Models\Transaction;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -29,7 +30,7 @@ class ReportController extends Controller
         $currentMonthSpending = Transaction::whereIn('from_account_id', $accountIds)
             ->whereYear('created_at', $now->year)
             ->whereMonth('created_at', $now->month)
-            ->where('type', 'transfer') // Assuming only transfers count as spending for now
+            ->where('type', 'transfer') 
             ->select('category', \DB::raw('SUM(amount) as total'))
             ->groupBy('category')
             ->get()
@@ -62,11 +63,35 @@ class ReportController extends Controller
         // 4. AI Insights
         $aiInsights = $groqService->analyzeSpending($currentMonthSpending, $budgets);
 
-        // 5. Paginated Transactions
-        $transactions = Transaction::whereIn('from_account_id', $accountIds)
-            ->orWhereIn('to_account_id', $accountIds)
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
+        // 5. Paginated & Filtered Transactions
+        $query = Transaction::query()
+            ->where(function($q) use ($accountIds) {
+                $q->whereIn('from_account_id', $accountIds)
+                  ->orWhereIn('to_account_id', $accountIds);
+            });
+
+        if ($request->has('search')) {
+            $query->where('category', 'like', '%' . $request->search . '%')
+                  ->orWhere('method', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->has('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->has('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(50)->withQueryString();
 
         return Inertia::render('reports/transactions', [
             'reportData' => [
@@ -78,7 +103,44 @@ class ReportController extends Controller
                 'user' => [
                     'name' => $user->name,
                 ],
+                'filters' => $request->only(['search', 'type', 'category', 'date_from', 'date_to'])
             ]
         ]);
+    }
+
+    /**
+     * Export transactions as PDF.
+     */
+    public function exportPdf(Request $request)
+    {
+        $user = $request->user();
+        $accountIds = $user->accounts()->pluck('id')->toArray();
+
+        $query = Transaction::query()
+            ->where(function($q) use ($accountIds) {
+                $q->whereIn('from_account_id', $accountIds)
+                  ->orWhereIn('to_account_id', $accountIds);
+            });
+
+        // Apply same filters as index
+        if ($request->has('search')) {
+            $query->where('category', 'like', '%' . $request->search . '%');
+        }
+        if ($request->has('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+        if ($request->has('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')->get();
+
+        $pdf = PDF::loadView('pdf.transactions', [
+            'transactions' => $transactions,
+            'user' => $user,
+            'date' => now()->format('d/m/Y H:i'),
+        ]);
+
+        return $pdf->download('AtlasPay_Transactions_'.now()->format('Ymd').'.pdf');
     }
 }
