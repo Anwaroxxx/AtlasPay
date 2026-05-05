@@ -75,15 +75,38 @@ class DaretController extends Controller
     public function accept(Request $request, DaretGroup $group)
     {
         $member = $group->members()->where('user_id', $request->user()->id)->firstOrFail();
-        $member->update(['status' => 'accepted']);
+        
+        $managementFee = 10.00;
+        $account = $request->user()->accounts()->where('status', 'active')->first();
 
-        // Check if all members accepted — if so, mark group as ready
-        $allAccepted = $group->members()->where('status', '!=', 'accepted')->count() === 0;
-        if ($allAccepted) {
-            $group->update(['status' => 'active']);
+        if (!$account || $account->balance < $managementFee) {
+            return redirect()->back()->withErrors(['message' => "Insufficient funds for the 10 MAD group management fee."]);
         }
 
-        return redirect()->back()->with('message', 'You joined the group!');
+        DB::transaction(function () use ($member, $account, $managementFee, $group) {
+            $account->decrement('balance', $managementFee);
+            $member->update(['status' => 'accepted']);
+
+            // Record management fee
+            \App\Models\Transaction::create([
+                'from_account_id' => $account->id,
+                'to_account_id' => $account->id,
+                'amount' => $managementFee,
+                'method' => 'daret_fee',
+                'category' => 'Fees',
+                'description' => "Group Management Fee for: {$group->name}",
+                'status' => 'completed',
+                'type' => 'transfer'
+            ]);
+
+            // Check if all members accepted — if so, mark group as ready
+            $allAccepted = $group->members()->where('status', '!=', 'accepted')->count() === 0;
+            if ($allAccepted) {
+                $group->update(['status' => 'active']);
+            }
+        });
+
+        return redirect()->back()->with('message', 'You joined the group! A 10 MAD management fee has been applied.');
     }
 
     public function decline(Request $request, DaretGroup $group)

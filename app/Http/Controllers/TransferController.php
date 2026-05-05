@@ -28,15 +28,18 @@ class TransferController extends Controller
 
         $fromAccount = Account::where('account_number', $request->from_account_rib)->first();
         
-        if ($fromAccount->balance < $request->amount) {
-            return back()->withErrors(['message' => 'Insufficient funds in capital reserve.']);
+        $processingFee = 5.00;
+        $totalDeduction = $request->amount + $processingFee;
+
+        if ($fromAccount->balance < $totalDeduction) {
+            return back()->withErrors(['message' => "Insufficient funds. Required: " . number_format($totalDeduction, 2) . " MAD (includes 5 MAD fee)."]);
         }
 
-        DB::transaction(function () use ($fromAccount, $request, $method) {
-            // Deduct from source
-            $fromAccount->decrement('balance', $request->amount);
+        DB::transaction(function () use ($fromAccount, $request, $method, $processingFee) {
+            // Deduct from source (Amount + Fee)
+            $fromAccount->decrement('balance', $request->amount + $processingFee);
 
-            // Create Transaction Record
+            // Create main transaction
             $transaction = Transaction::create([
                 'from_account_id' => $fromAccount->id,
                 'to_account_id' => 1, // Default bridge

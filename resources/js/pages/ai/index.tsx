@@ -68,13 +68,10 @@ export default function SmartBankingAI({ analysis }: Props) {
         }
     }, [messages, isLoading]);
 
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!message.trim() || isLoading) return;
+    const sendDirectly = async (msg: string) => {
+        if (!msg.trim() || isLoading) return;
 
-        const userMsg = message.trim();
-        setMessage('');
-        setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+        setMessages(prev => [...prev, { role: 'user', content: msg }]);
         setIsLoading(true);
 
         try {
@@ -84,7 +81,7 @@ export default function SmartBankingAI({ analysis }: Props) {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
                 },
-                body: JSON.stringify({ message: userMsg })
+                body: JSON.stringify({ message: msg })
             });
 
             const data = await response.json();
@@ -98,6 +95,13 @@ export default function SmartBankingAI({ analysis }: Props) {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleSend = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const msg = message;
+        setMessage('');
+        await sendDirectly(msg);
     };
 
     const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
@@ -129,10 +133,10 @@ export default function SmartBankingAI({ analysis }: Props) {
                             <div className="p-1.5 rounded-lg bg-primary/10">
                                 <Sparkles className="h-5 w-5 fill-current" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Neural Interface v2.0</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Your Financial Sidekick</span>
                         </div>
                         <h1 className="font-display text-4xl font-black tracking-tighter md:text-6xl uppercase leading-none">
-                            AI <span className="text-primary italic">INSIGHTS.</span>
+                            AI <span className="text-primary italic">MENTOR.</span>
                         </h1>
                     </div>
                     <div className="flex items-center gap-4 bg-card/50 backdrop-blur-md p-4 rounded-3xl border border-border/50">
@@ -321,18 +325,35 @@ export default function SmartBankingAI({ analysis }: Props) {
                                     <div className="flex justify-start">
                                         <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-2.5 text-sm border border-white/5">
                                             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                                            <span className="text-white/50 text-[10px] font-bold uppercase tracking-widest">Neural Link...</span>
+                                            <span className="text-white/50 text-[10px] font-bold uppercase tracking-widest">Thinking...</span>
                                         </div>
                                     </div>
                                 )}
                             </CardContent>
 
+                            <div className="px-6 py-4 bg-black/20 flex flex-wrap gap-2 border-t border-white/5">
+                                {[
+                                    "What if I buy a car?",
+                                    "Save 2000 MAD more?",
+                                    "Lose my income?",
+                                    "Reach goals faster?"
+                                ].map((suggestion) => (
+                                    <button
+                                        key={suggestion}
+                                        onClick={() => sendDirectly(suggestion)}
+                                        className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-white/70 hover:bg-primary/20 hover:text-primary transition-all shrink-0"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
+                            </div>
+                            
                             <div className="p-4 bg-black/20">
                                 <form onSubmit={handleSend} className="relative flex items-center gap-2">
                                     <Input
                                         value={message}
                                         onChange={e => setMessage(e.target.value)}
-                                        placeholder="Type a message..."
+                                        placeholder="Type a scenario..."
                                         className="h-11 w-full rounded-xl border-white/10 bg-white/5 px-4 text-xs text-white"
                                         disabled={isLoading}
                                     />

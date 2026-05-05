@@ -45,9 +45,12 @@ class CreditController extends Controller
 
         try {
             $interestRate = 0.08;
+            $originationFeeRate = 0.015; // 1.5%
             $totalToPay = $request->amount * (1 + $interestRate);
+            $originationFee = $request->amount * $originationFeeRate;
+            $payoutAmount = $request->amount - $originationFee;
 
-            DB::transaction(function () use ($user, $request, $totalToPay, $interestRate) {
+            DB::transaction(function () use ($user, $request, $totalToPay, $interestRate, $payoutAmount, $originationFee) {
                 $account = $user->accounts()->where('status', 'active')->first();
                 
                 if (!$account) {
@@ -63,16 +66,17 @@ class CreditController extends Controller
                     'status' => 'active',
                 ]);
 
-                $account->increment('balance', $request->amount);
+                $account->increment('balance', $payoutAmount);
 
-                // Create transaction record
+                // Create transaction record for the payout
                 Transaction::create([
-                    'from_account_id' => $account->id, // Representing the bank as source
-                    'to_account_id' => $account->id,   // Destination is user's account
-                    'amount' => $request->amount,
+                    'from_account_id' => $account->id,
+                    'to_account_id' => $account->id,
+                    'amount' => $payoutAmount,
                     'type' => 'deposit',
                     'method' => 'bank_credit',
-                    'category' => 'Credit',
+                    'category' => 'Credit Payout',
+                    'description' => "Credit payout (Gross: {$request->amount} MAD, Origination Fee: {$originationFee} MAD)",
                     'status' => 'completed',
                 ]);
             });

@@ -12,7 +12,8 @@ import {
     Shield,
     ArrowUpRight,
     Users,
-    Bot
+    Bot,
+    Target
 } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,7 @@ export function CustomSidebar() {
         { title: t('dashboard', 'Dashboard'), href: '/dashboard', icon: LayoutGrid },
         { title: t('history', 'Transactions'), href: '/reports/transactions', icon: Activity },
         { title: t('send_money', 'Send Money'), href: '/transfer', icon: ArrowUpRight },
+        { title: t('savings', 'Savings Goals'), href: '/savings', icon: Target },
         { title: t('credits_loans', 'Credits & Loans'), href: '/credits', icon: CreditCard },
         { title: t('daret', 'Daret Groups'), href: '/daret', icon: Users },
         { title: t('ai_assistant', 'AI Assistant'), href: '/ai', icon: Bot },

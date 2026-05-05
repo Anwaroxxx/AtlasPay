@@ -70,26 +70,27 @@ class ReportController extends Controller
                   ->orWhereIn('to_account_id', $accountIds);
             });
 
-        if ($request->has('search')) {
-            $query->where('category', 'like', '%' . $request->search . '%')
-                  ->orWhere('method', 'like', '%' . $request->search . '%');
-        }
+        $query->where(function($q) use ($request) {
+            if ($request->filled('search')) {
+                $q->where(function($inner) use ($request) {
+                    $inner->where('category', 'like', '%' . $request->search . '%')
+                          ->orWhere('method', 'like', '%' . $request->search . '%')
+                          ->orWhere('description', 'like', '%' . $request->search . '%');
+                });
+            }
 
-        if ($request->has('type') && $request->type !== 'all') {
-            $query->where('type', $request->type);
-        }
+            if ($request->filled('type') && $request->type !== 'all') {
+                $q->where('type', $request->type);
+            }
 
-        if ($request->has('category') && $request->category !== 'all') {
-            $query->where('category', $request->category);
-        }
+            if ($request->filled('date_from')) {
+                $q->whereDate('created_at', '>=', $request->date_from);
+            }
 
-        if ($request->has('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->has('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
+            if ($request->filled('date_to')) {
+                $q->whereDate('created_at', '<=', $request->date_to);
+            }
+        });
 
         $transactions = $query->orderBy('created_at', 'desc')->paginate(50)->withQueryString();
 

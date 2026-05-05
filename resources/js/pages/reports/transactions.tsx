@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { reports } from '@/routes/custom';
+import { reports } from '@/custom-routes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Activity, 
@@ -74,13 +74,23 @@ export default function Transactions({ reportData }: any) {
 
     const handleSearch = useCallback(
         debounce((val: string) => {
-            router.get(reports.transactions.url({ ...filters, search: val }), {}, { preserveState: true, preserveScroll: true });
+            router.get(reports.transactions.url({ ...filters, search: val }), {}, { 
+                preserveState: true, 
+                preserveScroll: true,
+                replace: true,
+                only: ['reportData', 'transactions', 'filters']
+            });
         }, 500),
         [filters]
     );
 
     const updateFilter = (newFilters: any) => {
-        router.get(reports.transactions.url({ ...filters, ...newFilters }), {}, { preserveState: true, preserveScroll: true });
+        router.get(reports.transactions.url({ ...filters, ...newFilters }), {}, { 
+            preserveState: true, 
+            preserveScroll: true,
+            replace: true,
+            only: ['reportData', 'transactions', 'filters']
+        });
     };
 
     const clearFilters = () => {
@@ -258,24 +268,24 @@ export default function Transactions({ reportData }: any) {
 
                     {/* Category Distribution Chart */}
                     <motion.div variants={item} className="lg:col-span-4">
-                        <Card className="h-full border border-border shadow-soft bg-card rounded-3xl glass-card">
+                        <Card className="h-full border border-border shadow-soft bg-card rounded-3xl glass-card flex flex-col">
                             <CardHeader className="p-8 pb-0">
                                 <CardTitle className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                                     <TrendingUp className="h-3.5 w-3.5 text-primary" />
                                     Spending Categories
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-8 h-[250px] flex flex-col justify-between">
-                                <div className="flex-1 min-h-0">
+                            <CardContent className="p-8 flex-1 flex flex-col min-h-[400px]">
+                                <div className="flex-1 min-h-[300px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
                                                 data={pieData.length > 0 ? pieData : [{ name: 'Empty Signal', value: 1 }]}
                                                 cx="50%"
                                                 cy="50%"
-                                                innerRadius={70}
-                                                outerRadius={95}
-                                                paddingAngle={6}
+                                                innerRadius={80}
+                                                outerRadius={120}
+                                                paddingAngle={8}
                                                 dataKey="value"
                                                 stroke="none"
                                             >
@@ -297,9 +307,9 @@ export default function Transactions({ reportData }: any) {
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3 mt-6">
-                                    {pieData.slice(0, 4).map((entry, index) => (
-                                        <div key={entry.name} className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/50">
+                                <div className="grid grid-cols-2 gap-3 mt-8">
+                                    {pieData.slice(0, 6).map((entry, index) => (
+                                        <div key={entry.name} className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 border border-border/50">
                                             <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                                             <span className="text-[9px] font-black uppercase text-muted-foreground truncate">{entry.name}</span>
                                         </div>
@@ -309,6 +319,69 @@ export default function Transactions({ reportData }: any) {
                         </Card>
                     </motion.div>
                 </div>
+
+                {/* Middle Row: Monthly Trends */}
+                <motion.div variants={item} className="mt-8 mb-8">
+                    <Card className="border border-border shadow-elevated rounded-3xl bg-card overflow-hidden">
+                        <CardHeader className="p-8 pb-0">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-xl font-black uppercase tracking-tight">Financial <span className="text-primary italic">Momentum.</span></CardTitle>
+                                    <CardDescription className="text-[9px] font-black uppercase tracking-[0.2em] mt-1 text-muted-foreground">Monthly spending velocity (Last 6 Months)</CardDescription>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full bg-primary" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Total Expenditure</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-8 h-[300px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={reportData.trends}>
+                                    <defs>
+                                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+                                    <XAxis 
+                                        dataKey="month" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fontSize: 10, fontWeight: 900, fill: 'var(--color-muted-foreground)' }} 
+                                        dy={10}
+                                    />
+                                    <YAxis 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fontSize: 10, fontWeight: 900, fill: 'var(--color-muted-foreground)' }} 
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{ 
+                                            background: 'var(--color-popover)', 
+                                            borderRadius: '16px', 
+                                            border: '1px solid var(--color-border)', 
+                                            boxShadow: 'var(--shadow-elevated)',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold'
+                                        }}
+                                    />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="total" 
+                                        stroke="var(--color-primary)" 
+                                        strokeWidth={4}
+                                        fillOpacity={1} 
+                                        fill="url(#colorTotal)" 
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
                 {/* Bottom Section: Transaction History */}
                 <motion.div variants={item}>
