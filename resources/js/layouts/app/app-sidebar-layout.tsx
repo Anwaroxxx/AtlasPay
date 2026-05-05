@@ -18,6 +18,7 @@ import {
     Zap
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAppearance } from '@/hooks/use-appearance';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import i18n from '@/i18n';
 
@@ -26,6 +27,7 @@ export default function AppSidebarLayout({
     breadcrumbs = [],
 }: AppLayoutProps) {
     const { props, url } = usePage();
+    const { appearance } = useAppearance();
     const sidebarOpen = (props as any).sidebarOpen ?? true;
     const auth = (props as any).auth;
     const currentLocale = (props as any).locale || 'en';
@@ -78,13 +80,8 @@ export default function AppSidebarLayout({
                 <main className="flex flex-1 flex-col overflow-hidden min-w-0">
                     {/* Compact top toolbar — search, notifications, theme */}
                     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl md:px-6">
-                        {/* Mobile logo */}
-                        <div className="flex items-center gap-2 md:hidden">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                                <Zap className="h-3.5 w-3.5 fill-current" />
-                            </div>
-                            <span className="font-display text-sm font-bold tracking-tight uppercase">AtlasPay</span>
-                        </div>
+                        {/* Mobile logo removed as requested */}
+                        <div className="flex items-center gap-2 md:hidden" />
                         {/* Empty spacer on desktop */}
                         <div className="hidden md:block" />
 

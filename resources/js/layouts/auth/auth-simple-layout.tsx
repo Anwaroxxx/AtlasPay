@@ -28,10 +28,13 @@ export default function AuthSimpleLayout({
                             href={home()}
                             className="flex items-center gap-3 group"
                         >
-                            <div className="w-10 h-10 rounded-full border border-brand-medium/30 flex items-center justify-center bg-[#010301] transition-all group-hover:border-brand-medium">
-                                <div className="w-7 h-7 rounded-full bg-brand-medium flex items-center justify-center text-black font-serif font-bold italic text-sm transition-transform group-hover:scale-110">A</div>
+                            <div className="flex items-center justify-center transition-all group-hover:scale-105 active:scale-95">
+                                <img 
+                                    src="/images/logos/darkmode-Photoroom.png" 
+                                    alt="AtlasPay Logo" 
+                                    className="h-24 w-auto object-contain"
+                                />
                             </div>
-                            <span className="text-lg font-serif font-bold tracking-tighter uppercase italic">AtlasPay</span>
                         </Link>
 
                         <div className="space-y-0.5 text-center">

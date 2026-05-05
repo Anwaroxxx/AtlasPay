@@ -14,6 +14,7 @@ import {
   MousePointer2,
   Sparkles
 } from 'lucide-react';
+import { home } from '@/routes';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import CardSwap, { Card } from '@/components/CardSwap';
@@ -62,12 +63,13 @@ export default function LandingPage() {
           }`}
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-elevated group cursor-pointer">
-              <Zap className="w-6 h-6 text-white fill-current group-hover:scale-110 transition-transform" />
-            </div>
-            {!isScrolled && (
-               <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-2xl font-display font-black tracking-tighter uppercase italic">AtlasPay</motion.span>
-            )}
+            <Link href={home()} className="flex items-center">
+              <img 
+                src="/images/logos/darkmode-Photoroom.png" 
+                alt="AtlasPay Logo" 
+                className={`object-contain transition-all ${isScrolled ? 'h-12' : 'h-24'}`}
+              />
+            </Link>
           </div>
 
           <div className={`flex items-center gap-8 ${isScrolled ? 'mx-8' : ''}`}>
@@ -285,10 +287,11 @@ export default function LandingPage() {
         <footer className="py-24 px-6 border-t border-white/5 bg-black/40">
            <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 md:p-8">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Zap className="w-5 h-5 fill-current" />
-                </div>
-                <span className="text-2xl font-display font-black tracking-tighter uppercase italic">AtlasPay</span>
+                <img 
+                  src="/images/logos/darkmode-Photoroom.png" 
+                  alt="AtlasPay Logo" 
+                  className="h-16 w-auto object-contain"
+                />
               </div>
               <div className="flex gap-16 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
                 <a href="#" className="hover:text-primary transition-colors">Vault Privacy</a>

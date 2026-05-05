@@ -17,14 +17,20 @@ import {
 } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
+import { useAppearance } from '@/hooks/use-appearance';
 
 export function CustomSidebar() {
     const { url, props } = usePage();
     const { open, setOpen } = useSidebar();
     const { t } = useTranslation();
+    const { appearance } = useAppearance();
     const isCollapsed = !open;
     const authUser = (props.auth as any)?.user;
     const displayName = authUser ? `${authUser.first_name || ''} ${authUser.last_name || ''}`.trim() || authUser.name || authUser.email : 'User';
+
+    const logoSrc = appearance === 'dark' 
+        ? '/images/logos/darkmode-Photoroom.png' 
+        : '/images/logos/lightmode-Photoroom.png';
 
     const navItems = [
         { title: t('dashboard', 'Dashboard'), href: '/dashboard', icon: LayoutGrid },
@@ -43,24 +49,15 @@ export function CustomSidebar() {
             className="sticky top-0 hidden md:flex h-screen flex-col border-r border-border bg-sidebar transition-all duration-500 ease-in-out shrink-0 z-40"
         >
             {/* Logo Section */}
-            <div className={`flex h-20 items-center px-6 ${isCollapsed ? 'justify-center px-0' : 'justify-between'}`}>
+            <div className={`flex items-center px-6 ${isCollapsed ? 'justify-center h-20' : 'justify-start h-32'}`}>
                 <div className="flex items-center gap-3">
-                    <div className="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[image:var(--gradient-primary)] shadow-lg transition-all hover:scale-110 active:scale-95 text-primary-foreground">
-                        <span className="font-display text-lg font-bold">A</span>
+                    <div className={`group relative flex items-center justify-center transition-all hover:scale-105 active:scale-95 ${isCollapsed ? 'h-12 w-12' : 'h-24 w-auto'}`}>
+                        <img 
+                            src={logoSrc} 
+                            alt="AtlasPay Logo" 
+                            className={`object-contain transition-all ${isCollapsed ? 'h-10 w-10' : 'h-24'}`}
+                        />
                     </div>
-                    <AnimatePresence mode="wait">
-                        {!isCollapsed && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                className="flex flex-col"
-                            >
-                                <span className="font-display text-lg font-bold tracking-tight text-foreground uppercase">AtlasPay</span>
-                                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Online Banking</span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
                 </div>
             </div>
 
