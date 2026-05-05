@@ -78,7 +78,7 @@ class AnwarLogic
         ];
     }
 
-    private static function getSeasonalNudges($now)
+    public static function getSeasonalNudges($now)
     {
         $nudges = [];
         $month = $now->month;
@@ -122,21 +122,72 @@ class AnwarLogic
     }
 
     /**
-     * Simulate a "What If" scenario using real AI logic.
+     * Builds a comprehensive financial context for the Simulation Engine.
+     */
+    public static function getFullFinancialContext($user)
+    {
+        $accounts = $user->accounts()->get();
+        $accountIds = $accounts->pluck('id')->toArray();
+        $now = Carbon::now();
+
+        // Income patterns
+        $monthlyIncome = Transaction::whereIn('to_account_id', $accountIds)
+            ->where('type', 'deposit')
+            ->where('created_at', '>=', $now->copy()->subMonths(3))
+            ->sum('amount') / 3;
+
+        // Spending behavior
+        $spending = Transaction::whereIn('from_account_id', $accountIds)
+            ->where('type', 'transfer')
+            ->select('category', \DB::raw('SUM(amount) as total'))
+            ->groupBy('category')
+            ->get()
+            ->pluck('total', 'category')
+            ->toArray();
+
+        // Recurring Debts
+        $debts = Credit::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($credit) {
+                return [
+                    'amount_due' => $credit->total_to_pay - $credit->repaid_amount,
+                    'due_date' => $credit->due_date->format('Y-m-d')
+                ];
+            })->toArray();
+
+        // Active Goals
+        $goals = SavingsGoal::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($goal) use ($now) {
+                $remaining = $goal->target_amount - $goal->current_amount;
+                $monthsLeft = $goal->monthly_deduction > 0 ? ceil($remaining / $goal->monthly_deduction) : 'N/A';
+                return [
+                    'name' => $goal->name,
+                    'target' => $goal->target_amount,
+                    'current' => $goal->current_amount,
+                    'monthly_deduction' => $goal->monthly_deduction,
+                    'estimated_months_to_complete' => $monthsLeft
+                ];
+            })->toArray();
+
+        return [
+            'current_balance' => $accounts->sum('balance'),
+            'average_monthly_income' => round($monthlyIncome, 2),
+            'spending_categories' => $spending,
+            'active_debts' => $debts,
+            'active_savings_goals' => $goals,
+            'seasonal_nudges' => self::getSeasonalNudges($now),
+        ];
+    }
+
+    /**
+     * Deprecated: Use ChatController directly for simulations.
      */
     public static function simulate($user, $scenario)
     {
-        $groq = new GroqService();
-        $context = 'You are SmartBanking AI. Evaluate the feasibility of a financial scenario for a Moroccan user. Answer in one or two sharp, premium sentences.';
-        $prompt = "Scenario: $scenario. User has " . $user->accounts()->sum('balance') . " MAD.";
-
-        $answer = $groq->chat([
-            ['role' => 'user', 'content' => $prompt]
-        ], $context);
-
-        return [
-            'message' => $answer,
-            'feasible' => !str_contains(strtolower($answer), 'not feasible') && !str_contains(strtolower($answer), 'error')
-        ];
+        // This is deprecated, moved to ChatController
+        return ['message' => 'Use Chat interface', 'feasible' => true];
     }
 }
