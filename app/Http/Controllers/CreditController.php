@@ -63,7 +63,7 @@ class CreditController extends Controller
                     'status' => 'active',
                 ]);
 
-                $account->increment('blance', $request->amount);
+                $account->increment('balance', $request->amount);
 
                 // Create transaction record
                 Transaction::create([
@@ -99,7 +99,7 @@ class CreditController extends Controller
 
             DB::transaction(function () use ($user, $credit, $isOnTime) {
                 $account = $user->accounts()->where('status', 'active')
-                    ->where('blance', '>=', $credit->total_to_pay)
+                    ->where('balance', '>=', $credit->total_to_pay)
                     ->first();
 
                 if (!$account) {
@@ -111,7 +111,7 @@ class CreditController extends Controller
                     'status' => 'paid',
                 ]);
 
-                $account->decrement('blance', $credit->total_to_pay);
+                $account->decrement('balance', $credit->total_to_pay);
 
                 // Create transaction record
                 \App\Models\Transaction::create([

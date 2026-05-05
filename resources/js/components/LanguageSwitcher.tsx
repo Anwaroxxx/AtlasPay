@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { language } from '@/routes';
+import { language } from '@/routes/custom';
 
 const languages = [
     { code: 'en', label: 'English', flag: 'https://flagcdn.com/w40/gb.png' },

@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { reports } from '@/routes';
+import { reports } from '@/routes/custom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Activity, 
