@@ -26,9 +26,9 @@ export function BalanceCard({ balance, currency, accountNumber = "MA53 ATLS 0009
       <div className="absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-white/5 blur-3xl group-hover:scale-110 transition-transform duration-700" />
 
       <div className="relative flex items-start justify-between">
-        <div className="space-y-1">
+        <div className="space-y-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-foreground/60">Account Number</p>
-          <p className="font-mono text-sm tracking-widest opacity-90">{accountNumber}</p>
+          <p className="font-mono text-sm tracking-widest opacity-90 truncate max-w-[160px] sm:max-w-full">{accountNumber}</p>
         </div>
         <button
           onClick={() => setHidden((h) => !h)}
@@ -39,27 +39,27 @@ export function BalanceCard({ balance, currency, accountNumber = "MA53 ATLS 0009
         </button>
       </div>
 
-      <div className="relative mt-8 mb-8">
+      <div className="relative mt-6 md:mt-8 mb-6 md:mb-8">
         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-foreground/60 mb-1">Available Balance</p>
-        <div className="flex items-baseline gap-3">
-          <span className="font-display text-5xl md:text-7xl font-black tracking-tighter">
+        <div className="flex items-baseline gap-2 md:gap-3">
+          <span className="font-display text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter">
             {hidden ? "••••••" : balance.toLocaleString()}
           </span>
-          <span className="text-xl font-black opacity-60 uppercase tracking-widest">{currency}</span>
+          <span className="text-base md:text-xl font-black opacity-60 uppercase tracking-widest">{currency}</span>
         </div>
       </div>
 
-      <div className="relative grid grid-cols-4 gap-4">
+      <div className="relative grid grid-cols-4 gap-2 md:gap-4">
         {actions.map((a) => (
           <Link key={a.label} href={a.href} className="flex-1">
             <Button
               variant="ghost"
-              className="w-full flex h-auto flex-col items-center gap-3 rounded-[1.5rem] bg-white/10 py-6 text-primary-foreground hover:bg-white/20 hover:scale-[1.02] transition-all border border-white/5 shadow-inner"
+              className="w-full flex h-auto flex-col items-center gap-2 md:gap-3 rounded-[1.5rem] bg-white/10 py-4 md:py-6 text-primary-foreground hover:bg-white/20 hover:scale-[1.02] transition-all border border-white/5 shadow-inner"
             >
-              <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center">
-                <a.icon className="h-5 w-5" />
+              <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-white/10 flex items-center justify-center">
+                <a.icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">{a.label}</span>
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">{a.label}</span>
             </Button>
           </Link>
         ))}

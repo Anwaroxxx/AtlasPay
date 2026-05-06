@@ -92,7 +92,8 @@ class TokenController extends Controller
         return Inertia::render("transactions/qr/shared/QrPage", [
             "id" => $url,
             "token" => $token->load(['fromAccount.user', 'toAccount.user']),
-            "goal" => $token->goal
+            "goal" => $token->goal,
+            "appUrl" => config('app.url')
         ]);
     }
 

@@ -143,7 +143,7 @@ export default function QRPage() {
                                     ))}
                                 </div>
 
-                                <div className="p-8 md:p-6 md:p-8 space-y-10">
+                                <div className="p-4 md:p-8 space-y-10">
                                     <div className="grid gap-8">
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between px-1">

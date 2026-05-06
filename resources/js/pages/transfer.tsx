@@ -311,18 +311,18 @@ export default function Transfer({ accounts }: Props) {
                                     setQrStep('input');
                                     setIsScanning(false);
                                 }}
-                                className={`group relative flex items-center gap-5 rounded-3xl p-8 transition-all duration-500 text-left border overflow-hidden ${
+                                className={`group relative flex items-center gap-3 md:gap-5 rounded-3xl p-4 md:p-8 transition-all duration-500 text-left border overflow-hidden ${
                                     isActive 
                                     ? 'bg-card border-primary shadow-elevated' 
                                     : 'bg-card/30 border-border/50 hover:border-primary/30 text-muted-foreground'
                                 }`}
                             >
-                                <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl transition-all duration-500 shadow-soft ${
+                                <div className={`flex h-10 w-10 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl transition-all duration-500 shadow-soft ${
                                     isActive 
                                     ? 'bg-primary text-primary-foreground scale-110' 
                                     : 'bg-muted text-muted-foreground group-hover:bg-accent'
                                 }`}>
-                                    <Icon className="h-8 w-8" />
+                                    <Icon className="h-5 w-5 md:h-8 md:w-8" />
                                 </div>
                                 <div className="min-w-0">
                                     <p className={`text-lg font-black tracking-tight uppercase ${isActive ? 'text-foreground' : ''}`}>{cfg.label}</p>
@@ -529,10 +529,10 @@ export default function Transfer({ accounts }: Props) {
                                                     ) : (
                                                         <Button 
                                                             type="submit" 
-                                                            className="w-full h-24 rounded-3xl bg-primary text-primary-foreground font-black text-2xl uppercase tracking-widest shadow-elevated group"
+                                                            className="w-full h-14 md:h-24 rounded-3xl bg-primary text-primary-foreground font-black text-base md:text-2xl uppercase tracking-widest shadow-elevated group"
                                                             disabled={!data.amount || Number(data.amount) <= 0}
                                                         >
-                                                            {qrFlow === 'send' ? 'Generate Token' : 'Generate Request'} <ArrowRight className="ml-4 h-8 w-8 transition-transform group-hover:translate-x-4" />
+                                                            {qrFlow === 'send' ? 'Generate Token' : 'Generate Request'} <ArrowRight className="ml-2 md:ml-4 h-5 w-5 md:h-8 md:w-8 transition-transform group-hover:translate-x-4" />
                                                         </Button>
                                                     )}
                                                 </form>
@@ -666,10 +666,10 @@ export default function Transfer({ accounts }: Props) {
 
                                                 <Button 
                                                     type="submit" 
-                                                    className="w-full h-24 rounded-3xl bg-primary text-primary-foreground font-black text-2xl uppercase tracking-widest shadow-elevated group" 
+                                                    className="w-full h-14 md:h-24 rounded-3xl bg-primary text-primary-foreground font-black text-base md:text-2xl uppercase tracking-widest shadow-elevated group" 
                                                     disabled={processing || !data.amount}
                                                 >
-                                                    {processing ? <Loader2 className="h-10 w-10 animate-spin" /> : 'Confirm Transfer'}
+                                                    {processing ? <Loader2 className="h-6 w-6 md:h-10 md:w-10 animate-spin" /> : 'Confirm Transfer'}
                                                 </Button>
                                             </form>
                                         </CardContent>

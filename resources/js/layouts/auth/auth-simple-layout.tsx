@@ -9,7 +9,7 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="flex h-svh w-screen flex-col items-center justify-center bg-[#010301] text-white p-4 selection:bg-brand-medium/30 relative overflow-hidden">
+        <div className="flex min-h-svh w-screen flex-col items-center justify-center bg-[#010301] text-white p-4 py-8 selection:bg-brand-medium/30 relative overflow-x-hidden overflow-y-auto">
             {/* Background elements to match LandingPage */}
             <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,_transparent_0%,_#010301_100%)] opacity-80" />
             <div className="fixed inset-0 z-0 pointer-events-none moroccan-pattern opacity-[0.03]" />

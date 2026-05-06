@@ -20,22 +20,22 @@ export function StatCard({
 }) {
   const content = (
     <>
-      <div className="flex items-center justify-between">
-        <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent text-accent-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-          <Icon className="h-5 w-5" />
+      <div className="flex items-center justify-between gap-1">
+        <div className="grid h-9 w-9 md:h-10 md:w-10 place-items-center rounded-xl bg-accent text-accent-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
+          <Icon className="h-4 w-4 md:h-5 md:w-5" />
         </div>
         <span
           className={cn(
-            "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-widest",
+            "inline-flex items-center gap-1 rounded-full px-1.5 md:px-2.5 py-1 text-[9px] md:text-[11px] font-black uppercase tracking-widest truncate max-w-[80px]",
             positive ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
           )}
         >
-          {positive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+          {positive ? <TrendingUp className="h-3 w-3 shrink-0" /> : <TrendingDown className="h-3 w-3 shrink-0" />}
           {delta}
         </span>
       </div>
-      <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground/60 transition-colors">{label}</p>
-      <p className="mt-1 font-display text-3xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">{value}</p>
+      <p className="mt-3 md:mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground/60 transition-colors truncate">{label}</p>
+      <p className="mt-1 font-display text-2xl md:text-3xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">{value}</p>
     </>
   );
 

@@ -32,9 +32,10 @@ interface Props {
     id: string; // Encrypted token for URL
     token: QrToken;
     goal: string;
+    appUrl: string;
 }
 
-export default function QrPage({ id, token: initialToken, goal }: Props) {
+export default function QrPage({ id, token: initialToken, goal, appUrl }: Props) {
     const { auth } = usePage<any>().props;
     const [token, setToken] = useState<QrToken>(initialToken);
     const [countdown, setCountdown] = useState("");
@@ -62,7 +63,7 @@ export default function QrPage({ id, token: initialToken, goal }: Props) {
     const isCreator = auth.wallet && token.created_by_account_id === auth.wallet.id;
 
     // Generate scan URL
-    const scanUrl = `${window.location.origin}/qr/redirect/${id}`;
+    const scanUrl = `${appUrl}/qr/redirect/${id}`;
 
     useEffect(() => {
         if (qrRef.current) {
