@@ -43,6 +43,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import QrScanner from '@/components/transactions/qr/QrScanner';
+import axios from 'axios';
 
 interface Account {
     id: number;
@@ -231,10 +233,19 @@ export default function Transfer({ accounts }: Props) {
             return;
         }
 
-        if (activeMethod === 'qr' && qrFlow === 'send' && qrStep === 'input') {
-            setQrStep('generated');
-            setExpiryTime(300);
-            return;
+        if (activeMethod === 'qr') {
+            if (qrFlow === 'send') {
+                router.post('/qr/create/sender', { amount: data.amount });
+                return;
+            }
+            if (qrFlow === 'request') {
+                router.post('/qr/create/receiver', { amount: data.amount });
+                return;
+            }
+            if (qrFlow === 'merchant') {
+                router.post('/qr/create/store', { amount: data.amount });
+                return;
+            }
         }
 
         setShowConfirm(true);
@@ -394,16 +405,13 @@ export default function Transfer({ accounts }: Props) {
                                         
                                         <CardContent className="p-6 flex-1 flex flex-col justify-center">
                                             {qrFlow === 'scanner' ? (
-                                                <div className="relative aspect-square w-full max-w-sm mx-auto bg-neutral-900 rounded-3xl overflow-hidden border-4 border-primary/30 group">
-                                                    <div className="absolute inset-0 bg-primary/5 flex items-center justify-center">
-                                                        <div className="relative h-64 w-64 border-2 border-primary/50 rounded-3xl">
-                                                            <div className="absolute inset-0 bg-primary/10 animate-pulse" />
-                                                            <ScanLine className="absolute top-0 left-0 w-full h-1 text-primary shadow-[0_0_15px_var(--color-primary)] animate-[scan_2s_ease-in-out_infinite]" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-                                                        <Badge className="bg-primary text-white font-black text-[9px] uppercase tracking-widest px-6 py-2 rounded-full">Position QR code within frame</Badge>
-                                                    </div>
+                                                <div className="relative aspect-square w-full max-w-sm mx-auto rounded-3xl overflow-hidden border-4 border-primary/30 group">
+                                                    <QrScanner 
+                                                        onResult={(result) => {
+                                                            // result is the encrypted token URL or just the id
+                                                            window.location.href = result;
+                                                        }}
+                                                    />
                                                 </div>
                                             ) : qrStep === 'generated' ? (
                                                 <div className="space-y-10 text-center flex flex-col items-center">

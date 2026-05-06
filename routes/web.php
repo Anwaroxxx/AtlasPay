@@ -96,50 +96,40 @@ Route::middleware(["auth"])->group(function () {
 
 // QRCODE payment service
 
-// Create
 Route::middleware(["auth", "verified"])->group(function () {
-
+    // Create QR
     Route::inertia("qr/create/sender", "transactions/qr/create/sender");
     Route::post("qr/create/sender",[TokenController::class, "storeSender"]);
-    Route::inertia("qr/create/reciver", "transactions/qr/create/reciver");
-    Route::post("qr/create/reciver",[TokenController::class, "storeReciver"]);
+    Route::inertia("qr/create/receiver", "transactions/qr/create/receiver");
+    Route::post("qr/create/receiver",[TokenController::class, "storeReceiver"]);
     Route::inertia("qr/create/store", "transactions/qr/create/store");
     Route::post("qr/create/store",[TokenController::class, "storeReceiverSTORE"]);
     
-});
-
-// update
-Route::middleware(["auth","verified"])->group(function() {
-
-    Route::get('qr/redirect/{id}', function ($id) {
-        $token = Token::where("token", (Crypt::decryptString($id)))->first() ;
+    // Scan & Update
+    Route::get('qr/redirect/{id}', [TokenController::class, 'handleScan'])->name('qr.scan');
+    
+    Route::get('qr/view/{id}', function ($id) {
+        $token = Token::where("token", (Crypt::decryptString($id)))->firstOrFail();
         
-        if(!$token)
-                {
-                    return;
-                }
         switch ($token->goal) {
             case "sender":
-                return Inertia::render("transactions/qr/update/sender",["id" => $id]);
-                break;
-
-            case "reciver":
-                return Inertia::render("transactions/qr/update/reciver",["id" => $id]);
-                break;
-
+                return Inertia::render("transactions/qr/update/sender", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
+            case "receiver":
+                return Inertia::render("transactions/qr/update/receiver", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
             case "store":
-                return Inertia::render("transactions/qr/update/store",["id" => $id]);
-                break;
-
+                return Inertia::render("transactions/qr/update/store", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
             default:
                 return back();
         }
-        
-    });
+    })->name('qr.update.view');
+
+    Route::post('/qr/confirm/{id}', [TokenController::class, 'confirmTransaction'])->name('qr.confirm');
+    Route::get('/qr/status/{token}', [TokenController::class, 'checkStatus'])->name('qr.status');
     
-    Route::post("qr/update/sender/{id}",[TokenController::class, "updateSender"])->name("updateSender");
-    Route::post("qr/update/reciver/{id}",[TokenController::class, "updateReciver"])->name("updateReciver");
-    Route::post("qr/update/store/{id}",[TokenController::class, "updateReciverSTORE"])->name("updateStore");
+    // Compatibility routes for existing frontend calls
+    Route::post("qr/update/sender/{id}",[TokenController::class, "updateSender"]);
+    Route::post("qr/update/receiver/{id}",[TokenController::class, "updateReceiver"]);
+    Route::post("qr/update/store/{id}",[TokenController::class, "updateReceiverSTORE"]);
 });
 
 

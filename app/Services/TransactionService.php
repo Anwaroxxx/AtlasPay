@@ -21,7 +21,7 @@ class TransactionService
             'to_account_id' => $data["to"]->id,
             "amount" => $data["amount"],
             "method" => $data["method"],
-            // "status" => $data["active"]
+            "type" => $data["type"] ?? "transfer",
         ]);
     }
 
