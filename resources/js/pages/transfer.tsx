@@ -1,9 +1,9 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    ArrowUpRight, 
-    QrCode, 
-    CreditCard, 
+import {
+    ArrowUpRight,
+    QrCode,
+    CreditCard,
     Wallet,
     Send,
     AlertCircle,
@@ -33,10 +33,16 @@ import {
     Home,
     ShoppingBag,
     Ticket,
-    HeartPulse
+    HeartPulse,
 } from 'lucide-react';
 import { router } from '@inertiajs/react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,86 +65,120 @@ interface Props {
     accounts: Account[];
 }
 
+type SendMethod = 'specify' | 'cut';
 type TransferMethod = 'bank' | 'qr' | 'card';
 type QRFlow = 'send' | 'request' | 'merchant' | 'scanner';
 
 const methodConfig = {
-    bank: {
-        label: 'Bank Transfer',
-        icon: Building2,
-        description: 'Standard RIB Transfer',
-        action: '/transfer/bank',
-    },
     qr: {
         label: 'QR Payment',
         icon: QrCode,
         description: 'Instant Scan & Pay',
         action: '/transfer/qr',
     },
-    card: {
-        label: 'Card Transfer',
-        icon: CreditCard,
-        description: 'Direct Card Remittance',
-        action: '/transfer/card',
+    bank: {
+        label: 'Bank Transfer',
+        icon: Building2,
+        description: 'Standard RIB Transfer',
+        action: '/transfer/bank',
     },
+
+    // card: {
+    //     label: 'Card Transfer',
+    //     icon: CreditCard,
+    //     description: 'Direct Card Remittance',
+    //     action: '/transfer/card',
+    // },
 };
 
-export function ConfirmationModal({ 
-    isOpen, 
-    onClose, 
-    onConfirm, 
-    data, 
-    processing 
-}: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    onConfirm: () => void; 
+export function ConfirmationModal({
+    isOpen,
+    onClose,
+    onConfirm,
+    data,
+    processing,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
     data: any;
     processing: boolean;
 }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div 
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+            <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="w-full max-w-md bg-card border border-border shadow-2xl rounded-[2.5rem] overflow-hidden"
+                className="w-full max-w-md overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-2xl"
             >
-                <div className="p-8 space-y-8">
+                <div className="space-y-8 p-8">
                     <div className="flex items-center justify-between">
-                        <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                             <ShieldCheck className="h-8 w-8" />
                         </div>
-                        <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors">
+                        <button
+                            onClick={onClose}
+                            className="rounded-full p-2 transition-colors hover:bg-muted"
+                        >
                             <X className="h-6 w-6" />
                         </button>
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="text-3xl font-black uppercase tracking-tight">Confirm <span className="text-primary italic">Transfer.</span></h3>
-                        <p className="text-muted-foreground font-medium">Please verify the transaction details before deployment.</p>
+                        <h3 className="text-3xl font-black tracking-tight uppercase">
+                            Confirm{' '}
+                            <span className="text-primary italic">
+                                Transfer.
+                            </span>
+                        </h3>
+                        <p className="font-medium text-muted-foreground">
+                            Please verify the transaction details before
+                            deployment.
+                        </p>
                     </div>
 
-                    <div className="space-y-4 rounded-3xl bg-muted/30 p-6 border border-border/50">
-                        <div className="flex justify-between items-center border-b border-border/50 pb-4">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Amount</span>
-                            <span className="text-2xl font-black">{Number(data.amount).toLocaleString()} MAD</span>
+                    <div className="space-y-4 rounded-3xl border border-border/50 bg-muted/30 p-6">
+                        <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                            <span className="text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                Amount
+                            </span>
+                            <span className="text-2xl font-black">
+                                {Number(data.amount).toLocaleString()} MAD
+                            </span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-border/50 pb-4">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">To RIB/Card</span>
-                            <span className="text-xs font-mono font-bold tracking-tighter">{data.to_account_rib || 'Instant QR'}</span>
+                        <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                            <span className="text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                To RIB/Card
+                            </span>
+                            <span className="font-mono text-xs font-bold tracking-tighter">
+                                {data.to_account_rib || 'Instant QR'}
+                            </span>
                         </div>
                     </div>
 
                     <div className="flex gap-4">
-                        <Button variant="outline" onClick={onClose} className="flex-1 h-16 rounded-2xl font-black uppercase tracking-widest border-2">Cancel</Button>
-                        <Button 
-                            onClick={onConfirm} 
-                            disabled={processing}
-                            className="flex-1 h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-lg group"
+                        <Button
+                            variant="outline"
+                            onClick={onClose}
+                            className="h-16 flex-1 rounded-2xl border-2 font-black tracking-widest uppercase"
                         >
-                            {processing ? <Loader2 className="h-6 w-6 animate-spin" /> : <>Confirm <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></>}
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={onConfirm}
+                            disabled={processing}
+                            className="group h-16 flex-1 rounded-2xl bg-primary font-black tracking-widest text-primary-foreground uppercase shadow-lg"
+                        >
+                            {processing ? (
+                                <Loader2 className="h-6 w-6 animate-spin" />
+                            ) : (
+                                <>
+                                    Confirm{' '}
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </>
+                            )}
                         </Button>
                     </div>
                 </div>
@@ -148,13 +188,16 @@ export function ConfirmationModal({
 }
 
 export default function Transfer({ accounts }: Props) {
-    const [activeMethod, setActiveMethod] = useState<TransferMethod>('bank');
+    const [activeMethod, setActiveMethod] = useState<TransferMethod>('qr');
+    const [activeSendMethod, setSendActiveMethod] = useState<SendMethod>('cut');
     const [qrFlow, setQrFlow] = useState<QRFlow>('send');
     const [isScanning, setIsScanning] = useState(false);
-    const [qrStep, setQrStep] = useState<'input' | 'generated' | 'processing' | 'confirmed'>('input');
+    const [qrStep, setQrStep] = useState<
+        'input' | 'generated' | 'processing' | 'confirmed'
+    >('input');
     const [expiryTime, setExpiryTime] = useState(300); // 5 minutes in seconds
     const [showConfirm, setShowConfirm] = useState(false);
-    
+
     const { props } = usePage();
     const auth = (props as any).auth;
     const pageErrors = (props as any).errors;
@@ -169,12 +212,18 @@ export default function Transfer({ accounts }: Props) {
     });
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && (window as any).Echo && auth?.user) {
+        if (
+            typeof window !== 'undefined' &&
+            (window as any).Echo &&
+            auth?.user
+        ) {
             const channel = `App.Models.User.${auth.user.id}`;
-            (window as any).Echo.private(channel)
-                .listen('.transaction.created', (e: any) => {
+            (window as any).Echo.private(channel).listen(
+                '.transaction.created',
+                (e: any) => {
                     router.reload({ only: ['accounts'] });
-                });
+                },
+            );
 
             return () => {
                 (window as any).Echo.leave(channel);
@@ -185,7 +234,7 @@ export default function Transfer({ accounts }: Props) {
     useEffect(() => {
         let timer: any;
         if (qrStep === 'generated' && expiryTime > 0) {
-            timer = setInterval(() => setExpiryTime(prev => prev - 1), 1000);
+            timer = setInterval(() => setExpiryTime((prev) => prev - 1), 1000);
         }
         return () => clearInterval(timer);
     }, [qrStep, expiryTime]);
@@ -203,7 +252,9 @@ export default function Transfer({ accounts }: Props) {
     };
 
     const config = methodConfig[activeMethod];
-    const selectedAccount = accounts.find(a => a.account_number === data.from_account_rib);
+    const selectedAccount = accounts.find(
+        (a) => a.account_number === data.from_account_rib,
+    );
 
     const handleConfirm = () => {
         setShowConfirm(false);
@@ -219,18 +270,20 @@ export default function Transfer({ accounts }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!data.from_account_rib) {
             toast.error('Please select a source account.');
             return;
         }
-        if (!data.to_account_rib && activeMethod !== 'qr') {
-            toast.error('Recipient details are required.');
-            return;
-        }
-        if (!data.amount || Number(data.amount) <= 0) {
-            toast.error('Please enter a valid amount.');
-            return;
+        if (activeSendMethod !== 'cut') {
+            if (!data.to_account_rib && activeMethod !== 'qr') {
+                toast.error('Recipient details are required.');
+                return;
+            }
+            if (!data.amount || Number(data.amount) <= 0) {
+                toast.error('Please enter a valid amount.');
+                return;
+            }
         }
 
         if (activeMethod === 'qr') {
@@ -255,28 +308,32 @@ export default function Transfer({ accounts }: Props) {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
-            transition: { staggerChildren: 0.1 }
-        }
+            transition: { staggerChildren: 0.1 },
+        },
     };
 
     const item: any = {
         hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: { type: 'spring', stiffness: 300, damping: 24 },
+        },
     };
 
     return (
         <>
             <Head title="Send Money" />
-            
-            <motion.div 
-                variants={container} 
-                initial="hidden" 
-                animate="show" 
-                className="flex flex-1 flex-col gap-6 p-6 md:p-6 md:p-8 max-w-7xl mx-auto w-full relative"
+
+            <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 md:p-6 md:p-8"
             >
-                <ConfirmationModal 
-                    isOpen={showConfirm} 
-                    onClose={() => setShowConfirm(false)} 
+                <ConfirmationModal
+                    isOpen={showConfirm}
+                    onClose={() => setShowConfirm(false)}
                     onConfirm={handleConfirm}
                     data={data}
                     processing={processing}
@@ -284,53 +341,69 @@ export default function Transfer({ accounts }: Props) {
                 {/* Header */}
                 <motion.div variants={item} className="space-y-4">
                     <div className="flex items-center gap-2 text-primary">
-                        <div className="p-1.5 rounded-lg bg-primary/10">
+                        <div className="rounded-lg bg-primary/10 p-1.5">
                             <Send className="h-5 w-5 fill-current" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Secure Remittance</span>
+                        <span className="text-[10px] font-black tracking-[0.3em] uppercase">
+                            Secure Remittance
+                        </span>
                     </div>
-                    <h1 className="font-display text-4xl font-black tracking-tighter text-foreground md:text-6xl uppercase leading-none">
+                    <h1 className="font-display text-4xl leading-none font-black tracking-tighter text-foreground uppercase md:text-6xl">
                         Send <span className="text-primary italic">Money.</span>
                     </h1>
-                    <p className="text-muted-foreground text-sm md:text-base max-w-xl font-medium">
-                        Fast and secure money transfers. Choose your preferred method and send funds across the AtlasPay network.
+                    <p className="max-w-xl text-sm font-medium text-muted-foreground md:text-base">
+                        Fast and secure money transfers. Choose your preferred
+                        method and send funds across the AtlasPay network.
                     </p>
                 </motion.div>
 
                 {/* Method Selector */}
-                <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {(Object.keys(methodConfig) as TransferMethod[]).map((method) => {
-                        const cfg = methodConfig[method];
-                        const isActive = activeMethod === method;
-                        const Icon = cfg.icon;
-                        return (
-                            <button
-                                key={method}
-                                onClick={() => {
-                                    setActiveMethod(method);
-                                    setQrStep('input');
-                                    setIsScanning(false);
-                                }}
-                                className={`group relative flex items-center gap-3 md:gap-5 rounded-3xl p-4 md:p-8 transition-all duration-500 text-left border overflow-hidden ${
-                                    isActive 
-                                    ? 'bg-card border-primary shadow-elevated' 
-                                    : 'bg-card/30 border-border/50 hover:border-primary/30 text-muted-foreground'
-                                }`}
-                            >
-                                <div className={`flex h-10 w-10 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl transition-all duration-500 shadow-soft ${
-                                    isActive 
-                                    ? 'bg-primary text-primary-foreground scale-110' 
-                                    : 'bg-muted text-muted-foreground group-hover:bg-accent'
-                                }`}>
-                                    <Icon className="h-5 w-5 md:h-8 md:w-8" />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className={`text-lg font-black tracking-tight uppercase ${isActive ? 'text-foreground' : ''}`}>{cfg.label}</p>
-                                    <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest mt-1">{cfg.description}</p>
-                                </div>
-                            </button>
-                        );
-                    })}
+                <motion.div
+                    variants={item}
+                    className="grid grid-cols-1 gap-6 sm:grid-cols-3"
+                >
+                    {(Object.keys(methodConfig) as TransferMethod[]).map(
+                        (method) => {
+                            const cfg = methodConfig[method];
+                            const isActive = activeMethod === method;
+                            const Icon = cfg.icon;
+                            return (
+                                <button
+                                    key={method}
+                                    onClick={() => {
+                                        setActiveMethod(method);
+                                        setQrStep('input');
+                                        setIsScanning(false);
+                                    }}
+                                    className={`group relative flex items-center gap-3 overflow-hidden rounded-3xl border p-4 text-left transition-all duration-500 md:gap-5 md:p-8 ${
+                                        isActive
+                                            ? 'shadow-elevated border-primary bg-card'
+                                            : 'border-border/50 bg-card/30 text-muted-foreground hover:border-primary/30'
+                                    }`}
+                                >
+                                    <div
+                                        className={`shadow-soft flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-500 md:h-16 md:w-16 ${
+                                            isActive
+                                                ? 'scale-110 bg-primary text-primary-foreground'
+                                                : 'bg-muted text-muted-foreground group-hover:bg-accent'
+                                        }`}
+                                    >
+                                        <Icon className="h-5 w-5 md:h-8 md:w-8" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p
+                                            className={`text-lg font-black tracking-tight uppercase ${isActive ? 'text-foreground' : ''}`}
+                                        >
+                                            {cfg.label}
+                                        </p>
+                                        <p className="mt-1 text-[9px] font-black tracking-widest text-muted-foreground/60 uppercase">
+                                            {cfg.description}
+                                        </p>
+                                    </div>
+                                </button>
+                            );
+                        },
+                    )}
                 </motion.div>
 
                 <div className="grid gap-6 lg:grid-cols-12">
@@ -346,141 +419,322 @@ export default function Transfer({ accounts }: Props) {
                                     className="space-y-10"
                                 >
                                     {/* QR Flow Selector */}
-                                    <div className="flex flex-wrap gap-4 p-2 rounded-2xl bg-muted/20 border border-border/50">
+                                    <div className="flex flex-wrap gap-4 rounded-2xl border border-border/50 bg-muted/20 p-2">
                                         {[
-                                            { id: 'send', label: 'Send', icon: Send },
-                                            { id: 'request', label: 'Request', icon: ArrowDownLeft },
-                                            { id: 'merchant', label: 'Merchant', icon: Store },
-                                            { id: 'scanner', label: 'Scan', icon: Camera }
+                                            {
+                                                id: 'send',
+                                                label: 'Send',
+                                                icon: Send,
+                                            },
+                                            {
+                                                id: 'request',
+                                                label: 'Request',
+                                                icon: ArrowDownLeft,
+                                            },
+                                            {
+                                                id: 'merchant',
+                                                label: 'Merchant',
+                                                icon: Store,
+                                            },
+                                            {
+                                                id: 'scanner',
+                                                label: 'Scan',
+                                                icon: Camera,
+                                            },
                                         ].map((flow) => (
                                             <button
                                                 key={flow.id}
                                                 onClick={() => {
-                                                    setQrFlow(flow.id as QRFlow);
+                                                    setQrFlow(
+                                                        flow.id as QRFlow,
+                                                    );
                                                     setQrStep('input');
-                                                    setIsScanning(flow.id === 'scanner');
+                                                    setIsScanning(
+                                                        flow.id === 'scanner',
+                                                    );
                                                 }}
-                                                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                                    qrFlow === flow.id 
-                                                    ? 'bg-primary text-primary-foreground shadow-lg' 
-                                                    : 'hover:bg-muted text-muted-foreground'
+                                                className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[10px] font-black tracking-widest uppercase transition-all ${
+                                                    qrFlow === flow.id
+                                                        ? 'bg-primary text-primary-foreground shadow-lg'
+                                                        : 'text-muted-foreground hover:bg-muted'
                                                 }`}
                                             >
                                                 <flow.icon className="h-4 w-4" />
-                                                <span className="hidden sm:inline">{flow.label}</span>
+                                                <span className="hidden sm:inline">
+                                                    {flow.label}
+                                                </span>
                                             </button>
                                         ))}
                                     </div>
 
                                     {/* QR Flow UI */}
-                                    <Card className="border-none shadow-elevated rounded-3xl overflow-hidden bg-card glass-card min-h-[500px] flex flex-col">
-                                        <CardHeader className="p-6 border-b border-border bg-muted/20">
+                                    <Card className="shadow-elevated glass-card flex min-h-[500px] flex-col overflow-hidden rounded-3xl border-none bg-card">
+                                        <CardHeader className="border-b border-border bg-muted/20 p-6">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                                                         <QrCode className="h-7 w-7" />
                                                     </div>
                                                     <div>
-                                                        <CardTitle className="text-2xl font-black uppercase tracking-tight">
-                                                            {qrFlow === 'send' && 'Send via QR'}
-                                                            {qrFlow === 'request' && 'Request Payment'}
-                                                            {qrFlow === 'merchant' && 'Merchant QR'}
-                                                            {qrFlow === 'scanner' && 'Scan QR'}
+                                                        <CardTitle className="text-2xl font-black tracking-tight uppercase">
+                                                            {qrFlow ===
+                                                                'send' &&
+                                                                'Send via QR'}
+                                                            {qrFlow ===
+                                                                'request' &&
+                                                                'Request Payment'}
+                                                            {qrFlow ===
+                                                                'merchant' &&
+                                                                'Merchant QR'}
+                                                            {qrFlow ===
+                                                                'scanner' &&
+                                                                'Scan QR'}
                                                         </CardTitle>
-                                                        <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1">
-                                                            {qrFlow === 'send' && 'Generate a one-time payment token'}
-                                                            {qrFlow === 'request' && 'Create a payment link for others'}
-                                                            {qrFlow === 'merchant' && 'Your permanent business identifier'}
-                                                            {qrFlow === 'scanner' && 'Point your camera at a code'}
+                                                        <CardDescription className="mt-1 text-[10px] font-black tracking-widest uppercase">
+                                                            {qrFlow ===
+                                                                'send' &&
+                                                                'Generate a one-time payment token'}
+                                                            {qrFlow ===
+                                                                'request' &&
+                                                                'Create a payment link for others'}
+                                                            {qrFlow ===
+                                                                'merchant' &&
+                                                                'Your permanent business identifier'}
+                                                            {qrFlow ===
+                                                                'scanner' &&
+                                                                'Point your camera at a code'}
                                                         </CardDescription>
                                                     </div>
                                                 </div>
                                                 {qrStep === 'generated' && (
-                                                    <Badge className="bg-primary/20 text-primary border-none px-4 py-2 font-black">
-                                                        <Timer className="h-3 w-3 mr-2" /> {formatTime(expiryTime)}
+                                                    <Badge className="border-none bg-primary/20 px-4 py-2 font-black text-primary">
+                                                        <Timer className="mr-2 h-3 w-3" />{' '}
+                                                        {formatTime(expiryTime)}
                                                     </Badge>
                                                 )}
                                             </div>
                                         </CardHeader>
-                                        
-                                        <CardContent className="p-6 flex-1 flex flex-col justify-center">
+
+                                        <CardContent className="flex flex-1 flex-col justify-center p-6">
                                             {qrFlow === 'scanner' ? (
-                                                <div className="relative aspect-square w-full max-w-sm mx-auto rounded-3xl overflow-hidden border-4 border-primary/30 group">
-                                                    <QrScanner 
+                                                <div className="group relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border-4 border-primary/30">
+                                                    <QrScanner
                                                         onResult={(result) => {
                                                             // result is the encrypted token URL or just the id
-                                                            window.location.href = result;
+                                                            window.location.href =
+                                                                result;
                                                         }}
                                                     />
                                                 </div>
                                             ) : qrStep === 'generated' ? (
-                                                <div className="space-y-10 text-center flex flex-col items-center">
-                                                    <div className="relative p-6 bg-white rounded-3xl shadow-elevated group">
-                                                        <div className="absolute inset-0 moroccan-pattern opacity-[0.05] pointer-events-none" />
+                                                <div className="flex flex-col items-center space-y-10 text-center">
+                                                    <div className="shadow-elevated group relative rounded-3xl bg-white p-6">
+                                                        <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
                                                         <QrCode className="h-64 w-64 text-neutral-900" />
-                                                        <div className="absolute inset-0 border-4 border-primary/20 rounded-3xl group-hover:border-primary/50 transition-colors" />
+                                                        <div className="absolute inset-0 rounded-3xl border-4 border-primary/20 transition-colors group-hover:border-primary/50" />
                                                     </div>
                                                     <div className="space-y-4">
-                                                        <p className="text-5xl font-black font-display tracking-tighter">{Number(data.amount).toLocaleString()} <span className="text-xl font-normal">MAD</span></p>
-                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">One-time payment token</p>
+                                                        <p className="font-display text-5xl font-black tracking-tighter">
+                                                            {Number(
+                                                                data.amount,
+                                                            ).toLocaleString()}{' '}
+                                                            <span className="text-xl font-normal">
+                                                                MAD
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase">
+                                                            One-time payment
+                                                            token
+                                                        </p>
                                                     </div>
-                                                    <div className="flex gap-4 w-full">
-                                                        <Button onClick={() => setQrStep('input')} variant="outline" className="flex-1 h-16 rounded-2xl font-black uppercase tracking-widest">Cancel</Button>
-                                                        <Button className="flex-1 h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest"><RefreshCw className="h-5 w-5 mr-3" /> Refresh</Button>
+                                                    <div className="flex w-full gap-4">
+                                                        <Button
+                                                            onClick={() =>
+                                                                setQrStep(
+                                                                    'input',
+                                                                )
+                                                            }
+                                                            variant="outline"
+                                                            className="h-16 flex-1 rounded-2xl font-black tracking-widest uppercase"
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                        <Button className="h-16 flex-1 rounded-2xl bg-primary font-black tracking-widest text-primary-foreground uppercase">
+                                                            <RefreshCw className="mr-3 h-5 w-5" />{' '}
+                                                            Refresh
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             ) : qrStep === 'confirmed' ? (
-                                                <div className="text-center space-y-8 py-10">
-                                                    <div className="h-32 w-32 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto scale-110">
+                                                <div className="space-y-8 py-10 text-center">
+                                                    <div className="mx-auto flex h-32 w-32 scale-110 items-center justify-center rounded-full bg-success/10 text-success">
                                                         <CheckCircle2 className="h-16 w-16" />
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <h4 className="text-3xl font-black uppercase tracking-tight">Payment <span className="text-success italic">Complete.</span></h4>
-                                                        <p className="text-muted-foreground font-medium">Transaction verified and settled instantly.</p>
+                                                        <h4 className="text-3xl font-black tracking-tight uppercase">
+                                                            Payment{' '}
+                                                            <span className="text-success italic">
+                                                                Complete.
+                                                            </span>
+                                                        </h4>
+                                                        <p className="font-medium text-muted-foreground">
+                                                            Transaction verified
+                                                            and settled
+                                                            instantly.
+                                                        </p>
                                                     </div>
-                                                    <Button onClick={() => setQrStep('input')} className="h-16 px-10 rounded-2xl bg-success text-white font-black uppercase tracking-widest">Done</Button>
+                                                    <Button
+                                                        onClick={() =>
+                                                            setQrStep('input')
+                                                        }
+                                                        className="h-16 rounded-2xl bg-success px-10 font-black tracking-widest text-white uppercase"
+                                                    >
+                                                        Done
+                                                    </Button>
                                                 </div>
                                             ) : (
-                                                <form onSubmit={submit} className="space-y-8">
-                                                    <div className="space-y-4">
-                                                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Source Account</Label>
-                                                        <div className="grid gap-4">
-                                                            {accounts.map(acc => (
-                                                                <button
-                                                                    key={acc.id}
-                                                                    type="button"
-                                                                    onClick={() => setData('from_account_rib', acc.account_number)}
-                                                                    className={`p-6 rounded-2xl border text-left flex items-center justify-between transition-all ${
-                                                                        data.from_account_rib === acc.account_number ? 'bg-primary/5 border-primary ring-2 ring-primary/20' : 'bg-muted/10 border-border/50 hover:border-primary/30'
-                                                                    }`}
-                                                                >
-                                                                    <div>
-                                                                        <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">{acc.type}</p>
-                                                                        <p className="text-xl font-black tracking-tight">{acc.balance.toLocaleString()} MAD</p>
-                                                                    </div>
-                                                                    <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${data.from_account_rib === acc.account_number ? 'border-primary bg-primary text-white' : 'border-muted-foreground/30'}`}>
-                                                                        {data.from_account_rib === acc.account_number && <CheckCircle2 className="h-4 w-4" />}
-                                                                    </div>
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
+                                                <>
+                                                    {qrFlow === 'send' ? (
+                                                        <div className="">
+                                                            <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                                Source Account
+                                                            </Label>
 
-                                                    <div className="space-y-4">
-                                                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Amount to {qrFlow === 'send' ? 'Send' : 'Request'}</Label>
-                                                        <div className="relative">
-                                                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-muted-foreground">DH</div>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="0.00"
-                                                                className="h-24 pl-20 rounded-3xl bg-muted/20 border-border/50 text-5xl font-black font-display tracking-tighter focus:ring-primary/10 transition-all"
-                                                                value={data.amount}
-                                                                onChange={e => setData('amount', e.target.value)}
-                                                            />
+                                                            <div className="ml-1 flex justify-around space-y-8 text-[20px] font-black tracking-widest text-muted-foreground uppercase">
+                                                                <div className="p-y-10">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setSendActiveMethod(
+                                                                                'specify',
+                                                                            );
+                                                                        }}
+                                                                        className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-14 py-6 text-[10px] font-black tracking-widest uppercase transition-all ${
+                                                                            activeSendMethod ===
+                                                                            'specify'
+                                                                                ? 'bg-primary text-primary-foreground shadow-lg'
+                                                                                : 'text-muted-foreground hover:bg-muted'
+                                                                        }`}
+                                                                    >
+                                                                        specify{' '}
+                                                                    </button>
+                                                                </div>
+                                                                <div>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setSendActiveMethod(
+                                                                                'cut',
+                                                                            );
+                                                                        }}
+                                                                        className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-14 py-6 text-[10px] font-black tracking-widest uppercase transition-all ${
+                                                                            activeSendMethod ===
+                                                                            'cut'
+                                                                                ? 'bg-primary text-primary-foreground shadow-lg'
+                                                                                : 'text-muted-foreground hover:bg-muted'
+                                                                        }`}
+                                                                    >
+                                                                        pay{' '}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    ) : (
+                                                        ''
+                                                    )}
+                                                    <form
+                                                        onSubmit={submit}
+                                                        className="space-y-8"
+                                                    >
+                                                        <div className="space-y-4">
+                                                            <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                                Source Account
+                                                            </Label>
+                                                            <div className="grid gap-4">
+                                                                {accounts.map(
+                                                                    (acc) => (
+                                                                        <button
+                                                                            key={
+                                                                                acc.id
+                                                                            }
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                setData(
+                                                                                    'from_account_rib',
+                                                                                    acc.account_number,
+                                                                                )
+                                                                            }
+                                                                            className={`flex items-center justify-between rounded-2xl border p-6 text-left transition-all ${
+                                                                                data.from_account_rib ===
+                                                                                acc.account_number
+                                                                                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                                                                    : 'border-border/50 bg-muted/10 hover:border-primary/30'
+                                                                            }`}
+                                                                        >
+                                                                            {}
+                                                                            <div>
+                                                                                <p className="mb-1 text-[10px] font-black tracking-widest uppercase opacity-60">
+                                                                                    {
+                                                                                        acc.type
+                                                                                    }
+                                                                                </p>
+                                                                                <p className="text-xl font-black tracking-tight">
+                                                                                    {acc.balance.toLocaleString()}{' '}
+                                                                                    MAD
+                                                                                </p>
+                                                                            </div>
+                                                                            <div
+                                                                                className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${data.from_account_rib === acc.account_number ? 'border-primary bg-primary text-white' : 'border-muted-foreground/30'}`}
+                                                                            >
+                                                                                {data.from_account_rib ===
+                                                                                    acc.account_number && (
+                                                                                    <CheckCircle2 className="h-4 w-4" />
+                                                                                )}
+                                                                            </div>
+                                                                        </button>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        </div>
 
-                                                    {qrFlow === 'request' && (
+                                                        {qrFlow === 'send' &&
+                                                        activeSendMethod ==
+                                                            'cut' ? (
+                                                            ''
+                                                        ) : (
+                                                            <div className="space-y-4">
+                                                                <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                                    Amount to{' '}
+                                                                    {qrFlow ===
+                                                                    'send'
+                                                                        ? 'Send'
+                                                                        : 'Request'}
+                                                                </Label>
+                                                                <div className="relative">
+                                                                    <div className="absolute top-1/2 left-6 -translate-y-1/2 text-2xl font-black text-muted-foreground">
+                                                                        DH
+                                                                    </div>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder="0.00"
+                                                                        className="h-24 rounded-3xl border-border/50 bg-muted/20 pl-20 font-display text-5xl font-black tracking-tighter transition-all focus:ring-primary/10"
+                                                                        value={
+                                                                            data.amount
+                                                                        }
+                                                                        onChange={(
+                                                                            e,
+                                                                        ) =>
+                                                                            setData(
+                                                                                'amount',
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* {qrFlow === 'request' && (
                                                         <div className="grid gap-6 sm:grid-cols-2">
                                                             <div className="space-y-3">
                                                                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Note (Optional)</Label>
@@ -504,38 +758,70 @@ export default function Transfer({ accounts }: Props) {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    )}
+                                                    )} */}
 
-                                                    {qrFlow === 'merchant' ? (
-                                                        <div className="p-6 bg-neutral-900 rounded-3xl text-center space-y-8 relative overflow-hidden">
-                                                            <div className="absolute inset-0 moroccan-pattern opacity-[0.05]" />
-                                                            <div className="relative z-10 space-y-6">
-                                                                <div className="h-24 w-24 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto border-2 border-primary/30">
-                                                                    <Store className="h-12 w-12 text-primary" />
-                                                                </div>
-                                                                <div>
-                                                                    <h5 className="text-2xl font-black uppercase tracking-tight text-white">Your Business QR</h5>
-                                                                    <p className="text-muted-foreground text-sm font-medium">Permanent link to your account</p>
-                                                                </div>
-                                                                <div className="bg-white p-4 rounded-3xl inline-block shadow-lg">
-                                                                    <QrCode className="h-40 w-40 text-neutral-900" />
-                                                                </div>
-                                                                <div className="flex gap-4">
-                                                                    <Button className="flex-1 bg-primary text-white font-black uppercase tracking-widest h-14 rounded-xl">Download PDF</Button>
-                                                                    <Button variant="outline" className="flex-1 border-white/20 text-white font-black uppercase tracking-widest h-14 rounded-xl">Share link</Button>
+                                                        {qrFlow ===
+                                                        'merchant' ? (
+                                                            <div className="relative space-y-8 overflow-hidden rounded-3xl bg-neutral-900 p-6 text-center">
+                                                                <div className="moroccan-pattern absolute inset-0 opacity-[0.05]" />
+                                                                <div className="relative z-10 space-y-6">
+                                                                    <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border-2 border-primary/30 bg-primary/20">
+                                                                        <Store className="h-12 w-12 text-primary" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h5 className="text-2xl font-black tracking-tight text-white uppercase">
+                                                                            Your
+                                                                            Business
+                                                                            QR
+                                                                        </h5>
+                                                                        <p className="text-sm font-medium text-muted-foreground">
+                                                                            Permanent
+                                                                            link
+                                                                            to
+                                                                            your
+                                                                            account
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="inline-block rounded-3xl bg-white p-4 shadow-lg">
+                                                                        <QrCode className="h-40 w-40 text-neutral-900" />
+                                                                    </div>
+                                                                    <div className="flex gap-4">
+                                                                        <Button className="h-14 flex-1 rounded-xl bg-primary font-black tracking-widest text-white uppercase">
+                                                                            Download
+                                                                            PDF
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            className="h-14 flex-1 rounded-xl border-white/20 font-black tracking-widest text-white uppercase"
+                                                                        >
+                                                                            Share
+                                                                            link
+                                                                        </Button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <Button 
-                                                            type="submit" 
-                                                            className="w-full h-14 md:h-24 rounded-3xl bg-primary text-primary-foreground font-black text-base md:text-2xl uppercase tracking-widest shadow-elevated group"
-                                                            disabled={!data.amount || Number(data.amount) <= 0}
-                                                        >
-                                                            {qrFlow === 'send' ? 'Generate Token' : 'Generate Request'} <ArrowRight className="ml-2 md:ml-4 h-5 w-5 md:h-8 md:w-8 transition-transform group-hover:translate-x-4" />
-                                                        </Button>
-                                                    )}
-                                                </form>
+                                                        ) : (
+                                                            <Button
+                                                                type="submit"
+                                                                className="shadow-elevated group h-14 w-full rounded-3xl bg-primary text-base font-black tracking-widest text-primary-foreground uppercase md:h-24 md:text-2xl"
+                                                                disabled={!(qrFlow === 'send' && activeSendMethod === 'cut')
+                                                                        ?
+                                                                         !data.amount ||
+                                                                          Number(
+                                                                              data.amount,
+                                                                          ) <= 0
+                                                                        : false
+                                                                }
+                                                            >
+                                                                {qrFlow ===
+                                                                'send'
+                                                                    ? 'Generate Qr Code'
+                                                                    : 'Request'}{' '}
+                                                                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-4 md:ml-4 md:h-8 md:w-8" />
+                                                            </Button>
+                                                        )}
+                                                    </form>
+                                                </>
                                             )}
                                         </CardContent>
                                     </Card>
@@ -547,129 +833,239 @@ export default function Transfer({ accounts }: Props) {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                 >
-                                    <Card className="border-none shadow-elevated rounded-3xl overflow-hidden bg-card glass-card">
-                                        <CardHeader className="p-6 border-b border-border bg-muted/20">
+                                    <Card className="shadow-elevated glass-card overflow-hidden rounded-3xl border-none bg-card">
+                                        <CardHeader className="border-b border-border bg-muted/20 p-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
                                                     <config.icon className="h-7 w-7" />
                                                 </div>
                                                 <div>
-                                                    <CardTitle className="font-display text-2xl font-black uppercase tracking-tight">Transfer <span className="text-primary italic">Details.</span></CardTitle>
-                                                    <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1">Fill in the transfer information below</CardDescription>
+                                                    <CardTitle className="font-display text-2xl font-black tracking-tight uppercase">
+                                                        Transfer{' '}
+                                                        <span className="text-primary italic">
+                                                            Details.
+                                                        </span>
+                                                    </CardTitle>
+                                                    <CardDescription className="mt-1 text-[10px] font-black tracking-widest uppercase">
+                                                        Fill in the transfer
+                                                        information below
+                                                    </CardDescription>
                                                 </div>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="p-6">
-                                            <form onSubmit={submit} className="space-y-10">
+                                            <form
+                                                onSubmit={submit}
+                                                className="space-y-10"
+                                            >
                                                 <div className="space-y-4">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Select Source Account</Label>
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        Select Source Account
+                                                    </Label>
                                                     <div className="grid gap-4 sm:grid-cols-2">
-                                                        {accounts.map((account) => {
-                                                            const isSelected = data.from_account_rib === account.account_number;
-                                                            return (
-                                                                <button
-                                                                    key={account.id}
-                                                                    type="button"
-                                                                    onClick={() => setData('from_account_rib', account.account_number)}
-                                                                    className={`group relative rounded-2xl p-6 text-left transition-all duration-500 border overflow-hidden ${
-                                                                        isSelected
-                                                                        ? 'bg-primary text-primary-foreground border-primary shadow-elevated scale-[1.02]'
-                                                                        : 'bg-muted/30 border-border/50 hover:border-primary/30'
-                                                                    }`}
-                                                                >
-                                                                    <div className="absolute inset-0 moroccan-pattern opacity-[0.05] pointer-events-none" />
-                                                                    <div className="relative z-10">
-                                                                        <div className="flex items-center justify-between mb-4">
-                                                                            <Badge className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-none ${
-                                                                                isSelected 
-                                                                                ? 'bg-white/20 text-white' 
-                                                                                : 'bg-muted text-muted-foreground'
-                                                                            }`}>
-                                                                                {account.type}
-                                                                            </Badge>
-                                                                            {isSelected && <CheckCircle2 className="h-4 w-4" />}
+                                                        {accounts.map(
+                                                            (account) => {
+                                                                const isSelected =
+                                                                    data.from_account_rib ===
+                                                                    account.account_number;
+                                                                return (
+                                                                    <button
+                                                                        key={
+                                                                            account.id
+                                                                        }
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            setData(
+                                                                                'from_account_rib',
+                                                                                account.account_number,
+                                                                            )
+                                                                        }
+                                                                        className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-500 ${
+                                                                            isSelected
+                                                                                ? 'shadow-elevated scale-[1.02] border-primary bg-primary text-primary-foreground'
+                                                                                : 'border-border/50 bg-muted/30 hover:border-primary/30'
+                                                                        }`}
+                                                                    >
+                                                                        <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
+                                                                        <div className="relative z-10">
+                                                                            <div className="mb-4 flex items-center justify-between">
+                                                                                <Badge
+                                                                                    className={`border-none px-2 py-0.5 text-[8px] font-black tracking-widest uppercase ${
+                                                                                        isSelected
+                                                                                            ? 'bg-white/20 text-white'
+                                                                                            : 'bg-muted text-muted-foreground'
+                                                                                    }`}
+                                                                                >
+                                                                                    {
+                                                                                        account.type
+                                                                                    }
+                                                                                </Badge>
+                                                                                {isSelected && (
+                                                                                    <CheckCircle2 className="h-4 w-4" />
+                                                                                )}
+                                                                            </div>
+                                                                            <p
+                                                                                className={`mb-2 font-mono text-[10px] tracking-tighter ${isSelected ? 'text-white/70' : 'text-muted-foreground'}`}
+                                                                            >
+                                                                                {
+                                                                                    account.account_number
+                                                                                }
+                                                                            </p>
+                                                                            <p className="font-display text-2xl font-black tracking-tight">
+                                                                                {account.balance.toLocaleString()}{' '}
+                                                                                <span className="text-xs font-normal opacity-60">
+                                                                                    {
+                                                                                        account.currency
+                                                                                    }
+                                                                                </span>
+                                                                            </p>
                                                                         </div>
-                                                                        <p className={`text-[10px] font-mono mb-2 tracking-tighter ${isSelected ? 'text-white/70' : 'text-muted-foreground'}`}>
-                                                                            {account.account_number}
-                                                                        </p>
-                                                                        <p className="text-2xl font-black font-display tracking-tight">
-                                                                            {account.balance.toLocaleString()} <span className="text-xs font-normal opacity-60">{account.currency}</span>
-                                                                        </p>
-                                                                    </div>
-                                                                </button>
-                                                            );
-                                                        })}
+                                                                    </button>
+                                                                );
+                                                            },
+                                                        )}
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
-                                                        {activeMethod === 'bank' ? 'Recipient RIB' : 'Recipient Card Number'}
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        {activeMethod === 'bank'
+                                                            ? 'Recipient RIB'
+                                                            : 'Recipient Card Number'}
                                                     </Label>
-                                                    <div className="relative group">
-                                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors flex items-center justify-center">
-                                                            {activeMethod === 'bank' ? <Hash className="h-6 w-6" /> : <CreditCard className="h-6 w-6" />}
+                                                    <div className="group relative">
+                                                        <div className="absolute top-1/2 left-6 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-muted-foreground transition-colors group-focus-within:text-primary">
+                                                            {activeMethod ===
+                                                            'bank' ? (
+                                                                <Hash className="h-6 w-6" />
+                                                            ) : (
+                                                                <CreditCard className="h-6 w-6" />
+                                                            )}
                                                         </div>
                                                         <Input
                                                             type="text"
-                                                            placeholder={activeMethod === 'bank' ? "Enter 24-digit RIB" : "Enter 16-digit Card Number"}
-                                                            className="h-16 pl-16 rounded-[1.5rem] bg-muted/20 border-border/50 text-base font-black tracking-tight focus:ring-primary/10 transition-all"
-                                                            value={data.to_account_rib}
-                                                            onChange={e => setData('to_account_rib', e.target.value)}
+                                                            placeholder={
+                                                                activeMethod ===
+                                                                'bank'
+                                                                    ? 'Enter 24-digit RIB'
+                                                                    : 'Enter 16-digit Card Number'
+                                                            }
+                                                            className="h-16 rounded-[1.5rem] border-border/50 bg-muted/20 pl-16 text-base font-black tracking-tight transition-all focus:ring-primary/10"
+                                                            value={
+                                                                data.to_account_rib
+                                                            }
+                                                            onChange={(e) =>
+                                                                setData(
+                                                                    'to_account_rib',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-4">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Spending Category</Label>
-                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        Spending Category
+                                                    </Label>
+                                                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                                                         {[
-                                                            { id: 'Remittance', icon: Wallet },
-                                                            { id: 'Food', icon: Utensils },
-                                                            { id: 'Transport', icon: Car },
-                                                            { id: 'Housing', icon: Home },
-                                                            { id: 'Shopping', icon: ShoppingBag },
-                                                            { id: 'Fun', icon: Ticket },
-                                                            { id: 'Health', icon: HeartPulse },
-                                                            { id: 'Other', icon: Hash }
+                                                            {
+                                                                id: 'Remittance',
+                                                                icon: Wallet,
+                                                            },
+                                                            {
+                                                                id: 'Food',
+                                                                icon: Utensils,
+                                                            },
+                                                            {
+                                                                id: 'Transport',
+                                                                icon: Car,
+                                                            },
+                                                            {
+                                                                id: 'Housing',
+                                                                icon: Home,
+                                                            },
+                                                            {
+                                                                id: 'Shopping',
+                                                                icon: ShoppingBag,
+                                                            },
+                                                            {
+                                                                id: 'Fun',
+                                                                icon: Ticket,
+                                                            },
+                                                            {
+                                                                id: 'Health',
+                                                                icon: HeartPulse,
+                                                            },
+                                                            {
+                                                                id: 'Other',
+                                                                icon: Hash,
+                                                            },
                                                         ].map((cat) => (
                                                             <button
                                                                 key={cat.id}
                                                                 type="button"
-                                                                onClick={() => setData('category', cat.id)}
-                                                                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all ${
-                                                                    data.category === cat.id 
-                                                                    ? 'bg-primary/10 border-primary text-primary shadow-sm' 
-                                                                    : 'bg-muted/10 border-border/50 hover:border-primary/20 text-muted-foreground'
+                                                                onClick={() =>
+                                                                    setData(
+                                                                        'category',
+                                                                        cat.id,
+                                                                    )
+                                                                }
+                                                                className={`flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 transition-all ${
+                                                                    data.category ===
+                                                                    cat.id
+                                                                        ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                                                                        : 'border-border/50 bg-muted/10 text-muted-foreground hover:border-primary/20'
                                                                 }`}
                                                             >
                                                                 <cat.icon className="h-5 w-5" />
-                                                                <span className="text-[9px] font-black uppercase tracking-tighter">{cat.id}</span>
+                                                                <span className="text-[9px] font-black tracking-tighter uppercase">
+                                                                    {cat.id}
+                                                                </span>
                                                             </button>
                                                         ))}
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Amount (MAD)</Label>
-                                                    <div className="relative group">
-                                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-muted-foreground">DH</div>
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        Amount (MAD)
+                                                    </Label>
+                                                    <div className="group relative">
+                                                        <div className="absolute top-1/2 left-6 -translate-y-1/2 text-2xl font-black text-muted-foreground">
+                                                            DH
+                                                        </div>
                                                         <Input
                                                             type="number"
                                                             placeholder="0.00"
-                                                            className="h-24 pl-20 rounded-3xl bg-muted/20 border-border/50 text-5xl font-black font-display tracking-tighter focus:ring-primary/10 transition-all"
+                                                            className="h-24 rounded-3xl border-border/50 bg-muted/20 pl-20 font-display text-5xl font-black tracking-tighter transition-all focus:ring-primary/10"
                                                             value={data.amount}
-                                                            onChange={e => setData('amount', e.target.value)}
+                                                            onChange={(e) =>
+                                                                setData(
+                                                                    'amount',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
                                                         />
                                                     </div>
                                                 </div>
 
-                                                <Button 
-                                                    type="submit" 
-                                                    className="w-full h-14 md:h-24 rounded-3xl bg-primary text-primary-foreground font-black text-base md:text-2xl uppercase tracking-widest shadow-elevated group" 
-                                                    disabled={processing || !data.amount}
+                                                <Button
+                                                    type="submit"
+                                                    className="shadow-elevated group h-14 w-full rounded-3xl bg-primary text-base font-black tracking-widest text-primary-foreground uppercase md:h-24 md:text-2xl"
+                                                    disabled={
+                                                        processing ||
+                                                        !data.amount
+                                                    }
                                                 >
-                                                    {processing ? <Loader2 className="h-6 w-6 md:h-10 md:w-10 animate-spin" /> : 'Confirm Transfer'}
+                                                    {processing ? (
+                                                        <Loader2 className="h-6 w-6 animate-spin md:h-10 md:w-10" />
+                                                    ) : (
+                                                        'Confirm Transfer'
+                                                    )}
                                                 </Button>
                                             </form>
                                         </CardContent>
@@ -679,7 +1075,7 @@ export default function Transfer({ accounts }: Props) {
                         </AnimatePresence>
                     </motion.div>
 
-                    {/* Security & Features Side Section */}
+                    {/* Security & Features Side Section
                     <motion.div variants={item} className="lg:col-span-5 space-y-8">
                         <Card className="border-none shadow-elevated rounded-3xl bg-neutral-900 text-white overflow-hidden dark:bg-black group">
                             <CardContent className="p-6 md:p-8 relative">
@@ -779,7 +1175,7 @@ export default function Transfer({ accounts }: Props) {
                                 </CardContent>
                             </Card>
                         )}
-                    </motion.div>
+                    </motion.div> */}
                 </div>
             </motion.div>
         </>
@@ -794,4 +1190,3 @@ Transfer.layout = {
         },
     ],
 };
-

@@ -25,6 +25,11 @@ class TokenController extends Controller
         return $this->store($request, QrTypes::SENDER);
     }
 
+    public function storeSenderPay(Request $request)
+    {
+        return $this->store($request, QrTypes::SENDER);
+    }
+
     public function storeReceiver(Request $request)
     {
         return $this->store($request, QrTypes::RECEIVER);
@@ -52,6 +57,14 @@ class TokenController extends Controller
                     "to_account_id" => null,
                     "amount" => $request->amount,
                     "goal" => RedirectGoals::SENDER
+                ];
+                break;
+            
+            case QrTypes::SENDERPAY:
+                $tokenData = [
+                    "from_account_id" => $walletId,
+                    "to_account_id" => null,
+                    "goal" => RedirectGoals::SENDERPAY
                 ];
                 break;
 
