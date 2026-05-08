@@ -9,11 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Account extends Model
 {
-    //
+    protected $fillable = ["user_id", "account_number", "type", "status", "balance", "currency"];
 
-    protected $fillable = [""];
-
-    public  function user()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -22,5 +20,4 @@ class Account extends Model
     {
         return $this->hasMany(Transaction::class);
     }
-    
 }

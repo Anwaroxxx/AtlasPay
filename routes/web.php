@@ -100,30 +100,21 @@ Route::middleware(["auth", "verified"])->group(function () {
     // Create QR
     Route::inertia("qr/create/sender", "transactions/qr/create/sender");
     Route::post("qr/create/sender",[TokenController::class, "storeSender"]);
+    Route::post("qr/create/sender/quickpay",[TokenController::class, "storeSenderPay"]);
     Route::inertia("qr/create/receiver", "transactions/qr/create/receiver");
     Route::post("qr/create/receiver",[TokenController::class, "storeReceiver"]);
     Route::inertia("qr/create/store", "transactions/qr/create/store");
     Route::post("qr/create/store",[TokenController::class, "storeReceiverSTORE"]);
+    Route::get("qr/merchant/permanent", [TokenController::class, "getPermanentMerchantToken"]);
+    
     
     // Scan & Update
     Route::get('qr/redirect/{id}', [TokenController::class, 'handleScan'])->name('qr.scan');
-    
-    Route::get('qr/view/{id}', function ($id) {
-        $token = Token::where("token", (Crypt::decryptString($id)))->firstOrFail();
-        
-        switch ($token->goal) {
-            case "sender":
-                return Inertia::render("transactions/qr/update/sender", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
-            case "receiver":
-                return Inertia::render("transactions/qr/update/receiver", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
-            case "store":
-                return Inertia::render("transactions/qr/update/store", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
-            default:
-                return back();
-        }
-    })->name('qr.update.view');
+    Route::get('qr/view/{id}', [TokenController::class, 'showToken'])->name('qr.update.view');
 
     Route::post('/qr/confirm/{id}', [TokenController::class, 'confirmTransaction'])->name('qr.confirm');
+    Route::post('/qr/approve/{id}', [TokenController::class, 'finalApproval'])->name('qr.approve');
+    Route::post('/qr/cancel/{id}', [TokenController::class, 'cancelTransaction'])->name('qr.cancel');
     Route::get('/qr/status/{token}', [TokenController::class, 'checkStatus'])->name('qr.status');
     
     // Compatibility routes for existing frontend calls

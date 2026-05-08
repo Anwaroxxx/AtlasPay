@@ -1,4 +1,7 @@
 import { Head, useForm, Link } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2, ShieldCheck, Zap, Lock, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -6,9 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ShieldCheck, Zap, Lock, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
 
 type Props = {
     status?: string;
@@ -45,7 +45,7 @@ export default function Login({
                     {isFocused && (
                         <motion.div
                             layoutId="glow"
-                            className="absolute -inset-4 bg-primary/5 blur-2xl rounded-3xl -z-10"
+                            className="absolute -inset-4 -z-10 rounded-3xl bg-primary/5 blur-2xl"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -55,23 +55,32 @@ export default function Login({
 
                 <form onSubmit={submit} className="flex flex-col gap-8">
                     <div className="grid gap-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
                             className="grid gap-2.5"
                         >
                             <div className="flex items-center gap-2 px-1">
-                                <UserIcon className={`w-3 h-3 transition-colors ${isFocused === 'email' ? 'text-primary' : 'text-white/20'}`} />
-                                <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.25em] font-black text-white/40">Email Address</Label>
+                                <UserIcon
+                                    className={`h-3 w-3 transition-colors ${isFocused === 'email' ? 'text-primary' : 'text-white/20'}`}
+                                />
+                                <Label
+                                    htmlFor="email"
+                                    className="text-[10px] font-black tracking-[0.25em] text-white/40 uppercase"
+                                >
+                                    Email Address
+                                </Label>
                             </div>
-                            <div className="relative group">
+                            <div className="group relative">
                                 <Input
                                     id="email"
                                     type="email"
                                     name="email"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
                                     onFocus={() => setIsFocused('email')}
                                     onBlur={() => setIsFocused(null)}
                                     required
@@ -79,14 +88,14 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="name@atlaspay.ma"
-                                    className="h-14 bg-white/[0.02] border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all pl-4 group-hover:bg-white/[0.04]"
+                                    className="h-14 rounded-2xl border-white/5 bg-white/[0.02] pl-4 text-white transition-all group-hover:bg-white/[0.04] focus:border-primary/50"
                                 />
-                                <div className="absolute inset-0 rounded-2xl border border-primary/0 group-hover:border-primary/10 pointer-events-none transition-all" />
+                                <div className="pointer-events-none absolute inset-0 rounded-2xl border border-primary/0 transition-all group-hover:border-primary/10" />
                             </div>
                             <InputError message={errors.email} />
                         </motion.div>
 
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 }}
@@ -94,61 +103,79 @@ export default function Login({
                         >
                             <div className="flex items-center justify-between px-1">
                                 <div className="flex items-center gap-2">
-                                    <Lock className={`w-3 h-3 transition-colors ${isFocused === 'password' ? 'text-primary' : 'text-white/20'}`} />
-                                    <Label htmlFor="password" className="text-[10px] uppercase tracking-[0.25em] font-black text-white/40">Password</Label>
+                                    <Lock
+                                        className={`h-3 w-3 transition-colors ${isFocused === 'password' ? 'text-primary' : 'text-white/20'}`}
+                                    />
+                                    <Label
+                                        htmlFor="password"
+                                        className="text-[10px] font-black tracking-[0.25em] text-white/40 uppercase"
+                                    >
+                                        Password
+                                    </Label>
                                 </div>
                                 {canResetPassword && (
                                     <TextLink
                                         href="/password/reset"
-                                        className="text-[9px] uppercase tracking-widest font-black text-primary/60 hover:text-white transition-colors no-underline"
+                                        className="text-[9px] font-black tracking-widest text-primary/60 uppercase no-underline transition-colors hover:text-white"
                                         tabIndex={5}
                                     >
                                         Forgot?
                                     </TextLink>
                                 )}
                             </div>
-                            <div className="relative group">
+                            <div className="group relative">
                                 <PasswordInput
                                     id="password"
                                     name="password"
                                     value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
                                     onFocus={() => setIsFocused('password')}
                                     onBlur={() => setIsFocused(null)}
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="••••••••"
-                                    className="h-14 bg-white/[0.02] border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all group-hover:bg-white/[0.04]"
+                                    className="h-14 rounded-2xl border-white/5 bg-white/[0.02] text-white transition-all group-hover:bg-white/[0.04] focus:border-primary/50"
                                 />
-                                <div className="absolute inset-0 rounded-2xl border border-primary/0 group-hover:border-primary/10 pointer-events-none transition-all" />
+                                <div className="pointer-events-none absolute inset-0 rounded-2xl border border-primary/0 transition-all group-hover:border-primary/10" />
                             </div>
                             <InputError message={errors.password} />
                         </motion.div>
 
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className="flex items-center justify-between px-1"
                         >
-                            <label className="flex items-center space-x-3 cursor-pointer group">
+                            <label className="group flex cursor-pointer items-center space-x-3">
                                 <div className="relative flex items-center justify-center">
                                     <Checkbox
                                         id="remember"
                                         name="remember"
                                         checked={data.remember}
-                                        onCheckedChange={(checked) => setData('remember', checked as boolean)}
+                                        onCheckedChange={(checked) =>
+                                            setData(
+                                                'remember',
+                                                checked as boolean,
+                                            )
+                                        }
                                         tabIndex={3}
-                                        className="h-5 w-5 border-white/10 data-[state=checked]:bg-primary data-[state=checked]:text-white rounded-lg transition-all"
+                                        className="h-5 w-5 rounded-lg border-white/10 transition-all data-[state=checked]:bg-primary data-[state=checked]:text-white"
                                     />
                                 </div>
-                                <span className="text-[11px] text-white/40 font-bold uppercase tracking-wider group-hover:text-white/60 transition-colors">Remember Me</span>
+                                <span className="text-[11px] font-bold tracking-wider text-white/40 uppercase transition-colors group-hover:text-white/60">
+                                    Remember Me
+                                </span>
                             </label>
-                            
-                            <div className="flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary/5 border border-primary/10">
-                                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Secure Login</span>
+
+                            <div className="flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5">
+                                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                                <span className="text-[8px] font-black tracking-[0.2em] text-primary uppercase">
+                                    Secure Login
+                                </span>
                             </div>
                         </motion.div>
 
@@ -159,17 +186,17 @@ export default function Login({
                         >
                             <Button
                                 type="submit"
-                                className="relative w-full h-16 overflow-hidden bg-primary text-white hover:bg-success font-black uppercase tracking-[0.25em] text-[10px] transition-all hover:scale-[1.02] active:scale-95 shadow-elevated rounded-2xl group border-none"
+                                className="shadow-elevated group relative h-16 w-full overflow-hidden rounded-2xl border-none bg-primary text-[10px] font-black tracking-[0.25em] text-white uppercase transition-all hover:scale-[1.02] hover:bg-success active:scale-95"
                                 tabIndex={4}
                                 disabled={processing}
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+                                <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-[shimmer_2s_infinite]" />
                                 <div className="relative flex items-center justify-center gap-3">
                                     {processing ? (
                                         <Loader2 className="h-4 w-4 animate-spin text-white" />
                                     ) : (
                                         <>
-                                            <Zap className="h-4 w-4 fill-current group-hover:text-glow transition-all" />
+                                            <Zap className="group-hover:text-glow h-4 w-4 fill-current transition-all" />
                                             <span>Sign In to AtlasPay</span>
                                         </>
                                     )}
@@ -179,18 +206,21 @@ export default function Login({
                     </div>
 
                     {canRegister && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
                             className="text-center"
                         >
-                            <Link 
-                                href="/register" 
-                                className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-black text-white/20 hover:text-white transition-all no-underline"
+                            <Link
+                                href="/register"
+                                className="group inline-flex items-center gap-2 text-[10px] font-black tracking-widest text-white/20 uppercase no-underline transition-all hover:text-white"
                             >
-                                New here? <span className="text-primary group-hover:underline">Create an Account</span>
-                                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                New here?{' '}
+                                <span className="text-primary group-hover:underline">
+                                    Create an Account
+                                </span>
+                                <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                             </Link>
                         </motion.div>
                     )}
@@ -199,14 +229,16 @@ export default function Login({
 
             <AnimatePresence>
                 {status && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="mt-8 p-5 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-center gap-3"
+                        className="mt-8 flex items-center justify-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-5"
                     >
-                        <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">{status}</span>
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                        <span className="text-[10px] font-black tracking-widest text-primary uppercase">
+                            {status}
+                        </span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -225,7 +257,15 @@ export default function Login({
 
 function UserIcon({ className }: { className?: string }) {
     return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
         </svg>
@@ -236,4 +276,3 @@ Login.layout = {
     title: 'Sign In',
     description: 'Login to manage your finances',
 };
-

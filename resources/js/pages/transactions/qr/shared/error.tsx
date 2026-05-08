@@ -1,7 +1,7 @@
-import React from "react";
-import { Head, Link } from "@inertiajs/react";
-import { motion } from "framer-motion";
-import { AlertCircle, ArrowLeft, Home } from "lucide-react";
+import { Head, Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
+import React from 'react';
 
 interface Props {
     message: string;
@@ -9,34 +9,36 @@ interface Props {
 
 export default function ErrorPage({ message }: Props) {
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
             <Head title="Transaction Error" />
-            
-            <motion.div 
+
+            <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-8 text-center border border-slate-100 dark:border-slate-800"
+                className="w-full max-w-md rounded-[2.5rem] border border-slate-100 bg-white p-8 text-center shadow-2xl dark:border-slate-800 dark:bg-slate-900"
             >
-                <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                    <AlertCircle className="w-10 h-10" />
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-rose-100 text-rose-600 dark:bg-rose-900/30">
+                    <AlertCircle className="h-10 w-10" />
                 </div>
-                
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Oops! Something went wrong</h1>
-                <p className="text-slate-500 mb-8">{message}</p>
-                
+
+                <h1 className="mb-2 text-2xl font-bold text-slate-800 dark:text-white">
+                    Oops! Something went wrong
+                </h1>
+                <p className="mb-8 text-slate-500">{message}</p>
+
                 <div className="space-y-3">
-                    <Link 
-                        href="/transfer" 
-                        className="w-full inline-flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-2xl transition-all"
+                    <Link
+                        href="/transfer"
+                        className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800 py-4 font-bold text-white transition-all hover:bg-slate-700"
                     >
-                        <ArrowLeft className="w-5 h-5 mr-2" />
+                        <ArrowLeft className="mr-2 h-5 w-5" />
                         Back to Transfers
                     </Link>
-                    <Link 
-                        href="/dashboard" 
-                        className="w-full inline-flex items-center justify-center text-slate-500 hover:text-slate-700 font-bold py-4 transition-all"
+                    <Link
+                        href="/dashboard"
+                        className="inline-flex w-full items-center justify-center py-4 font-bold text-slate-500 transition-all hover:text-slate-700"
                     >
-                        <Home className="w-5 h-5 mr-2" />
+                        <Home className="mr-2 h-5 w-5" />
                         Dashboard
                     </Link>
                 </div>

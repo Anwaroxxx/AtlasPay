@@ -1,6 +1,6 @@
+import { BankBot } from '@/components/bank-bot';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
-import { BankBot } from '@/components/bank-bot';
 
 export default function AppLayout({
     breadcrumbs = [],

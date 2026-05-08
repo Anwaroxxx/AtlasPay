@@ -10,11 +10,9 @@ use TransferMoneyService;
 
 class TransactionService
 {
-    public static function create(array $data):Transaction
+    public static function create(array $data): Transaction
     {
-        // dd($from->id);
-
-        ServicesTransferMoneyService::sendMoney($data["from"],$data["to"],$data["amount"]);
+        ServicesTransferMoneyService::sendMoney($data["from"], $data["to"], $data["amount"]);
 
         return Transaction::create([
             'from_account_id' => $data["from"]->id,
@@ -22,6 +20,7 @@ class TransactionService
             "amount" => $data["amount"],
             "method" => $data["method"],
             "type" => $data["type"] ?? "transfer",
+            "status" => $data["status"] ?? "completed",
         ]);
     }
 

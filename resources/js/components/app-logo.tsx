@@ -7,7 +7,7 @@ export default function AppLogo() {
                 <Zap className="size-5 fill-current" />
             </div>
             <div className="grid flex-1 text-left">
-                <span className="font-display text-base font-bold leading-none tracking-tight uppercase">
+                <span className="font-display text-base leading-none font-bold tracking-tight uppercase">
                     Atlas<span className="text-primary">Pay</span>
                 </span>
             </div>

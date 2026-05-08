@@ -1,13 +1,15 @@
-import { 
-    LayoutGrid, 
-    Target, 
-    RotateCcw, 
-    BrainCircuit, 
+import { Link as InertiaLink } from '@inertiajs/react';
+import {
+    LayoutGrid,
+    Target,
+    RotateCcw,
+    BrainCircuit,
     History,
     CreditCard,
     Wallet,
-    Link
+    Link,
 } from 'lucide-react';
+import { FolderGit2, BookOpen } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -23,8 +25,6 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
-import { Link as InertiaLink } from '@inertiajs/react';
-import { FolderGit2, BookOpen } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {

@@ -9,58 +9,58 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-svh w-screen flex-col items-center justify-center bg-[#010301] text-white p-4 py-8 selection:bg-brand-medium/30 relative overflow-x-hidden overflow-y-auto">
+        <div className="selection:bg-brand-medium/30 relative flex min-h-svh w-screen flex-col items-center justify-center overflow-x-hidden overflow-y-auto bg-[#010301] p-4 py-8 text-white">
             {/* Background elements to match LandingPage */}
-            <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,_transparent_0%,_#010301_100%)] opacity-80" />
-            <div className="fixed inset-0 z-0 pointer-events-none moroccan-pattern opacity-[0.03]" />
-            <div className="fixed top-0 right-0 w-[400px] h-[400px] bg-brand-medium/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-brand-medium/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,_transparent_0%,_#010301_100%)] opacity-80" />
+            <div className="moroccan-pattern pointer-events-none fixed inset-0 z-0 opacity-[0.03]" />
+            <div className="bg-brand-medium/5 fixed top-0 right-0 h-[400px] w-[400px] translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]" />
+            <div className="bg-brand-medium/5 fixed bottom-0 left-0 h-[400px] w-[400px] -translate-x-1/2 translate-y-1/2 rounded-full blur-[100px]" />
 
-            <div className="w-full max-w-md relative z-10 flex flex-col items-center justify-center">
-                <motion.div 
+            <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center">
+                <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="flex flex-col gap-4 w-full"
+                    className="flex w-full flex-col gap-4"
                 >
                     <div className="flex flex-col items-center gap-3">
                         <Link
                             href={home()}
-                            className="flex items-center gap-3 group"
+                            className="group flex items-center gap-3"
                         >
                             <div className="flex items-center justify-center transition-all group-hover:scale-105 active:scale-95">
-                                <img 
-                                    src="/images/logos/darkmode-Photoroom.png" 
-                                    alt="AtlasPay Logo" 
+                                <img
+                                    src="/images/logos/darkmode-Photoroom.png"
+                                    alt="AtlasPay Logo"
                                     className="h-24 w-auto object-contain"
                                 />
                             </div>
                         </Link>
 
                         <div className="space-y-0.5 text-center">
-                            <h1 className="text-xl font-serif font-bold tracking-tight italic text-glow">{title}</h1>
-                            <p className="text-center text-[9px] text-gray-400 font-light max-w-xs mx-auto uppercase tracking-[0.3em]">
+                            <h1 className="text-glow font-serif text-xl font-bold tracking-tight italic">
+                                {title}
+                            </h1>
+                            <p className="mx-auto max-w-xs text-center text-[9px] font-light tracking-[0.3em] text-gray-400 uppercase">
                                 {description}
                             </p>
                         </div>
                     </div>
-                    
-                    <motion.div 
+
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="glass-card p-6 md:p-8 border border-white/10 bg-white/[0.02] backdrop-blur-[40px] w-full rounded-xl shadow-2xl relative"
+                        className="glass-card relative w-full rounded-xl border border-white/10 bg-white/[0.02] p-6 shadow-2xl backdrop-blur-[40px] md:p-8"
                     >
                         {/* Inner subtle glow */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-xl pointer-events-none" />
-                        <div className="relative z-10">
-                            {children}
-                        </div>
+                        <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/5 to-transparent" />
+                        <div className="relative z-10">{children}</div>
                     </motion.div>
                 </motion.div>
             </div>
 
-            <footer className="absolute bottom-4 z-10 text-[9px] text-gray-700 uppercase tracking-[0.4em] font-bold italic opacity-50">
+            <footer className="absolute bottom-4 z-10 text-[9px] font-bold tracking-[0.4em] text-gray-700 uppercase italic opacity-50">
                 © 2026 ATLASPAY BANKING GROUP.
             </footer>
 

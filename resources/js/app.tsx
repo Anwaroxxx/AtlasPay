@@ -1,13 +1,13 @@
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createInertiaApp } from '@inertiajs/react';
+import Echo from 'laravel-echo';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import Pusher from 'pusher-js';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
 import './i18n';
 
 if (typeof window !== 'undefined') {
@@ -27,7 +27,11 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) =>
+        resolvePageComponent(
+            `./pages/${name}.tsx`,
+            import.meta.glob('./pages/**/*.tsx'),
+        ),
     layout: (name) => {
         switch (true) {
             case name === 'welcome':
