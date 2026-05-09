@@ -27,3 +27,15 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+sync-ip.sh
+composer.phar
+
+/database/*.sqlite
+
+# Additional IDEs and Configs
+.project
+.settings/
+.claude/
+.remember/
+
