@@ -51,6 +51,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 interface Account {
     id: number;
@@ -441,23 +442,23 @@ export default function Transfer({ accounts }: Props) {
                     )}
                 </motion.div>
 
-                <div className="grid gap-6 lg:grid-cols-1">
+                <div className="grid gap-12 lg:grid-cols-12">
                     {/* Main UI Section */}
                     <motion.div
                         variants={item}
-                        className="mx-auto w-full max-w-3xl"
+                        className="lg:col-span-7"
                     >
                         <AnimatePresence mode="wait">
                             {activeMethod === 'qr' ? (
                                 <motion.div
                                     key="qr-flows"
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    className="space-y-10"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    className="space-y-8"
                                 >
                                     {/* QR Flow Selector */}
-                                    <div className="flex flex-wrap gap-4 rounded-2xl border border-border/50 bg-muted/20 p-2">
+                                    <div className="flex flex-wrap gap-2 rounded-2xl border border-border/50 bg-muted/20 p-2">
                                         {[
                                             {
                                                 id: 'send',
@@ -491,13 +492,13 @@ export default function Transfer({ accounts }: Props) {
                                                         flow.id === 'scanner',
                                                     );
                                                 }}
-                                                className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-6 py-4 text-[10px] font-black tracking-widest uppercase transition-all ${
+                                                className={`group flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-[9px] font-black tracking-[0.15em] uppercase transition-all active:scale-95 ${
                                                     qrFlow === flow.id
-                                                        ? 'bg-primary text-primary-foreground shadow-lg'
-                                                        : 'text-muted-foreground hover:bg-muted'
+                                                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                                        : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
                                                 }`}
                                             >
-                                                <flow.icon className="h-4 w-4" />
+                                                <flow.icon className={cn("h-4 w-4", qrFlow === flow.id ? "animate-pulse" : "group-hover:scale-110 transition-transform")} />
                                                 <span className="hidden sm:inline">
                                                     {flow.label}
                                                 </span>
@@ -505,11 +506,12 @@ export default function Transfer({ accounts }: Props) {
                                         ))}
                                     </div>
                                     {/* QR Flow UI */}
-                                    <Card className="shadow-elevated glass-card flex min-h-[500px] flex-col overflow-hidden rounded-3xl border-none bg-card">
-                                        <CardHeader className="border-b border-border bg-muted/20 p-6">
+                                    <Card className="shadow-elevated relative overflow-hidden rounded-3xl border-none bg-card min-h-[550px]">
+                                        <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.02]" />
+                                        <CardHeader className="relative z-10 border-b border-border/50 bg-muted/20 p-8">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
                                                         <QrCode className="h-7 w-7" />
                                                     </div>
                                                     <div>
@@ -527,7 +529,7 @@ export default function Transfer({ accounts }: Props) {
                                                                 'scanner' &&
                                                                 'Scan QR'}
                                                         </CardTitle>
-                                                        <CardDescription className="mt-1 text-[10px] font-black tracking-widest uppercase">
+                                                        <CardDescription className="mt-1 text-[9px] font-black tracking-widest text-muted-foreground uppercase">
                                                             {qrFlow ===
                                                                 'send' &&
                                                                 'Generate a one-time payment token'}
@@ -544,58 +546,57 @@ export default function Transfer({ accounts }: Props) {
                                                     </div>
                                                 </div>
                                                 {qrStep === 'generated' && (
-                                                    <Badge className="border-none bg-primary/20 px-4 py-2 font-black text-primary">
+                                                    <Badge className="border-none bg-primary/20 px-4 py-2 font-black text-primary animate-pulse">
                                                         <Timer className="mr-2 h-3 w-3" />{' '}
                                                         {formatTime(expiryTime)}
                                                     </Badge>
                                                 )}
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="flex flex-1 flex-col justify-center p-6">
+                                        <CardContent className="relative z-10 flex flex-1 flex-col justify-center p-8">
                                             {qrFlow === 'scanner' ? (
-                                                <div className="group relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border-4 border-primary/30">
+                                                <div className="group relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border-4 border-primary/20 shadow-2xl transition-all hover:border-primary/40">
+                                                    <div className="absolute inset-0 z-10 border-[40px] border-black/40 pointer-events-none" />
+                                                    <div className="absolute top-1/2 left-1/2 z-20 h-1 w-full -translate-x-1/2 -translate-y-1/2 bg-primary/40 blur-sm animate-scan" />
                                                     <QrScanner
                                                         onResult={(result) => {
-                                                            // result is the encrypted token URL or just the id
-                                                            window.location.href =
-                                                                result;
+                                                            window.location.href = result;
                                                         }}
                                                     />
                                                 </div>
                                             ) : qrStep === 'generated' ? (
                                                 <div className="flex flex-col items-center space-y-10 text-center">
-                                                    <div className="shadow-elevated group relative rounded-3xl bg-white p-6">
+                                                    <motion.div 
+                                                        initial={{ scale: 0.9, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        className="shadow-elevated group relative rounded-[2.5rem] bg-white p-8"
+                                                    >
                                                         <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
                                                         <QrCode className="h-64 w-64 text-neutral-900" />
-                                                        <div className="absolute inset-0 rounded-3xl border-4 border-primary/20 transition-colors group-hover:border-primary/50" />
-                                                    </div>
+                                                        <div className="absolute inset-0 rounded-[2.5rem] border-4 border-primary/10 transition-colors group-hover:border-primary/30" />
+                                                    </motion.div>
                                                     <div className="space-y-4">
-                                                        <p className="font-display text-5xl font-black tracking-tighter">
+                                                        <p className="font-display text-6xl font-black tracking-tighter">
                                                             {Number(
                                                                 data.amount,
                                                             ).toLocaleString()}{' '}
-                                                            <span className="text-xl font-normal">
+                                                            <span className="text-xl font-normal opacity-40">
                                                                 MAD
                                                             </span>
                                                         </p>
-                                                        <p className="text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase">
-                                                            One-time payment
-                                                            token
+                                                        <p className="text-[10px] font-black tracking-[0.4em] text-primary uppercase">
+                                                            Dynamic Secure Token
                                                         </p>
                                                     </div>
-                                                    <div className="flex w-full gap-4">
+                                                    <div className="flex w-full gap-4 max-w-sm">
                                                         <Button
-                                                            onClick={() =>
-                                                                setQrStep(
-                                                                    'input',
-                                                                )
-                                                            }
+                                                            onClick={() => setQrStep('input')}
                                                             variant="outline"
-                                                            className="h-16 flex-1 rounded-2xl font-black tracking-widest uppercase"
+                                                            className="h-16 flex-1 rounded-2xl border-2 font-black tracking-widest uppercase"
                                                         >
                                                             Cancel
                                                         </Button>
-                                                        <Button className="h-16 flex-1 rounded-2xl bg-primary font-black tracking-widest text-primary-foreground uppercase">
+                                                        <Button className="h-16 flex-1 rounded-2xl bg-primary font-black tracking-widest text-primary-foreground uppercase shadow-lg shadow-primary/20">
                                                             <RefreshCw className="mr-3 h-5 w-5" />{' '}
                                                             Refresh
                                                         </Button>
@@ -603,11 +604,15 @@ export default function Transfer({ accounts }: Props) {
                                                 </div>
                                             ) : qrStep === 'confirmed' ? (
                                                 <div className="space-y-8 py-10 text-center">
-                                                    <div className="mx-auto flex h-32 w-32 scale-110 items-center justify-center rounded-full bg-success/10 text-success">
+                                                    <motion.div 
+                                                        initial={{ scale: 0 }}
+                                                        animate={{ scale: 1, rotate: 360 }}
+                                                        className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-success/10 text-success shadow-inner"
+                                                    >
                                                         <CheckCircle2 className="h-16 w-16" />
-                                                    </div>
+                                                    </motion.div>
                                                     <div className="space-y-2">
-                                                        <h4 className="text-3xl font-black tracking-tight uppercase">
+                                                        <h4 className="text-4xl font-black tracking-tight uppercase">
                                                             Payment{' '}
                                                             <span className="text-success italic">
                                                                 Complete.
@@ -620,12 +625,10 @@ export default function Transfer({ accounts }: Props) {
                                                         </p>
                                                     </div>
                                                     <Button
-                                                        onClick={() =>
-                                                            setQrStep('input')
-                                                        }
-                                                        className="h-16 rounded-2xl bg-success px-10 font-black tracking-widest text-white uppercase"
+                                                        onClick={() => setQrStep('input')}
+                                                        className="h-16 rounded-2xl bg-success px-12 font-black tracking-widest text-white uppercase shadow-lg shadow-success/20"
                                                     >
-                                                        Done
+                                                        Continue
                                                     </Button>
                                                 </div>
                                             ) : (
@@ -633,8 +636,8 @@ export default function Transfer({ accounts }: Props) {
                                                     {(qrFlow === 'send' ||
                                                         qrFlow ===
                                                             'merchant') && (
-                                                        <div className="space-y-4">
-                                                            <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        <div className="mb-10 space-y-4">
+                                                            <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
                                                                 {qrFlow ===
                                                                 'send'
                                                                     ? 'Transfer Mode'
@@ -645,62 +648,37 @@ export default function Transfer({ accounts }: Props) {
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
-                                                                        if (
-                                                                            qrFlow ===
-                                                                            'send'
-                                                                        ) {
-                                                                            setSendActiveMethod(
-                                                                                'specify',
-                                                                            );
+                                                                        if (qrFlow === 'send') {
+                                                                            setSendActiveMethod('specify');
                                                                         } else {
-                                                                            setMerchantActiveMethod(
-                                                                                'specify',
-                                                                            );
+                                                                            setMerchantActiveMethod('specify');
                                                                         }
                                                                     }}
-                                                                    className={`flex items-center justify-center gap-2 rounded-2xl py-4 text-[10px] font-black tracking-widest uppercase transition-all ${
-                                                                        (qrFlow ===
-                                                                        'send'
-                                                                            ? activeSendMethod
-                                                                            : activeMerchantMethod) ===
-                                                                        'specify'
-                                                                            ? 'bg-primary text-primary-foreground shadow-lg'
-                                                                            : 'border border-border/50 bg-muted/20 text-muted-foreground hover:bg-muted'
+                                                                    className={`flex items-center justify-center gap-2 rounded-2xl py-5 text-[10px] font-black tracking-widest uppercase transition-all active:scale-95 ${
+                                                                        (qrFlow === 'send' ? activeSendMethod : activeMerchantMethod) === 'specify'
+                                                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                                                            : 'border border-border/50 bg-muted/10 text-muted-foreground hover:border-primary/30'
                                                                     }`}
                                                                 >
-                                                                    Specify
+                                                                    Fixed
                                                                     Amount
                                                                 </button>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
-                                                                        if (
-                                                                            qrFlow ===
-                                                                            'send'
-                                                                        ) {
-                                                                            setSendActiveMethod(
-                                                                                'cut',
-                                                                            );
+                                                                        if (qrFlow === 'send') {
+                                                                            setSendActiveMethod('cut');
                                                                         } else {
-                                                                            setMerchantActiveMethod(
-                                                                                'cut',
-                                                                            );
+                                                                            setMerchantActiveMethod('cut');
                                                                         }
                                                                     }}
-                                                                    className={`flex items-center justify-center gap-2 rounded-2xl py-4 text-[10px] font-black tracking-widest uppercase transition-all ${
-                                                                        (qrFlow ===
-                                                                        'send'
-                                                                            ? activeSendMethod
-                                                                            : activeMerchantMethod) ===
-                                                                        'cut'
-                                                                            ? 'bg-primary text-primary-foreground shadow-lg'
-                                                                            : 'border border-border/50 bg-muted/20 text-muted-foreground hover:bg-muted'
+                                                                    className={`flex items-center justify-center gap-2 rounded-2xl py-5 text-[10px] font-black tracking-widest uppercase transition-all active:scale-95 ${
+                                                                        (qrFlow === 'send' ? activeSendMethod : activeMerchantMethod) === 'cut'
+                                                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                                                            : 'border border-border/50 bg-muted/10 text-muted-foreground hover:border-primary/30'
                                                                     }`}
                                                                 >
-                                                                    {qrFlow ===
-                                                                    'send'
-                                                                        ? 'Quick Pay'
-                                                                        : 'Show My QR'}
+                                                                    {qrFlow === 'send' ? 'Quick Pay' : 'Open Store'}
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -708,104 +686,85 @@ export default function Transfer({ accounts }: Props) {
                                                     {qrFlow === 'merchant' &&
                                                     activeMerchantMethod ===
                                                         'cut' ? (
-                                                        <div className="relative space-y-8 overflow-hidden rounded-3xl bg-neutral-900 p-8 text-center">
+                                                        <div className="relative overflow-hidden rounded-[2.5rem] bg-neutral-950 p-10 text-center shadow-2xl">
                                                             <div className="moroccan-pattern absolute inset-0 opacity-[0.05]" />
-                                                            <div className="relative z-10 space-y-6">
-                                                                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl border-2 border-primary/30 bg-primary/20">
+                                                            <div className="relative z-10 space-y-8">
+                                                                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/20 shadow-inner">
                                                                     <Store className="h-12 w-12 text-primary" />
                                                                 </div>
-                                                                <div>
-                                                                    <h5 className="text-2xl font-black tracking-tight text-white uppercase">
+                                                                <div className="space-y-3">
+                                                                    <h5 className="text-3xl font-black tracking-tight text-white uppercase">
                                                                         Business
-                                                                        Identifier
+                                                                        Gateway
                                                                     </h5>
-                                                                    <p className="text-sm font-medium text-muted-foreground">
+                                                                    <p className="mx-auto max-w-sm text-sm font-medium text-muted-foreground/80">
                                                                         Display
                                                                         your
                                                                         permanent
-                                                                        QR for
-                                                                        customers
-                                                                        to scan
-                                                                        and pay
-                                                                        any
-                                                                        amount.
+                                                                        neural
+                                                                        identifier
+                                                                        for
+                                                                        seamless
+                                                                        customer
+                                                                        onboarding.
                                                                     </p>
                                                                 </div>
                                                                 <Button
                                                                     type="button"
                                                                     onClick={() => {
-                                                                        axios
-                                                                            .get(
-                                                                                '/qr/merchant/permanent',
-                                                                            )
-                                                                            .then(
-                                                                                (
-                                                                                    res,
-                                                                                ) => {
-                                                                                    router.get(
-                                                                                        `/qr/view/${res.data.id}`,
-                                                                                    );
-                                                                                },
-                                                                            );
+                                                                        axios.get('/qr/merchant/permanent').then((res) => {
+                                                                            router.get(`/qr/view/${res.data.id}`);
+                                                                        });
                                                                     }}
-                                                                    className="h-16 w-full rounded-2xl bg-primary font-black tracking-widest text-white uppercase shadow-lg"
+                                                                    className="h-20 w-full rounded-2xl bg-primary font-black tracking-widest text-white uppercase shadow-lg shadow-primary/20 hover:scale-[1.02]"
                                                                 >
-                                                                    <QrCode className="mr-3 h-5 w-5" />{' '}
-                                                                    View My QR
+                                                                    <QrCode className="mr-4 h-6 w-6" />{' '}
+                                                                    Generate Terminal
                                                                 </Button>
                                                             </div>
                                                         </div>
                                                     ) : (
                                                         <form
                                                             onSubmit={submit}
-                                                            className="space-y-8"
+                                                            className="space-y-10"
                                                         >
                                                             <div className="space-y-4">
-                                                                <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                                <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
                                                                     Source
                                                                     Account
                                                                 </Label>
-                                                                <div className="grid gap-4">
+                                                                <div className="grid gap-3">
                                                                     {accounts.map(
-                                                                        (
-                                                                            acc,
-                                                                        ) => (
+                                                                        (acc) => (
                                                                             <button
-                                                                                key={
-                                                                                    acc.id
-                                                                                }
+                                                                                key={acc.id}
                                                                                 type="button"
-                                                                                onClick={() =>
-                                                                                    setData(
-                                                                                        'from_account_rib',
-                                                                                        acc.account_number,
-                                                                                    )
-                                                                                }
-                                                                                className={`flex items-center justify-between rounded-2xl border p-6 text-left transition-all ${
-                                                                                    data.from_account_rib ===
-                                                                                    acc.account_number
-                                                                                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                                                                                        : 'border-border/50 bg-muted/10 hover:border-primary/30'
+                                                                                onClick={() => setData('from_account_rib', acc.account_number)}
+                                                                                className={`group flex items-center justify-between rounded-2xl border p-6 text-left transition-all duration-300 active:scale-[0.98] ${
+                                                                                    data.from_account_rib === acc.account_number
+                                                                                        ? 'border-primary bg-primary/5 shadow-md'
+                                                                                        : 'border-border/50 bg-muted/10 hover:border-primary/20'
                                                                                 }`}
                                                                             >
-                                                                                {}
                                                                                 <div>
-                                                                                    <p className="mb-1 text-[10px] font-black tracking-widest uppercase opacity-60">
-                                                                                        {
-                                                                                            acc.type
-                                                                                        }
+                                                                                    <p className="mb-1 text-[9px] font-black tracking-[0.2em] uppercase opacity-40">
+                                                                                        {acc.type}
                                                                                     </p>
-                                                                                    <p className="text-xl font-black tracking-tight">
+                                                                                    <p className="text-2xl font-black tracking-tight">
                                                                                         {acc.balance.toLocaleString()}{' '}
-                                                                                        MAD
+                                                                                        <span className="text-xs font-normal opacity-40">MAD</span>
                                                                                     </p>
                                                                                 </div>
                                                                                 <div
-                                                                                    className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${data.from_account_rib === acc.account_number ? 'border-primary bg-primary text-white' : 'border-muted-foreground/30'}`}
+                                                                                    className={cn(
+                                                                                        "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all",
+                                                                                        data.from_account_rib === acc.account_number 
+                                                                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" 
+                                                                                            : "border-muted-foreground/20 group-hover:border-primary/40"
+                                                                                    )}
                                                                                 >
-                                                                                    {data.from_account_rib ===
-                                                                                        acc.account_number && (
-                                                                                        <CheckCircle2 className="h-4 w-4" />
+                                                                                    {data.from_account_rib === acc.account_number && (
+                                                                                        <CheckCircle2 className="h-5 w-5" />
                                                                                     )}
                                                                                 </div>
                                                                             </button>
@@ -814,46 +773,25 @@ export default function Transfer({ accounts }: Props) {
                                                                 </div>
                                                             </div>
 
-                                                            {(qrFlow ===
-                                                                'send' &&
-                                                                activeSendMethod ===
-                                                                    'cut') ||
-                                                            (qrFlow ===
-                                                                'merchant' &&
-                                                                activeMerchantMethod ===
-                                                                    'cut') ? (
+                                                            {(qrFlow === 'send' && activeSendMethod === 'cut') ||
+                                                            (qrFlow === 'merchant' && activeMerchantMethod === 'cut') ? (
                                                                 ''
                                                             ) : (
                                                                 <div className="space-y-4">
-                                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
-                                                                        Amount
-                                                                        to{' '}
-                                                                        {qrFlow ===
-                                                                        'send'
-                                                                            ? 'Send'
-                                                                            : 'Receive'}
+                                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
+                                                                        Transaction
+                                                                        Value{' '}
                                                                     </Label>
-                                                                    <div className="relative">
-                                                                        <div className="absolute top-1/2 left-6 -translate-y-1/2 text-2xl font-black text-muted-foreground">
+                                                                    <div className="group relative">
+                                                                        <div className="absolute top-1/2 left-8 -translate-y-1/2 text-3xl font-black text-muted-foreground transition-colors group-focus-within:text-primary">
                                                                             DH
                                                                         </div>
                                                                         <Input
                                                                             type="number"
                                                                             placeholder="0.00"
-                                                                            className="h-24 rounded-3xl border-border/50 bg-muted/20 pl-20 font-display text-5xl font-black tracking-tighter transition-all focus:ring-primary/10"
-                                                                            value={
-                                                                                data.amount
-                                                                            }
-                                                                            onChange={(
-                                                                                e,
-                                                                            ) =>
-                                                                                setData(
-                                                                                    'amount',
-                                                                                    e
-                                                                                        .target
-                                                                                        .value,
-                                                                                )
-                                                                            }
+                                                                            className="h-32 rounded-[2rem] border-border/50 bg-muted/20 pl-24 font-display text-7xl font-black tracking-tighter transition-all focus:ring-primary/5 focus:border-primary/30"
+                                                                            value={data.amount}
+                                                                            onChange={(e) => setData('amount', e.target.value)}
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -861,60 +799,33 @@ export default function Transfer({ accounts }: Props) {
 
                                                             <Button
                                                                 type="submit"
-                                                                className="shadow-elevated group h-14 w-full rounded-3xl bg-primary text-base font-black tracking-widest text-primary-foreground uppercase md:h-24 md:text-2xl"
+                                                                className="shadow-elevated group h-20 w-full rounded-[1.5rem] bg-primary text-xl font-black tracking-[0.2em] text-primary-foreground uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
                                                                 disabled={
-                                                                    (qrFlow ===
-                                                                        'send' &&
-                                                                        activeSendMethod ===
-                                                                            'specify' &&
-                                                                        (!data.amount ||
-                                                                            Number(
-                                                                                data.amount,
-                                                                            ) <=
-                                                                                0)) ||
-                                                                    (qrFlow ===
-                                                                        'merchant' &&
-                                                                        activeMerchantMethod ===
-                                                                            'specify' &&
-                                                                        (!data.amount ||
-                                                                            Number(
-                                                                                data.amount,
-                                                                            ) <=
-                                                                                0)) ||
-                                                                    (qrFlow ===
-                                                                        'request' &&
-                                                                        (!data.amount ||
-                                                                            Number(
-                                                                                data.amount,
-                                                                            ) <=
-                                                                                0))
+                                                                    (qrFlow === 'send' && activeSendMethod === 'specify' && (!data.amount || Number(data.amount) <= 0)) ||
+                                                                    (qrFlow === 'merchant' && activeMerchantMethod === 'specify' && (!data.amount || Number(data.amount) <= 0)) ||
+                                                                    (qrFlow === 'request' && (!data.amount || Number(data.amount) <= 0))
                                                                 }
                                                             >
-                                                                {qrFlow ===
-                                                                'send'
-                                                                    ? 'Generate Qr Code'
-                                                                    : qrFlow ===
-                                                                        'merchant'
-                                                                      ? 'Generate Store QR'
-                                                                      : 'Request'}{' '}
-                                                                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-4 md:ml-4 md:h-8 md:w-8" />
+                                                                {qrFlow === 'send' ? 'Initialize Link' : qrFlow === 'merchant' ? 'Provision Store' : 'Request Funds'}{' '}
+                                                                <ArrowRight className="ml-4 h-6 w-6 transition-transform group-hover:translate-x-3" />
                                                             </Button>
                                                         </form>
                                                     )}
                                                 </>
                                             )}
                                         </CardContent>
-                                    </Card>{' '}
+                                    </Card>
                                 </motion.div>
                             ) : (
                                 <motion.div
                                     key="form-ui"
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
                                 >
-                                    <Card className="shadow-elevated glass-card overflow-hidden rounded-3xl border-none bg-card">
-                                        <CardHeader className="border-b border-border bg-muted/20 p-6">
+                                    <Card className="shadow-elevated relative overflow-hidden rounded-[2.5rem] border-none bg-card">
+                                        <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.02]" />
+                                        <CardHeader className="relative z-10 border-b border-border/50 bg-muted/20 p-8">
                                             <div className="flex items-center gap-4">
                                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
                                                     <config.icon className="h-7 w-7" />
@@ -926,20 +837,19 @@ export default function Transfer({ accounts }: Props) {
                                                             Details.
                                                         </span>
                                                     </CardTitle>
-                                                    <CardDescription className="mt-1 text-[10px] font-black tracking-widest uppercase">
-                                                        Fill in the transfer
-                                                        information below
+                                                    <CardDescription className="mt-1 text-[9px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        Neural routing configuration
                                                     </CardDescription>
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="p-6">
+                                        <CardContent className="relative z-10 p-8">
                                             <form
                                                 onSubmit={submit}
-                                                className="space-y-10"
+                                                className="space-y-12"
                                             >
                                                 <div className="space-y-4">
-                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
                                                         Select Source Account
                                                     </Label>
                                                     <div className="grid gap-4 sm:grid-cols-2">
@@ -961,10 +871,10 @@ export default function Transfer({ accounts }: Props) {
                                                                                 account.account_number,
                                                                             )
                                                                         }
-                                                                        className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-500 ${
+                                                                        className={`group relative overflow-hidden rounded-2xl border p-6 text-left transition-all duration-500 active:scale-[0.98] ${
                                                                             isSelected
-                                                                                ? 'shadow-elevated scale-[1.02] border-primary bg-primary text-primary-foreground'
-                                                                                : 'border-border/50 bg-muted/30 hover:border-primary/30'
+                                                                                ? 'shadow-elevated border-primary bg-primary text-primary-foreground'
+                                                                                : 'border-border/50 bg-muted/20 hover:border-primary/30'
                                                                         }`}
                                                                     >
                                                                         <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
@@ -1008,10 +918,10 @@ export default function Transfer({ accounts }: Props) {
                                                     </div>
                                                 </div>
 
-                                                <div className="space-y-3">
-                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                <div className="space-y-4">
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
                                                         {activeMethod === 'bank'
-                                                            ? 'Recipient RIB'
+                                                            ? 'Recipient RIB Identifier'
                                                             : 'Recipient Card Number'}
                                                     </Label>
                                                     <div className="group relative">
@@ -1031,7 +941,7 @@ export default function Transfer({ accounts }: Props) {
                                                                     ? 'Enter 24-digit RIB'
                                                                     : 'Enter 16-digit Card Number'
                                                             }
-                                                            className="h-16 rounded-[1.5rem] border-border/50 bg-muted/20 pl-16 text-base font-black tracking-tight transition-all focus:ring-primary/10"
+                                                            className="h-20 rounded-[1.5rem] border-border/50 bg-muted/20 pl-16 text-base font-black tracking-tight transition-all focus:ring-primary/10"
                                                             value={
                                                                 data.to_account_rib
                                                             }
@@ -1047,7 +957,7 @@ export default function Transfer({ accounts }: Props) {
                                                 </div>
 
                                                 <div className="space-y-4">
-                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
                                                         Spending Category
                                                     </Label>
                                                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -1094,14 +1004,14 @@ export default function Transfer({ accounts }: Props) {
                                                                         cat.id,
                                                                     )
                                                                 }
-                                                                className={`flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 transition-all ${
+                                                                className={`group flex flex-col items-center justify-center gap-2 rounded-2xl border p-5 transition-all active:scale-95 ${
                                                                     data.category ===
                                                                     cat.id
-                                                                        ? 'border-primary bg-primary/10 text-primary shadow-sm'
-                                                                        : 'border-border/50 bg-muted/10 text-muted-foreground hover:border-primary/20'
+                                                                        ? 'border-primary bg-primary/10 text-primary shadow-sm shadow-primary/10'
+                                                                        : 'border-border/50 bg-muted/10 text-muted-foreground hover:border-primary/30 hover:text-primary'
                                                                 }`}
                                                             >
-                                                                <cat.icon className="h-5 w-5" />
+                                                                <cat.icon className="h-5 w-5 transition-transform group-hover:scale-110" />
                                                                 <span className="text-[9px] font-black tracking-tighter uppercase">
                                                                     {cat.id}
                                                                 </span>
@@ -1110,18 +1020,18 @@ export default function Transfer({ accounts }: Props) {
                                                     </div>
                                                 </div>
 
-                                                <div className="space-y-3">
-                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">
-                                                        Amount (MAD)
+                                                <div className="space-y-4">
+                                                    <Label className="ml-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
+                                                        Transfer Volume (MAD)
                                                     </Label>
                                                     <div className="group relative">
-                                                        <div className="absolute top-1/2 left-6 -translate-y-1/2 text-2xl font-black text-muted-foreground">
+                                                        <div className="absolute top-1/2 left-8 -translate-y-1/2 text-3xl font-black text-muted-foreground transition-colors group-focus-within:text-primary">
                                                             DH
                                                         </div>
                                                         <Input
                                                             type="number"
                                                             placeholder="0.00"
-                                                            className="h-24 rounded-3xl border-border/50 bg-muted/20 pl-20 font-display text-5xl font-black tracking-tighter transition-all focus:ring-primary/10"
+                                                            className="h-32 rounded-[2.5rem] border-border/50 bg-muted/20 pl-24 font-display text-7xl font-black tracking-tighter transition-all focus:ring-primary/5 focus:border-primary/30"
                                                             value={data.amount}
                                                             onChange={(e) =>
                                                                 setData(
@@ -1136,16 +1046,19 @@ export default function Transfer({ accounts }: Props) {
 
                                                 <Button
                                                     type="submit"
-                                                    className="shadow-elevated group h-14 w-full rounded-3xl bg-primary text-base font-black tracking-widest text-primary-foreground uppercase md:h-24 md:text-2xl"
+                                                    className="shadow-elevated group h-24 w-full rounded-[2rem] bg-primary text-2xl font-black tracking-[0.2em] text-primary-foreground uppercase shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all"
                                                     disabled={
                                                         processing ||
                                                         !data.amount
                                                     }
                                                 >
                                                     {processing ? (
-                                                        <Loader2 className="h-6 w-6 animate-spin md:h-10 md:w-10" />
+                                                        <Loader2 className="h-10 w-10 animate-spin" />
                                                     ) : (
-                                                        'Confirm Transfer'
+                                                        <>
+                                                            Confirm Routing
+                                                            <ArrowRight className="ml-4 h-8 w-8 transition-transform group-hover:translate-x-4" />
+                                                        </>
                                                     )}
                                                 </Button>
                                             </form>
@@ -1156,26 +1069,26 @@ export default function Transfer({ accounts }: Props) {
                         </AnimatePresence>
                     </motion.div>
 
-                    {/* Security & Features Side Section
+                    {/* Security & Features Side Section */}
                     <motion.div variants={item} className="lg:col-span-5 space-y-8">
-                        <Card className="border-none shadow-elevated rounded-3xl bg-neutral-900 text-white overflow-hidden dark:bg-black group">
-                            <CardContent className="p-6 md:p-8 relative">
-                                <div className="absolute inset-0 moroccan-pattern opacity-[0.05] pointer-events-none" />
-                                <div className="absolute top-0 right-0 p-6 md:p-8 opacity-[0.03] group-hover:opacity-[0.1] transition-opacity">
+                        <Card className="shadow-elevated group relative overflow-hidden rounded-[2.5rem] border-none bg-neutral-900 text-white dark:bg-black">
+                            <CardContent className="relative p-8 md:p-12">
+                                <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
+                                <div className="absolute top-0 right-0 p-8 opacity-[0.03] transition-opacity group-hover:opacity-[0.1]">
                                     <ShieldCheck className="h-64 w-64 text-primary" />
                                 </div>
                                 
-                                <div className="relative z-10 space-y-10">
+                                <div className="relative z-10 space-y-12">
                                     <div className="flex items-center gap-3 text-primary">
-                                        <div className="p-2 rounded-xl bg-primary/20">
+                                        <div className="rounded-xl bg-primary/20 p-2 shadow-inner">
                                             <Shield className="h-6 w-6 fill-current" />
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Security Protocol</span>
+                                        <span className="text-[10px] font-black tracking-[0.4em] uppercase">Security Core</span>
                                     </div>
                                     
                                     <div className="space-y-4">
-                                        <h3 className="text-3xl font-black uppercase tracking-tight leading-none">Secure <span className="text-primary italic">Transfer.</span></h3>
-                                        <p className="text-sm text-muted-foreground/80 leading-relaxed font-medium">
+                                        <h3 className="text-4xl font-black leading-none tracking-tight uppercase">Secure <span className="text-primary italic">Relay.</span></h3>
+                                        <p className="text-sm font-medium leading-relaxed text-muted-foreground/80">
                                             {activeMethod === 'qr' ? 'One-time tokens, time-expiry validation, and instant state confirmation ensure your QR payments are ironclad.' : 'Standard bank-grade encryption and biometric verification protect every transaction across the network.'}
                                         </p>
                                     </div>
@@ -1183,80 +1096,88 @@ export default function Transfer({ accounts }: Props) {
                                     <div className="space-y-6">
                                         {activeMethod === 'qr' ? (
                                             <>
-                                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                                    <Timer className="h-5 w-5 text-primary" />
+                                                <div className="flex items-center gap-5 rounded-2xl border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                                                        <Timer className="h-6 w-6" />
+                                                    </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-white">Dynamic Tokens</p>
-                                                        <p className="text-[10px] text-muted-foreground">Expires after 5 minutes for security</p>
+                                                        <p className="text-[10px] font-black tracking-widest text-white uppercase">Ephemeral Tokens</p>
+                                                        <p className="text-[10px] text-muted-foreground uppercase opacity-60">Auto-expires after 300s</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                                    <Receipt className="h-5 w-5 text-primary" />
+                                                <div className="flex items-center gap-5 rounded-2xl border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                                                        <Receipt className="h-6 w-6" />
+                                                    </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-white">Instant State</p>
-                                                        <p className="text-[10px] text-muted-foreground">Pending → Confirmed real-time tracking</p>
+                                                        <p className="text-[10px] font-black tracking-widest text-white uppercase">Live Ledger</p>
+                                                        <p className="text-[10px] text-muted-foreground uppercase opacity-60">Real-time state synchronization</p>
                                                     </div>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
-                                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                                    <Lock className="h-5 w-5 text-primary" />
+                                                <div className="flex items-center gap-5 rounded-2xl border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                                                        <Lock className="h-6 w-6" />
+                                                    </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-white">Encrypted RIB</p>
-                                                        <p className="text-[10px] text-muted-foreground">End-to-end payment masking</p>
+                                                        <p className="text-[10px] font-black tracking-widest text-white uppercase">End-to-End Encryption</p>
+                                                        <p className="text-[10px] text-muted-foreground uppercase opacity-60">AES-256 military grade</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                                    <ShieldCheck className="h-5 w-5 text-primary" />
+                                                <div className="flex items-center gap-5 rounded-2xl border border-white/5 bg-white/5 p-5 transition-colors hover:bg-white/10">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                                                        <ShieldCheck className="h-6 w-6" />
+                                                    </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-white">Identity Verification</p>
-                                                        <p className="text-[10px] text-muted-foreground">Verification required for settlement</p>
+                                                        <p className="text-[10px] font-black tracking-widest text-white uppercase">Biometric Guard</p>
+                                                        <p className="text-[10px] text-muted-foreground uppercase opacity-60">Identity verification active</p>
                                                     </div>
                                                 </div>
                                             </>
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-4 pt-4">
-                                        <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                                        <span className="text-[9px] font-black uppercase tracking-[0.4em] opacity-40 italic">System integrity verified</span>
+                                    <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+                                        <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                                        <span className="text-[9px] font-black tracking-[0.5em] text-primary italic uppercase opacity-60">Shield Protocol Active</span>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
                         {qrFlow === 'request' && (
-                            <Card className="border border-border shadow-soft rounded-3xl bg-card overflow-hidden">
-                                <CardContent className="p-6 md:p-8 space-y-8">
+                            <Card className="shadow-soft overflow-hidden rounded-[2rem] border border-border bg-card">
+                                <CardContent className="space-y-8 p-8">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Smart Features</p>
-                                        <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black">SOCIAL FEATURES</Badge>
+                                        <p className="text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase">Smart Features</p>
+                                        <Badge className="border-none bg-primary/10 text-[8px] font-black text-primary">SOCIAL SYNC</Badge>
                                     </div>
                                     <div className="space-y-6">
-                                        <div className="flex items-start gap-5">
-                                            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                                <Split className="h-5 w-5 text-primary" />
+                                        <div className="group flex items-start gap-5">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                                                <Split className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black uppercase tracking-tight">Bill Splitting</p>
-                                                <p className="text-xs text-muted-foreground font-medium">Split the total amount between multiple payers instantly.</p>
+                                                <p className="text-sm font-black tracking-tight uppercase">Neural Bill Splitting</p>
+                                                <p className="text-xs font-medium leading-relaxed text-muted-foreground">Distribute costs across multiple peers instantly with one link.</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-start gap-5">
-                                            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                                <Smartphone className="h-5 w-5 text-primary" />
+                                        <div className="group flex items-start gap-5">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                                                <Smartphone className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black uppercase tracking-tight">Push Notifications</p>
-                                                <p className="text-xs text-muted-foreground font-medium">Receive instant alerts when someone pays your request.</p>
+                                                <p className="text-sm font-black tracking-tight uppercase">Push Relay Alerts</p>
+                                                <p className="text-xs font-medium leading-relaxed text-muted-foreground">Instant synchronization when peer verification completes.</p>
                                             </div>
                                         </div>
                                     </div>
                                 </CardContent>
                             </Card>
                         )}
-                    </motion.div> */}
+                    </motion.div>
                 </div>
             </motion.div>
         </>

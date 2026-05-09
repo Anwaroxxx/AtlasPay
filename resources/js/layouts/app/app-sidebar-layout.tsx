@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { CustomSidebar } from '@/components/custom-sidebar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { CommandPalette } from '@/components/command-palette';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { useAppearance } from '@/hooks/use-appearance';
 import i18n from '@/i18n';
@@ -32,10 +33,22 @@ export default function AppSidebarLayout({
     const auth = (props as any).auth;
     const currentLocale = (props as any).locale || 'en';
     const [notifications, setNotifications] = useState<any[]>([]);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     useEffect(() => {
         i18n.changeLanguage(currentLocale);
     }, [currentLocale]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsSearchOpen(true);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     useEffect(() => {
         if (auth?.user) {
@@ -88,16 +101,30 @@ export default function AppSidebarLayout({
                 <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
                     {/* Compact top toolbar — search, notifications, theme */}
                     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl md:px-6">
-                        {/* Mobile logo removed as requested */}
-                        <div className="flex items-center gap-2 md:hidden" />
+                        {/* Mobile logo added back */}
+                        <div className="flex items-center gap-2 md:hidden">
+                            <Link href="/dashboard" className="flex items-center gap-2">
+                                <img 
+                                    src="/images/logos/favicon.png" 
+                                    alt="AtlasPay" 
+                                    className="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(118,177,130,0.3)]"
+                                />
+                                <span className="font-display text-lg font-black tracking-tighter text-foreground uppercase">
+                                    Atlas<span className="text-primary italic">Pay.</span>
+                                </span>
+                            </Link>
+                        </div>
                         {/* Empty spacer on desktop */}
                         <div className="hidden md:block" />
 
                         <div className="flex items-center gap-2">
-                            <button className="hidden h-9 items-center gap-2 rounded-full border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:text-foreground md:inline-flex">
+                            <button 
+                                onClick={() => setIsSearchOpen(true)}
+                                className="hidden h-9 items-center gap-2 rounded-full border border-border bg-card px-3 text-xs text-muted-foreground transition-all hover:border-primary/30 hover:text-foreground active:scale-95 md:inline-flex"
+                            >
                                 <Search className="h-3.5 w-3.5" />
                                 <span>Search...</span>
-                                <kbd className="ml-4 rounded bg-muted px-1.5 py-0.5 text-[10px]">
+                                <kbd className="ml-4 rounded bg-muted px-1.5 py-0.5 text-[10px] font-black tracking-widest">
                                     ⌘K
                                 </kbd>
                             </button>
@@ -121,12 +148,28 @@ export default function AppSidebarLayout({
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={url}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{
-                                    duration: 0.3,
-                                    ease: [0.23, 1, 0.32, 1],
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={{
+                                    hidden: { opacity: 0, y: 10 },
+                                    visible: { 
+                                        opacity: 1, 
+                                        y: 0,
+                                        transition: {
+                                            duration: 0.5,
+                                            ease: [0.23, 1, 0.32, 1],
+                                            staggerChildren: 0.1
+                                        }
+                                    },
+                                    exit: { 
+                                        opacity: 0, 
+                                        y: -10,
+                                        transition: {
+                                            duration: 0.3,
+                                            ease: [0.23, 1, 0.32, 1]
+                                        }
+                                    }
                                 }}
                                 className="min-h-full"
                             >
@@ -192,6 +235,8 @@ export default function AppSidebarLayout({
                         </motion.div>
                     </div>
                 </div>
+
+                <CommandPalette isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
             </div>
         </SidebarProvider>
     );

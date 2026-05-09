@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import {
@@ -15,6 +15,9 @@ import {
     Zap,
     Calendar,
     X,
+    ChevronLeft,
+    ChevronRight,
+    PiggyBank,
 } from 'lucide-react';
 import { useState, useCallback, useEffect } from 'react';
 import {
@@ -39,6 +42,8 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import { reports } from '@/custom-routes';
 
 const COLORS = [
@@ -635,93 +640,98 @@ export default function Transactions({ reportData }: any) {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
-                                    {transactions.data.map((tx: any) => (
-                                        <tr
-                                            key={tx.id}
-                                            className="group transition-colors hover:bg-primary/5"
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div
-                                                        className={`shadow-soft flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${tx.type === 'deposit' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}
-                                                    >
-                                                        {tx.type ===
-                                                        'deposit' ? (
-                                                            <ArrowDownLeft className="h-5 w-5" />
-                                                        ) : (
-                                                            <ArrowUpRight className="h-5 w-5" />
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <p className="mb-1 text-sm leading-none font-black tracking-tight text-foreground uppercase">
-                                                            {tx.method.replace(
-                                                                '_',
-                                                                ' ',
+                                    <AnimatePresence mode="wait">
+                                        {transactions.data.map((tx: any, index: number) => (
+                                            <motion.tr
+                                                key={tx.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ delay: index * 0.05 }}
+                                                className="group transition-colors hover:bg-primary/5"
+                                            >
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div
+                                                            className={`shadow-soft flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${tx.is_income ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}
+                                                        >
+                                                            {tx.is_income ? (
+                                                                <ArrowDownLeft className="h-5 w-5" />
+                                                            ) : (
+                                                                <ArrowUpRight className="h-5 w-5" />
                                                             )}
-                                                        </p>
-                                                        <p className="font-mono text-[8px] tracking-widest text-muted-foreground uppercase opacity-60">
-                                                            ID: #
-                                                            {tx.id
-                                                                .toString()
-                                                                .padStart(
-                                                                    8,
-                                                                    '0',
+                                                        </div>
+                                                        <div>
+                                                            <p className="mb-1 text-sm leading-none font-black tracking-tight text-foreground uppercase">
+                                                                {tx.method.replace(
+                                                                    '_',
+                                                                    ' ',
                                                                 )}
-                                                        </p>
+                                                            </p>
+                                                            <p className="font-mono text-[8px] tracking-widest text-muted-foreground uppercase opacity-60">
+                                                                ID: #
+                                                                {tx.id
+                                                                    .toString()
+                                                                    .padStart(
+                                                                        8,
+                                                                        '0',
+                                                                    )}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <Badge
-                                                    variant="outline"
-                                                    className="border-border bg-muted/20 px-3 py-1 text-[8px] font-black tracking-[0.2em] uppercase"
-                                                >
-                                                    {tx.category || 'GENERAL'}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-6 py-4 text-[9px] font-black tracking-widest text-muted-foreground uppercase">
-                                                {new Date(
-                                                    tx.created_at,
-                                                ).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <p
-                                                    className={`text-base font-black tracking-tighter ${tx.type === 'deposit' ? 'text-success' : 'text-foreground'}`}
-                                                >
-                                                    {tx.type === 'deposit'
-                                                        ? '+'
-                                                        : '-'}
-                                                    {Number(
-                                                        tx.amount,
-                                                    ).toLocaleString()}{' '}
-                                                    <span className="text-[9px] font-normal opacity-60">
-                                                        MAD
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="border-border bg-muted/20 px-3 py-1 text-[8px] font-black tracking-[0.2em] uppercase"
+                                                    >
+                                                        {tx.category || 'GENERAL'}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-6 py-4 text-[9px] font-black tracking-widest text-muted-foreground uppercase">
+                                                    {new Date(
+                                                        tx.created_at,
+                                                    ).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <p
+                                                        className={`text-base font-black tracking-tighter ${tx.is_income ? 'text-success' : 'text-foreground'}`}
+                                                    >
+                                                        {tx.is_income
+                                                            ? '+'
+                                                            : '-'}
+                                                        {Number(
+                                                            tx.amount,
+                                                        ).toLocaleString()}{' '}
+                                                        <span className="text-[9px] font-normal opacity-60">
+                                                            MAD
+                                                        </span>
+                                                    </p>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <span
+                                                        className={`shadow-soft inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[8px] font-black tracking-widest uppercase ${
+                                                            tx.status ===
+                                                            'completed'
+                                                                ? 'border-success/20 bg-success/10 text-success'
+                                                                : tx.status ===
+                                                                    'pending'
+                                                                  ? 'border-warning/20 bg-warning/10 text-warning'
+                                                                  : tx.status ===
+                                                                      'cancelled'
+                                                                    ? 'border-slate-500/20 bg-slate-500/10 text-slate-500'
+                                                                    : 'border-destructive/20 bg-destructive/10 text-destructive'
+                                                        }`}
+                                                    >
+                                                        <div
+                                                            className={`h-1 w-1 rounded-full ${tx.status === 'completed' ? 'bg-success' : tx.status === 'pending' ? 'bg-warning' : tx.status === 'cancelled' ? 'bg-slate-500' : 'bg-destructive'}`}
+                                                        />
+                                                        {tx.status}
                                                     </span>
-                                                </p>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <span
-                                                    className={`shadow-soft inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[8px] font-black tracking-widest uppercase ${
-                                                        tx.status ===
-                                                        'completed'
-                                                            ? 'border-success/20 bg-success/10 text-success'
-                                                            : tx.status ===
-                                                                'pending'
-                                                              ? 'border-warning/20 bg-warning/10 text-warning'
-                                                              : tx.status ===
-                                                                  'cancelled'
-                                                                ? 'border-slate-500/20 bg-slate-500/10 text-slate-500'
-                                                                : 'border-destructive/20 bg-destructive/10 text-destructive'
-                                                    }`}
-                                                >
-                                                    <div
-                                                        className={`h-1 w-1 rounded-full ${tx.status === 'completed' ? 'bg-success' : tx.status === 'pending' ? 'bg-warning' : tx.status === 'cancelled' ? 'bg-slate-500' : 'bg-destructive'}`}
-                                                    />
-                                                    {tx.status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                            </motion.tr>
+                                        ))}
+                                    </AnimatePresence>
                                     {transactions.data.length === 0 && (
                                         <tr>
                                             <td
@@ -736,6 +746,65 @@ export default function Transactions({ reportData }: any) {
                                 </tbody>
                             </table>
                         </CardContent>
+
+                        {/* Pagination Footer */}
+                        {transactions.last_page > 1 && (
+                            <div className="flex items-center justify-between border-t border-border bg-muted/10 p-6">
+                                <p className="text-[10px] font-black tracking-widest text-muted-foreground/60 uppercase">
+                                    Showing {transactions.from} to {transactions.to} of {transactions.total}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    {transactions.links.map((link: any, i: number) => {
+                                        // Filter out the prev/next labels from the main list
+                                        if (link.label.includes('Previous') || link.label.includes('Next')) return null;
+                                        
+                                        return (
+                                            <motion.div
+                                                key={i}
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <Link
+                                                    href={link.url || '#'}
+                                                    className={cn(
+                                                        "flex h-10 w-10 items-center justify-center rounded-xl border text-[10px] font-black transition-all",
+                                                        link.active 
+                                                            ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                                                            : "border-border/50 bg-card hover:border-primary/50 text-foreground"
+                                                    )}
+                                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                                />
+                                            </motion.div>
+                                        );
+                                    })}
+
+                                    <div className="ml-4 flex gap-2">
+                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <Link
+                                                href={transactions.prev_page_url || '#'}
+                                                className={cn(
+                                                    "flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-card transition-all",
+                                                    !transactions.prev_page_url && "opacity-30 pointer-events-none"
+                                                )}
+                                            >
+                                                <ChevronLeft className="h-4 w-4" />
+                                            </Link>
+                                        </motion.div>
+                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <Link
+                                                href={transactions.next_page_url || '#'}
+                                                className={cn(
+                                                    "flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-card transition-all",
+                                                    !transactions.next_page_url && "opacity-30 pointer-events-none"
+                                                )}
+                                            >
+                                                <ChevronRight className="h-4 w-4" />
+                                            </Link>
+                                        </motion.div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </Card>
                 </motion.div>
             </motion.div>

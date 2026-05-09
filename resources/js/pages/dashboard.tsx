@@ -81,10 +81,10 @@ export default function Dashboard({
     }, [auth.user.id]);
 
     const totalIn = recentTransactions
-        .filter((t) => t.type === 'deposit')
+        .filter((t) => t.is_income)
         .reduce((sum, t) => sum + t.amount, 0);
     const totalOut = recentTransactions
-        .filter((t) => t.type === 'withdrawal' || t.type === 'transfer')
+        .filter((t) => !t.is_income)
         .reduce((sum, t) => sum + t.amount, 0);
     const mainAccount = accounts[0];
 

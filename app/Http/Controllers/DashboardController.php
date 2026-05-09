@@ -18,11 +18,23 @@ class DashboardController extends Controller
         $accounts = $user->accounts()->get();
         $totalBalance = $accounts->sum('balance');
         
-        $recentTransactions = Transaction::whereIn('from_account_id', $accounts->pluck('id'))
-            ->orWhereIn('to_account_id', $accounts->pluck('id'))
+        $accountIds = $accounts->pluck('id')->toArray();
+        $recentTransactions = Transaction::whereIn('from_account_id', $accountIds)
+            ->orWhereIn('to_account_id', $accountIds)
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->take(20)
+            ->get()
+            ->map(function ($transaction) use ($accountIds) {
+                // If the user's account is the recipient, or it's a deposit, it's income
+                $isIncome = in_array($transaction->to_account_id, $accountIds) || $transaction->type === 'deposit';
+                
+                // If it's a transfer between the user's own accounts, we might want to handle it differently, 
+                // but for now, let's just stick to the basic logic.
+                
+                // Add the flag to the transaction object
+                $transaction->is_income = $isIncome;
+                return $transaction;
+            });
 
         $activeCredit = $user->credits()->where('status', 'active')->first();
         

@@ -22,14 +22,14 @@ class AnwarLogic
 
         // 1. Income Patterns
         $deposits = Transaction::whereIn('to_account_id', $accountIds)
-            ->where('type', 'deposit')
+            ->whereNotIn('from_account_id', $accountIds) // Exclude internal transfers
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
         // 2. Spending Behavior
         $spending = Transaction::whereIn('from_account_id', $accountIds)
-            ->where('type', 'transfer')
+            ->whereNotIn('to_account_id', $accountIds) // Exclude internal transfers
             ->select('category', \DB::raw('SUM(amount) as total'))
             ->groupBy('category')
             ->get()
@@ -38,12 +38,12 @@ class AnwarLogic
 
         // 3. Projections (Next 6 Months)
         $monthlyIncome = Transaction::whereIn('to_account_id', $accountIds)
-            ->where('type', 'deposit')
+            ->whereNotIn('from_account_id', $accountIds)
             ->where('created_at', '>=', $now->copy()->subMonths(3))
             ->sum('amount') / 3;
 
         $monthlyExpenses = Transaction::whereIn('from_account_id', $accountIds)
-            ->where('type', 'transfer')
+            ->whereNotIn('to_account_id', $accountIds)
             ->where('created_at', '>=', $now->copy()->subMonths(3))
             ->sum('amount') / 3;
 
@@ -132,13 +132,13 @@ class AnwarLogic
 
         // Income patterns
         $monthlyIncome = Transaction::whereIn('to_account_id', $accountIds)
-            ->where('type', 'deposit')
+            ->whereNotIn('from_account_id', $accountIds)
             ->where('created_at', '>=', $now->copy()->subMonths(3))
             ->sum('amount') / 3;
 
         // Spending behavior
         $spending = Transaction::whereIn('from_account_id', $accountIds)
-            ->where('type', 'transfer')
+            ->whereNotIn('to_account_id', $accountIds)
             ->select('category', \DB::raw('SUM(amount) as total'))
             ->groupBy('category')
             ->get()

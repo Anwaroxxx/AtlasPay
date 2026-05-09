@@ -26,11 +26,11 @@ class ReportController extends Controller
         $accounts = $user->accounts()->get();
         $accountIds = $accounts->pluck('id')->toArray();
 
-        // 1. Current Month Category Spending
+        // 1. Current Month Category Spending (Everything leaving the user's accounts to outside)
         $currentMonthSpending = Transaction::whereIn('from_account_id', $accountIds)
+            ->whereNotIn('to_account_id', $accountIds)
             ->whereYear('created_at', $now->year)
             ->whereMonth('created_at', $now->month)
-            ->where('type', 'transfer') 
             ->select('category', \DB::raw('SUM(amount) as total'))
             ->groupBy('category')
             ->get()
@@ -45,11 +45,12 @@ class ReportController extends Controller
             ->pluck('amount', 'category')
             ->toArray();
 
-        // 3. Monthly Trends (Last 6 Months)
+        // 3. Monthly Trends (Last 6 Months) - Outgoing spending
         $trends = [];
         for ($i = 5; $i >= 0; $i--) {
             $month = $now->copy()->subMonths($i);
             $total = Transaction::whereIn('from_account_id', $accountIds)
+                ->whereNotIn('to_account_id', $accountIds)
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->sum('amount');
@@ -92,7 +93,12 @@ class ReportController extends Controller
             }
         });
 
-        $transactions = $query->orderBy('created_at', 'desc')->paginate(50)->withQueryString();
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(5)->withQueryString();
+
+        $transactions->getCollection()->transform(function ($transaction) use ($accountIds) {
+            $transaction->is_income = in_array($transaction->to_account_id, $accountIds) || $transaction->type === 'deposit';
+            return $transaction;
+        });
 
         return Inertia::render('reports/transactions', [
             'reportData' => [

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { LucideIcon } from 'lucide-react';
 import { TrendingDown, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export function StatCard({
@@ -19,17 +20,24 @@ export function StatCard({
     href?: string;
 }) {
     const content = (
-        <>
+        <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-10"
+        >
             <div className="flex items-center justify-between gap-1">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground md:h-10 md:w-10">
+                <motion.div 
+                    whileHover={{ rotate: 15, scale: 1.1 }}
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20 md:h-10 md:w-10"
+                >
                     <Icon className="h-4 w-4 md:h-5 md:w-5" />
-                </div>
+                </motion.div>
                 <span
                     className={cn(
-                        'inline-flex max-w-[80px] items-center gap-1 truncate rounded-full px-1.5 py-1 text-[9px] font-black tracking-widest uppercase md:px-2.5 md:text-[11px]',
+                        'inline-flex items-center gap-1 rounded-full px-2 py-1 text-[9px] font-black tracking-widest uppercase md:px-2.5 md:text-[11px] shadow-sm',
                         positive
-                            ? 'bg-success/15 text-success'
-                            : 'bg-destructive/15 text-destructive',
+                            ? 'bg-success/10 text-success border border-success/20'
+                            : 'bg-destructive/10 text-destructive border border-destructive/20',
                     )}
                 >
                     {positive ? (
@@ -46,18 +54,23 @@ export function StatCard({
             <p className="mt-1 font-display text-2xl font-black tracking-tighter text-foreground transition-colors group-hover:text-primary md:text-3xl">
                 {value}
             </p>
-        </>
+        </motion.div>
     );
 
     const className = cn(
-        'group shadow-soft hover:shadow-elevated relative overflow-hidden rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30',
+        'group relative overflow-hidden rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm transition-all duration-500 hover:border-primary/30 hover:shadow-elevated',
         href && 'cursor-pointer',
+    );
+
+    const shimmer = (
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
     );
 
     if (href) {
         return (
             <Link href={href} className={className}>
                 <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.02] transition-opacity group-hover:opacity-[0.05]" />
+                {shimmer}
                 {content}
             </Link>
         );
@@ -66,6 +79,7 @@ export function StatCard({
     return (
         <div className={className}>
             <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.02]" />
+            {shimmer}
             {content}
         </div>
     );

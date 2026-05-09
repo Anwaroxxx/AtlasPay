@@ -10,7 +10,9 @@ import {
     BrainCircuit,
 } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface BalanceCardProps {
     balance: number;
@@ -37,7 +39,11 @@ export function BalanceCard({
     ];
 
     return (
-        <div className="shadow-elevated group relative overflow-hidden rounded-3xl bg-[image:var(--gradient-primary)] p-8 text-primary-foreground">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="shadow-elevated group light-sweep relative overflow-hidden rounded-3xl bg-[image:var(--gradient-primary)] p-8 text-primary-foreground transition-all duration-500 hover:shadow-2xl"
+        >
             <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.05]" />
             <div className="absolute -top-16 -right-16 h-72 w-72 rounded-full bg-white/10 blur-3xl transition-transform duration-700 group-hover:scale-110" />
             <div className="absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-white/5 blur-3xl transition-transform duration-700 group-hover:scale-110" />
@@ -51,17 +57,25 @@ export function BalanceCard({
                         {accountNumber}
                     </p>
                 </div>
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => setHidden((h) => !h)}
-                    className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-primary-foreground/90 transition-all hover:bg-white/20 active:scale-95"
+                    className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-primary-foreground/90 transition-all hover:bg-white/20"
                     aria-label="Toggle balance visibility"
                 >
-                    {hidden ? (
-                        <EyeOff className="h-4 w-4" />
-                    ) : (
-                        <Eye className="h-4 w-4" />
-                    )}
-                </button>
+                    <AnimatePresence mode="wait">
+                        {hidden ? (
+                            <motion.div key="eye-off" initial={{ opacity: 0, rotate: -45 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 45 }} transition={{ duration: 0.2 }}>
+                                <EyeOff className="h-4 w-4" />
+                            </motion.div>
+                        ) : (
+                            <motion.div key="eye" initial={{ opacity: 0, rotate: -45 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 45 }} transition={{ duration: 0.2 }}>
+                                <Eye className="h-4 w-4" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.button>
             </div>
 
             <div className="relative mt-6 mb-6 md:mt-8 md:mb-8">
@@ -69,9 +83,12 @@ export function BalanceCard({
                     Available Balance
                 </p>
                 <div className="flex items-baseline gap-2 md:gap-3">
-                    <span className="font-display text-4xl font-black tracking-tighter md:text-5xl lg:text-7xl">
+                    <motion.span 
+                        layout
+                        className="font-display text-4xl font-black tracking-tighter md:text-5xl lg:text-7xl"
+                    >
                         {hidden ? '••••••' : balance.toLocaleString()}
-                    </span>
+                    </motion.span>
                     <span className="text-base font-black tracking-widest uppercase opacity-60 md:text-xl">
                         {currency}
                     </span>
@@ -83,9 +100,9 @@ export function BalanceCard({
                     <Link key={a.label} href={a.href} className="flex-1">
                         <Button
                             variant="ghost"
-                            className="flex h-auto w-full flex-col items-center gap-2 rounded-[1.5rem] border border-white/5 bg-white/10 py-4 text-primary-foreground shadow-inner transition-all hover:scale-[1.02] hover:bg-white/20 md:gap-3 md:py-6"
+                            className="flex h-auto w-full flex-col items-center gap-2 rounded-[1.5rem] border border-white/5 bg-white/10 py-4 text-primary-foreground shadow-inner transition-all hover:scale-[1.05] hover:bg-white/20 active:scale-95 md:gap-3 md:py-6"
                         >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10 md:h-10 md:w-10">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10 transition-transform group-hover:scale-110 md:h-10 md:w-10">
                                 <a.icon className="h-4 w-4 md:h-5 md:w-5" />
                             </div>
                             <span className="text-[9px] font-black tracking-widest uppercase md:text-[10px]">
@@ -95,6 +112,6 @@ export function BalanceCard({
                     </Link>
                 ))}
             </div>
-        </div>
+        </motion.div>
     );
 }
