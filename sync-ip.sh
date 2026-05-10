@@ -30,6 +30,12 @@ sed -i "s|APP_URL=http://[^:/]*|APP_URL=http://$WIN_IP|g" "$ENV_FILE"
 # Update REVERB_HOST
 sed -i "s|REVERB_HOST=.*|REVERB_HOST=\"$WIN_IP\"|g" "$ENV_FILE"
 
+# Update VITE_REVERB variables
+sed -i "s|VITE_REVERB_HOST=.*|VITE_REVERB_HOST=\"$WIN_IP\"|g" "$ENV_FILE"
+sed -i "s|VITE_REVERB_APP_KEY=.*|VITE_REVERB_APP_KEY=\"atlaspay_key\"|g" "$ENV_FILE"
+sed -i "s|VITE_REVERB_PORT=.*|VITE_REVERB_PORT=8080|g" "$ENV_FILE"
+sed -i "s|VITE_REVERB_SCHEME=.*|VITE_REVERB_SCHEME=\"http\"|g" "$ENV_FILE"
+
 echo "Updated .env with IP: $WIN_IP"
 
 # 3. Update vite.config.ts HMR host

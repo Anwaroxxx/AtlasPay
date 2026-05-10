@@ -1,4 +1,4 @@
-import { BankBot } from '@/components/bank-bot';
+
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -16,7 +16,7 @@ export default function AppLayout({
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs}>
             {children}
-            {!isAiPage && <BankBot />}
+
         </AppLayoutTemplate>
     );
 }

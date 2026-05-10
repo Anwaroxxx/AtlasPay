@@ -69,7 +69,7 @@ class DaretController extends Controller
             }
         });
 
-        return redirect()->back()->with('message', 'Group created! Invitations sent to members.');
+        return redirect()->back()->with('message', 'Group created. Invitations have been dispatched to all members.');
     }
 
     public function accept(Request $request, DaretGroup $group)
@@ -80,7 +80,7 @@ class DaretController extends Controller
         $account = $request->user()->accounts()->where('status', 'active')->first();
 
         if (!$account || $account->balance < $managementFee) {
-            return redirect()->back()->withErrors(['message' => "Insufficient funds for the 10 MAD group management fee."]);
+            return redirect()->back()->with('error', 'Insufficient funds for the 10 MAD group management fee.');
         }
 
         DB::transaction(function () use ($member, $account, $managementFee, $group) {
@@ -106,7 +106,7 @@ class DaretController extends Controller
             }
         });
 
-        return redirect()->back()->with('message', 'You joined the group! A 10 MAD management fee has been applied.');
+        return redirect()->back()->with('message', 'Invitation accepted. The management fee has been processed.');
     }
 
     public function decline(Request $request, DaretGroup $group)
@@ -115,6 +115,36 @@ class DaretController extends Controller
         $member->update(['status' => 'declined']);
 
         return redirect()->back()->with('message', 'Invitation declined.');
+    }
+
+    public function destroy(Request $request, DaretGroup $group)
+    {
+        if ($group->creator_id !== $request->user()->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($group->status === 'active') {
+            return redirect()->back()->with('error', 'Active groups cannot be deleted while in progress.');
+        }
+
+        DB::transaction(function () use ($group) {
+            // Notify all members before deletion
+            foreach ($group->members as $member) {
+                if ($member->user_id !== $group->creator_id) {
+                    event(new \App\Events\GenericNotification(
+                        $member->user_id,
+                        'Daret Circle Disbanded',
+                        "The savings circle '{$group->name}' has been disbanded by its creator.",
+                        'warning'
+                    ));
+                }
+            }
+
+            $group->members()->delete();
+            $group->delete();
+        });
+
+        return redirect()->route('daret.index')->with('message', 'Savings circle has been successfully disbanded.');
     }
 
     public function pay(Request $request, DaretGroup $group)
@@ -133,7 +163,7 @@ class DaretController extends Controller
             $account = $request->user()->accounts()->where('status', 'active')->firstOrFail();
 
             if ($account->balance < $group->monthly_amount) {
-                throw new \Exception('Not enough balance for this contribution.');
+                return redirect()->back()->with('error', 'Not enough balance for this contribution. Please deposit funds and try again.');
             }
 
             $account->decrement('balance', $group->monthly_amount);

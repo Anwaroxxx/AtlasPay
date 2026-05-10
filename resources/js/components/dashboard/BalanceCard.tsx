@@ -54,7 +54,7 @@ export function BalanceCard({
                         Account Number
                     </p>
                     <p className="max-w-[160px] truncate font-mono text-sm tracking-widest opacity-90 sm:max-w-full">
-                        {accountNumber}
+                        {'*'.repeat(Math.max(0, accountNumber.length - 4)) + accountNumber.slice(-4)}
                     </p>
                 </div>
                 <motion.button

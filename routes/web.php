@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/daret/{group}/pay', [DaretController::class, 'pay'])->name('daret.pay');
     Route::post('/daret/{group}/accept', [DaretController::class, 'accept'])->name('daret.accept');
     Route::post('/daret/{group}/decline', [DaretController::class, 'decline'])->name('daret.decline');
+    Route::delete('/daret/{group}', [DaretController::class, 'destroy'])->name('daret.destroy');
 
     // Profile Photo Upload
     Route::post('/settings/profile/photo', function (Illuminate\Http\Request $request) {
@@ -121,6 +122,16 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::post("qr/update/sender/{id}",[TokenController::class, "updateSender"]);
     Route::post("qr/update/receiver/{id}",[TokenController::class, "updateReceiver"]);
     Route::post("qr/update/store/{id}",[TokenController::class, "updateReceiverSTORE"]);
+
+    Route::get('/debug-notify', function() {
+        event(new \App\Events\GenericNotification(
+            auth()->id(),
+            'System Diagnostic',
+            'Broadcasting is operational. Connection verified.',
+            'success'
+        ));
+        return "Diagnostic event dispatched to user ID: " . auth()->id();
+    })->middleware('auth');
 });
 
 

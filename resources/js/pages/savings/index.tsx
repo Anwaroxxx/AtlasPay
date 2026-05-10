@@ -324,13 +324,12 @@ export default function Savings({ goals }: Props) {
                                             </div>
                                             <Badge
                                                 className={`border-none px-3 py-1 text-[9px] font-black tracking-widest uppercase ${
-                                                    goal.status === 'completed'
-                                                        ? 'bg-success text-success-foreground'
-                                                        : goal.status ===
-                                                            'unlocked'
-                                                          ? 'bg-warning text-warning-foreground'
-                                                          : 'bg-primary/20 text-primary'
-                                                }`}
+                                                                                                    goal.status === 'completed' || goal.status === 'active'
+                                                                                                        ? 'bg-success text-success-foreground'
+                                                                                                        : goal.status === 'unlocked'
+                                                                                                          ? 'bg-destructive text-destructive-foreground'
+                                                                                                          : 'bg-primary/20 text-primary'
+                                                                                                } `}
                                             >
                                                 {goal.status}
                                             </Badge>

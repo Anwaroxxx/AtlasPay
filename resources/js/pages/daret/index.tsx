@@ -15,11 +15,23 @@ import {
     UserPlus,
     Check,
     XCircle,
+    Trash2,
+    AlertTriangle,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
     Card,
     CardHeader,
@@ -71,6 +83,8 @@ export default function Daret({
     const [isCreating, setIsCreating] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [groupToDelete, setGroupToDelete] = useState<number | null>(null);
 
     const { data, setData, post, processing, reset, errors } = useForm({
         name: '',
@@ -130,12 +144,12 @@ export default function Daret({
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/daret', {
-            onSuccess: () => {
+                onSuccess: () => {
                 setIsCreating(false);
                 reset();
                 setSelectedUsers([]);
                 setSearchQuery('');
-                toast.success('Group created! Invitations sent.');
+                toast.success('Group created and invitations dispatched.');
             },
         });
     };
@@ -145,7 +159,7 @@ export default function Daret({
             `/daret/${groupId}/accept`,
             {},
             {
-                onSuccess: () => toast.success('You joined the group!'),
+                onSuccess: () => toast.success('Joined the group successfully.'),
             },
         );
     };
@@ -165,9 +179,31 @@ export default function Daret({
             `/daret/${groupId}/pay`,
             {},
             {
-                onSuccess: () => toast.success('Contribution paid!'),
+                onSuccess: () => toast.success('Contribution processed.'),
             },
         );
+    };
+
+    const handleDestroy = (groupId: number) => {
+        setGroupToDelete(groupId);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDestroy = () => {
+        if (groupToDelete) {
+            router.delete(`/daret/${groupToDelete}`, {
+                onSuccess: () => {
+                    toast.success('Savings circle successfully disbanded.');
+                    setDeleteDialogOpen(false);
+                    setGroupToDelete(null);
+                },
+                onError: () => {
+                    toast.error('Failed to disband circle.');
+                    setDeleteDialogOpen(false);
+                    setGroupToDelete(null);
+                }
+            });
+        }
     };
 
     const container = {
@@ -522,6 +558,15 @@ export default function Daret({
                                                       ? 'Pending'
                                                       : 'Done'}
                                             </Badge>
+                                            {group.creator.id === auth.user.id && group.status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleDestroy(group.id)}
+                                                    className="ml-2 rounded-lg p-1.5 text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+                                                    title="Disband Circle"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            )}
                                         </div>
                                         <CardTitle className="text-lg font-bold">
                                             {group.name}
@@ -533,29 +578,25 @@ export default function Daret({
                                     </CardHeader>
                                     <CardContent className="flex-1 space-y-4 p-5 pt-0">
                                         {/* Current turn (only for active groups) */}
-                                        {group.status === 'active' && (
-                                            <div
-                                                className={`rounded-xl border p-3 ${isMyTurn ? 'border-primary/20 bg-primary/10' : 'border-border/50 bg-muted/30'}`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Coins
-                                                        className={`h-5 w-5 ${isMyTurn ? 'text-primary' : 'text-muted-foreground'}`}
-                                                    />
-                                                    <div>
-                                                        <p className="text-[10px] font-medium text-muted-foreground">
-                                                            This month's turn
-                                                        </p>
-                                                        <p className="text-sm font-bold">
-                                                            {isMyTurn
-                                                                ? 'Your turn! 🎉'
-                                                                : currentMemberTurn
-                                                                      ?.user
-                                                                      .name}
-                                                        </p>
+                                                    <div className={`rounded-xl border p-3 ${isMyTurn ? 'border-primary/20 bg-primary/10' : 'border-border/50 bg-muted/30'}`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`rounded-lg p-2 ${isMyTurn ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Coins className="h-4 w-4" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
+                                                                    Current Payout
+                                                                </p>
+                                                                <p className="text-sm font-black uppercase tracking-tight">
+                                                                    {isMyTurn
+                                                                        ? 'Your Collection Period'
+                                                                        : currentMemberTurn
+                                                                              ?.user
+                                                                              .name}
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        )}
 
                                         {/* Members list */}
                                         <div className="space-y-2">
@@ -679,6 +720,33 @@ export default function Daret({
                     )}
                 </div>
             </motion.div>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent className="rounded-[2rem] border-border/50 bg-card/95 p-8 backdrop-blur-xl">
+                    <AlertDialogHeader>
+                        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                            <AlertTriangle className="h-8 w-8" />
+                        </div>
+                        <AlertDialogTitle className="font-display text-center text-xl font-black tracking-tight text-foreground uppercase">
+                            Disband Savings Circle
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-center text-xs font-medium leading-relaxed text-muted-foreground opacity-60">
+                            You are about to terminate this Daret group. This will notify all invited members and permanently delete all records associated with this circle. This action is irreversible.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-8 flex gap-3 sm:justify-center">
+                        <AlertDialogCancel className="h-12 flex-1 rounded-xl border-border bg-card text-[10px] font-black tracking-widest text-foreground uppercase transition-all hover:bg-muted">
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDestroy}
+                            className="h-12 flex-1 rounded-xl bg-destructive text-[10px] font-black tracking-widest text-destructive-foreground uppercase shadow-lg shadow-destructive/20 transition-all hover:opacity-90"
+                        >
+                            Disband Circle
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

@@ -93,8 +93,13 @@ class SavingsGoalController extends Controller
         $user = $request->user();
         \Illuminate\Support\Facades\Log::info("VAULT UNLOCK CODE for {$user->email}: {$code}");
         
-        // You could also use Mail::to($user->email)->send(new VaultUnlockMail($code));
-        // But for this simulation, we'll assume the user checks their 'secure notifications'.
+        // Dispatch real-time notification
+        event(new \App\Events\GenericNotification(
+            $user->id,
+            'Vault Unlock Code',
+            "Your authorization code for '{$goal->name}' is: {$code}. Valid for 10 minutes.",
+            'warning'
+        ));
 
         return redirect()->back()->with('message', 'A verification code has been dispatched to your secure contact. Please enter it to authorize the liquidation.');
     }

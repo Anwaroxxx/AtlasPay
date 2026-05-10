@@ -143,7 +143,13 @@ export default function Dashboard({
                     </div>
                 </motion.div>
 
+
                 {/* AI Insights Bar */}
+                {/* Conditionally render AiInsight only on non-mobile devices.
+                    TODO: Implement proper mobile detection logic here.
+                    Example: import { useMediaQuery } from 'react-responsive'; const isMobile = useMediaQuery({ maxWidth: 767 });
+                {/* AI Insights Bar */}
+                {/* TODO: Implement mobile detection for 'isMobile' variable (e.g., using react-responsive hook or context) to conditionally render AiInsight on non-mobile devices. */}
                 <motion.div variants={item}>
                     <AiInsight narrative={stats.aiNarrative} />
                 </motion.div>

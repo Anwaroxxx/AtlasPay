@@ -10,6 +10,8 @@ import {
     CircleDollarSign,
     User,
     X,
+    Lock,
+    ChevronLeft,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -56,7 +58,7 @@ export default function ReceiverView({ id, token: initialToken }: Props) {
             (window as any).Echo.leave(`qr-token.${initialToken.token}`);
             clearInterval(pollInterval);
         };
-    }, [initialToken.token]); // Dependency changed: removed status to prevent re-hooking
+    }, [initialToken.token]);
 
     const handleRequest = (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,180 +66,176 @@ export default function ReceiverView({ id, token: initialToken }: Props) {
             .post(`/qr/confirm/${id}`, { amount: data.amount })
             .then(() => {
                 setStatus('ready');
-                toast.success('Request sent to sender!');
+                toast.success('Payment request sent to sender.');
             })
             .catch((err) => {
-                toast.error(err.response?.data?.message || 'Request failed');
+                toast.error(err.response?.data?.message || 'Request failed.');
             });
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
-            <Head title="Quick Pay Request" />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 md:p-8">
+            <Head title="Quick Pay" />
+            <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.03]" />
+
+            <Link
+                href="/transfer"
+                className="group absolute top-8 left-8 z-10 flex items-center gap-2 text-xs font-black tracking-widest text-muted-foreground uppercase transition-all hover:text-primary"
+            >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card transition-all group-hover:border-primary/30 group-hover:bg-primary/5">
+                    <ChevronLeft className="h-4 w-4" />
+                </div>
+                Return
+            </Link>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative z-10 w-full max-w-[440px]"
             >
-                {/* Header */}
-                <div className="relative overflow-hidden bg-slate-800 p-8 text-center text-white">
-                    <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
+                <div className="shadow-elevated overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-3xl">
+                    <div className="bg-noise absolute inset-0 opacity-[0.02]" />
 
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 text-primary backdrop-blur-md"
-                    >
-                        <User className="h-10 w-10" />
-                    </motion.div>
+                    {/* Header */}
+                    <div className="relative border-b border-border/50 p-8 text-center">
+                        <motion.div
+                            initial={{ y: -10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-lg shadow-primary/10"
+                        >
+                            <User className="h-8 w-8" />
+                        </motion.div>
 
-                    <h1 className="mb-1 text-xl font-bold">Quick Pay</h1>
-                    <p className="text-sm text-slate-400">
-                        Requesting from{' '}
-                        <span className="font-semibold text-white">
-                            {initialToken.from_account.user.name}
-                        </span>
-                    </p>
-                </div>
+                        <h1 className="font-display text-2xl font-black tracking-tighter text-foreground uppercase">
+                            Quick Pay
+                        </h1>
+                        <p className="mt-2 text-[10px] font-black tracking-widest text-muted-foreground uppercase opacity-60">
+                            Paying to <span className="text-foreground">{initialToken.from_account.user.name}</span>
+                        </p>
+                    </div>
 
-                <div className="p-8 text-center">
-                    <AnimatePresence mode="wait">
-                        {status === 'cancelled' ? (
-                            <motion.div
-                                key="cancelled"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="flex flex-col items-center"
-                            >
-                                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/30">
-                                    <X className="h-12 w-12" />
-                                </div>
-                                <h2 className="mb-2 text-2xl font-bold text-slate-800 dark:text-white">
-                                    Request Declined
-                                </h2>
-                                <p className="mb-8 text-slate-500">
-                                    The sender has declined or cancelled this
-                                    transaction request.
-                                </p>
-
-                                <Link
-                                    href="/dashboard"
-                                    className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800 py-4 font-bold text-white transition-all hover:bg-slate-700"
+                    <div className="p-8">
+                        <AnimatePresence mode="wait">
+                            {status === 'cancelled' ? (
+                                <motion.div
+                                    key="cancelled"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex flex-col items-center py-8 text-center"
                                 >
-                                    <ArrowLeft className="mr-2 h-5 w-5" />
-                                    Go to Dashboard
-                                </Link>
-                            </motion.div>
-                        ) : status === 'ready' || status === 'completed' ? (
-                            <motion.div
-                                key="success"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="flex flex-col items-center"
-                            >
-                                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                    <CheckCircle2 className="h-12 w-12" />
-                                </div>
-                                <h2 className="mb-2 text-2xl font-bold text-slate-800 dark:text-white">
-                                    {status === 'ready'
-                                        ? 'Request Sent!'
-                                        : 'Payment Completed!'}
-                                </h2>
-                                <p className="mb-8 text-slate-500">
-                                    {status === 'ready'
-                                        ? 'Waiting for the sender to approve the transaction.'
-                                        : 'The funds have been transferred successfully.'}
-                                </p>
-
-                                <Link
-                                    href="/dashboard"
-                                    className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-800 py-4 font-bold text-white transition-all hover:bg-slate-700"
-                                >
-                                    <ArrowLeft className="mr-2 h-5 w-5" />
-                                    Go to Dashboard
-                                </Link>
-                            </motion.div>
-                        ) : (
-                            <motion.form
-                                key="form"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                onSubmit={handleRequest}
-                                className="space-y-8"
-                            >
-                                <div className="rounded-3xl border border-slate-100 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-800/50">
-                                    <span className="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase">
-                                        Amount to Request
-                                    </span>
-
-                                    <div className="relative">
-                                        <CircleDollarSign className="absolute top-1/2 left-0 h-8 w-8 -translate-y-1/2 text-primary" />
-                                        <input
-                                            type="number"
-                                            value={data.amount}
-                                            onChange={(e) =>
-                                                setData(
-                                                    'amount',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="w-full border-none bg-transparent p-0 pl-12 text-center text-4xl font-black text-slate-800 focus:ring-0 dark:text-white"
-                                            placeholder="0.00"
-                                            autoFocus
-                                        />
+                                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                                        <X className="h-10 w-10" />
                                     </div>
-                                </div>
+                                    <h2 className="font-display mb-2 text-xl font-black tracking-tight text-foreground uppercase">
+                                        Request Declined
+                                    </h2>
+                                    <p className="mb-10 text-xs font-medium text-muted-foreground opacity-60">
+                                        The transaction request has been <br />
+                                        terminated by the counterparty.
+                                    </p>
 
-                                <button
-                                    type="submit"
-                                    disabled={processing || !data.amount}
-                                    className="flex w-full items-center justify-center space-x-3 rounded-2xl bg-primary py-5 font-bold text-primary-foreground shadow-xl transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-50"
+                                    <Link
+                                        href="/dashboard"
+                                        className="inline-block w-full rounded-2xl bg-foreground py-4 text-xs font-black tracking-widest text-background transition-all hover:opacity-90 active:scale-95"
+                                    >
+                                        Return to Dashboard
+                                    </Link>
+                                </motion.div>
+                            ) : status === 'ready' || status === 'completed' ? (
+                                <motion.div
+                                    key="success"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex flex-col items-center py-8 text-center"
                                 >
-                                    {processing ? (
-                                        <Loader2 className="h-6 w-6 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <ArrowUpRight className="h-6 w-6" />
-                                            <span className="text-lg">
-                                                Request Amount
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
+                                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                                        <CheckCircle2 className="h-10 w-10" />
+                                    </div>
+                                    <h2 className="font-display mb-2 text-xl font-black tracking-tight text-foreground uppercase">
+                                        {status === 'ready' ? 'Request Sent' : 'Payment Success'}
+                                    </h2>
+                                    <p className="mb-10 text-xs font-medium text-muted-foreground opacity-60">
+                                        {status === 'ready'
+                                            ? 'The transaction is awaiting authorization \n from the primary account owner.'
+                                            : 'The digital settlement has been \n successfully processed on the network.'}
+                                    </p>
 
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (confirm('Cancel this request?')) {
-                                            axios
-                                                .post(`/qr/cancel/${id}`)
-                                                .then(() => {
-                                                    router.visit('/dashboard');
-                                                });
-                                        }
-                                    }}
-                                    className="w-full py-2 text-xs font-bold tracking-widest text-slate-400 uppercase transition-colors hover:text-rose-500"
+                                    <Link
+                                        href="/dashboard"
+                                        className="inline-block w-full rounded-2xl bg-foreground py-4 text-xs font-black tracking-widest text-background transition-all hover:opacity-90 active:scale-95"
+                                    >
+                                        Return to Dashboard
+                                    </Link>
+                                </motion.div>
+                            ) : (
+                                <motion.form
+                                    key="form"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    onSubmit={handleRequest}
+                                    className="space-y-10"
                                 >
-                                    Cancel Request
-                                </button>
+                                    <div className="rounded-[2rem] border border-border/50 bg-muted/30 p-8 text-center">
+                                        <p className="mb-4 text-[10px] font-black tracking-[0.2em] text-muted-foreground uppercase opacity-60">
+                                            Specify Amount
+                                        </p>
 
-                                <p className="text-xs text-slate-400">
-                                    The sender will need to approve this amount
-                                    on their screen.
-                                </p>
-                            </motion.form>
-                        )}
-                    </AnimatePresence>
-                </div>
+                                        <div className="relative flex items-center justify-center gap-2">
+                                            <input
+                                                type="number"
+                                                value={data.amount}
+                                                onChange={(e) => setData('amount', e.target.value)}
+                                                className="w-full border-none bg-transparent p-0 text-center font-display text-5xl font-black tracking-tighter text-foreground focus:ring-0"
+                                                placeholder="0.00"
+                                                autoFocus
+                                            />
+                                            <span className="font-display text-xl font-black opacity-20">MAD</span>
+                                        </div>
+                                    </div>
 
-                <div className="flex items-center justify-center space-x-2 border-t border-slate-100 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-800/50">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                        Secured by AtlasPay Anti-Fraud
-                    </span>
+                                    <div className="space-y-4">
+                                        <button
+                                            type="submit"
+                                            disabled={processing || !data.amount}
+                                            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-5 text-xs font-black tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:opacity-90 active:scale-95 disabled:opacity-30"
+                                        >
+                                            {processing ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <ArrowUpRight className="h-4 w-4" />
+                                                    <span>Initiate Request</span>
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (confirm('Terminate this request?')) {
+                                                    axios.post(`/qr/cancel/${id}`).then(() => router.visit('/dashboard'));
+                                                }
+                                            }}
+                                            className="w-full text-center text-[10px] font-black tracking-widest text-muted-foreground/40 uppercase hover:text-destructive transition-colors"
+                                        >
+                                            Cancel Transaction
+                                        </button>
+                                    </div>
+                                </motion.form>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Footer Info */}
+                    <div className="border-t border-border/50 bg-muted/20 px-8 py-6">
+                        <div className="flex items-center justify-center gap-3 text-[9px] font-black tracking-[0.3em] text-muted-foreground uppercase opacity-40">
+                            <Lock className="h-3 w-3" />
+                            Secure Protocol
+                        </div>
+                    </div>
                 </div>
             </motion.div>
         </div>
     );
 }
+

@@ -12,6 +12,10 @@ import {
     ChevronLeft,
     Copy,
     Share2,
+    X,
+    TrendingUp,
+    Lock,
+    RefreshCcw,
 } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
 import React, { useEffect, useState, useRef } from 'react';
@@ -58,11 +62,11 @@ export default function QrPage({
                 width: 280,
                 height: 280,
                 dotsOptions: {
-                    color: '#10b981', // Emerald 500
+                    color: '#76b182', // AtlasPay Primary
                     type: 'rounded',
                 },
                 backgroundOptions: {
-                    color: '#ffffff',
+                    color: 'transparent',
                 },
                 imageOptions: {
                     crossOrigin: 'anonymous',
@@ -70,7 +74,7 @@ export default function QrPage({
                 },
                 cornersSquareOptions: {
                     type: 'extra-rounded',
-                    color: '#065f46',
+                    color: '#1a1a1a',
                 },
             }),
     );
@@ -163,308 +167,198 @@ export default function QrPage({
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(scanUrl);
-        toast.success('Link copied to clipboard!');
+        toast.success('Payment link copied to clipboard.');
     };
 
     const handleCancel = () => {
-        if (!confirm('Are you sure you want to cancel this transaction?'))
-            return;
-
         axios
             .post(`/qr/cancel/${id}`)
             .then(() => {
-                toast.error('Transaction cancelled');
+                toast.success('Transaction cancelled successfully.');
                 setToken((prev) => ({ ...prev, status: 'cancelled' }));
             })
             .catch(() => {
-                toast.error('Failed to cancel transaction');
+                toast.error('Failed to cancel transaction.');
             });
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
-            <Head title="Secure QR Payment" />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 md:p-8">
+            <Head title="Secure Transaction" />
+            <div className="moroccan-pattern pointer-events-none absolute inset-0 opacity-[0.03]" />
 
             <Link
                 href="/transfer"
-                className="absolute top-6 left-6 flex items-center text-slate-500 transition-colors hover:text-emerald-600"
+                className="group absolute top-8 left-8 z-10 flex items-center gap-2 text-xs font-black tracking-widest text-muted-foreground uppercase transition-all hover:text-primary"
             >
-                <ChevronLeft className="mr-1 h-5 w-5" />
-                Back to Transfers
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card transition-all group-hover:border-primary/30 group-hover:bg-primary/5">
+                    <ChevronLeft className="h-4 w-4" />
+                </div>
+                Return
             </Link>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative z-10 w-full max-w-[440px]"
             >
-                {/* Header Section */}
-                <div className="relative overflow-hidden bg-emerald-600 p-6 text-center text-white">
-                    <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-                    <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-32 w-32 rounded-full bg-emerald-900/20 blur-2xl" />
+                {/* Main Card */}
+                <div className="shadow-elevated overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-3xl">
+                    <div className="bg-noise absolute inset-0 opacity-[0.02]" />
 
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md"
-                    >
-                        <ShieldCheck className="h-8 w-8 text-white" />
-                    </motion.div>
-
-                    <h1 className="mb-1 text-xl font-bold">
-                        {goal === 'sender' && 'Sending Money'}
-                        {goal === 'sender_pay' && 'Quick Pay Request'}
-                        {goal === 'receiver' && 'Requesting Payment'}
-                        {goal === 'store' && 'Merchant Payment'}
-                    </h1>
-                    <p className="flex items-center justify-center text-sm text-emerald-100">
-                        <Clock className="mr-1 h-3 w-3" />
-                        Expires in:{' '}
-                        <span className="ml-1 font-mono font-bold">
-                            {countdown}
-                        </span>
-                    </p>
-                </div>
-
-                {/* Main Body */}
-                <div className="flex flex-col items-center p-8">
-                    {/* Amount Display */}
-                    {token.amount && (
-                        <div className="mb-8 text-center">
-                            <span className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                                {goal === 'sender_pay'
-                                    ? 'Requested Amount'
-                                    : `Amount to ${goal === 'sender' ? 'Send' : 'Receive'}`}
-                            </span>
-                            <div className="mt-1 text-4xl font-black text-slate-800 dark:text-white">
-                                {new Intl.NumberFormat('fr-MA', {
-                                    style: 'currency',
-                                    currency: 'MAD',
-                                }).format(parseFloat(token.amount))}
+                    {/* Header */}
+                    <div className="relative border-b border-border/50 p-8 text-center">
+                        <motion.div
+                            initial={{ y: -10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-lg shadow-primary/10"
+                        >
+                            <ShieldCheck className="h-8 w-8" />
+                        </motion.div>
+                        
+                        <h1 className="font-display text-2xl font-black tracking-tighter text-foreground uppercase">
+                            {goal === 'sender' && 'Send Payment'}
+                            {goal === 'sender_pay' && 'Quick Pay'}
+                            {goal === 'receiver' && 'Receive Payment'}
+                            {goal === 'store' && 'Merchant Link'}
+                        </h1>
+                        
+                        <div className="mt-4 flex items-center justify-center gap-4">
+                            <div className="flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1">
+                                <Clock className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                    {countdown}
+                                </span>
+                            </div>
+                            <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${
+                                token.status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
+                                token.status === 'completed' ? 'bg-primary/10 text-primary' :
+                                'bg-muted/50 text-muted-foreground'
+                            }`}>
+                                <RefreshCcw className={`h-3 w-3 ${token.status === 'pending' ? 'animate-spin' : ''}`} />
+                                <span className="text-[10px] font-black tracking-widest uppercase">
+                                    {token.status}
+                                </span>
                             </div>
                         </div>
-                    )}
-
-                    {/* QR Code Container */}
-                    <div className="group relative">
-                        <motion.div
-                            animate={
-                                token.status === 'expired' ||
-                                token.status === 'cancelled'
-                                    ? { opacity: 0.5, filter: 'grayscale(1)' }
-                                    : {}
-                            }
-                            className="rounded-3xl border-4 border-emerald-50 bg-white p-4 shadow-inner dark:border-emerald-950"
-                        >
-                            <div ref={qrRef} />
-                        </motion.div>
-
-                        <AnimatePresence>
-                            {(token.status === 'expired' ||
-                                token.status === 'cancelled') && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-white/80 dark:bg-slate-900/80"
-                                >
-                                    {token.status === 'expired' ? (
-                                        <AlertCircle className="mb-2 h-16 w-16 text-rose-500" />
-                                    ) : (
-                                        <X className="mb-2 h-16 w-16 text-slate-500" />
-                                    )}
-                                    <span
-                                        className={`font-bold ${token.status === 'expired' ? 'text-rose-600' : 'text-slate-600'}`}
-                                    >
-                                        {token.status === 'expired'
-                                            ? 'QR Code Expired'
-                                            : 'Transaction Cancelled'}
-                                    </span>
-                                    <Link
-                                        href="/transfer"
-                                        className="mt-4 rounded-full bg-slate-800 px-4 py-2 text-xs text-white"
-                                    >
-                                        Go Back
-                                    </Link>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
 
-                    {/* Full Page Success Overlay */}
-                    <AnimatePresence>
-                        {token.status === 'completed' && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 p-6 backdrop-blur-md"
-                            >
-                                <motion.div
-                                    initial={{ scale: 0.9, y: 20 }}
-                                    animate={{ scale: 1, y: 0 }}
-                                    className="w-full max-w-md rounded-[2.5rem] border border-emerald-500/20 bg-white p-8 text-center shadow-2xl dark:bg-slate-900"
-                                >
-                                    <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                                        <CheckCircle2 className="h-12 w-12 text-emerald-500" />
-                                    </div>
-                                    <h2 className="mb-2 text-3xl font-black tracking-tighter text-slate-800 uppercase dark:text-white">
-                                        Transfer Complete!
-                                    </h2>
-                                    <p className="mb-10 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                                        The funds have been successfully moved
-                                        to the recipient's account.
-                                    </p>
-                                    <Link
-                                        href="/dashboard"
-                                        className="inline-block w-full rounded-2xl bg-emerald-600 py-5 font-bold text-white shadow-xl shadow-emerald-500/20 transition-all hover:bg-emerald-500 active:scale-95"
-                                    >
-                                        Back to Dashboard
-                                    </Link>
-                                </motion.div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Status Text */}
-                    <div className="mt-8 w-full">
-                        <div className="mb-2 flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-500">
-                                Transaction Status
-                            </span>
-                            <span
-                                className={`rounded-full px-2 py-1 text-xs font-bold tracking-tight uppercase ${
-                                    token.status === 'pending'
-                                        ? 'bg-amber-100 text-amber-700'
-                                        : token.status === 'scanned'
-                                          ? 'bg-blue-100 text-blue-700'
-                                          : token.status === 'ready'
-                                            ? 'bg-emerald-100 font-black text-emerald-700'
-                                            : token.status === 'completed'
-                                              ? 'bg-emerald-100 text-emerald-700'
-                                              : 'bg-slate-100 text-slate-700'
-                                }`}
-                            >
-                                {token.status}
-                            </span>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                                    <Loader2
-                                        className={`h-5 w-5 text-emerald-600 ${token.status === 'pending' || token.status === 'scanned' ? 'animate-spin' : ''}`}
-                                    />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs font-medium tracking-wider text-slate-400 uppercase">
-                                        Instructions
-                                    </p>
-                                    <p className="truncate text-sm text-slate-600 dark:text-slate-300">
-                                        {token.status === 'pending' &&
-                                            'Waiting for receiver to scan...'}
-                                        {token.status === 'scanned' &&
-                                            (goal === 'sender_pay'
-                                                ? 'Receiver is entering amount...'
-                                                : `Scanned by ${token.to_account?.user?.name || 'Receiver'}`)}
-                                        {token.status === 'ready' &&
-                                            `Review amount from ${token.to_account?.user?.name || 'Receiver'}`}
-                                        {token.status === 'completed' &&
-                                            'Transaction finished.'}
-                                    </p>
+                    {/* Content */}
+                    <div className="p-8">
+                        {token.amount && (
+                            <div className="mb-10 text-center">
+                                <p className="mb-2 text-[10px] font-black tracking-[0.2em] text-muted-foreground uppercase opacity-60">
+                                    Transaction Amount
+                                </p>
+                                <div className="font-display text-5xl font-black tracking-tighter text-foreground">
+                                    {new Intl.NumberFormat('fr-MA', {
+                                        minimumFractionDigits: 2,
+                                    }).format(parseFloat(token.amount))}
+                                    <span className="ml-2 text-xl opacity-40">MAD</span>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Confirm/Decline Button for Sender (Standard) */}
-                            {goal === 'sender' &&
-                                token.status === 'scanned' && (
-                                    <div className="flex w-full gap-3">
-                                        <motion.button
-                                            initial={{ scale: 0.9, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            onClick={handleCancel}
-                                            className="rounded-2xl bg-slate-100 px-6 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95 dark:bg-slate-800 dark:text-slate-300"
+                        {/* QR Code */}
+                        <div className="relative mx-auto flex h-[320px] w-[320px] items-center justify-center rounded-[2rem] bg-white p-5 shadow-inner">
+                            <div ref={qrRef} className="relative z-10" />
+                            
+                            <AnimatePresence>
+                                {(token.status === 'expired' || token.status === 'cancelled') && (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="absolute inset-2 z-20 flex flex-col items-center justify-center rounded-[1.8rem] bg-white/90 backdrop-blur-sm"
+                                    >
+                                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                                            <AlertCircle className="h-8 w-8" />
+                                        </div>
+                                        <p className="font-display text-lg font-black tracking-tight text-foreground uppercase">
+                                            {token.status === 'expired' ? 'Link Expired' : 'Cancelled'}
+                                        </p>
+                                        <Link
+                                            href="/transfer"
+                                            className="mt-6 text-[10px] font-black tracking-[0.2em] text-muted-foreground uppercase hover:text-primary transition-colors"
                                         >
-                                            Decline
-                                        </motion.button>
-                                        <motion.button
-                                            initial={{ scale: 0.9, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            onClick={() => {
-                                                axios
-                                                    .post(`/qr/confirm/${id}`)
-                                                    .then(() => {
-                                                        toast.success(
-                                                            'Transfer confirmed!',
-                                                        );
-                                                        setToken((prev) => ({
-                                                            ...prev,
-                                                            status: 'completed',
-                                                        }));
-                                                    })
-                                                    .catch((err) => {
-                                                        toast.error(
-                                                            err.response?.data
-                                                                ?.message ||
-                                                                'Transfer failed',
-                                                        );
-                                                    });
-                                            }}
-                                            className="flex-1 rounded-2xl bg-emerald-600 py-4 font-bold text-white shadow-lg transition-all hover:bg-emerald-500 active:scale-95"
-                                        >
-                                            Confirm Transfer
-                                        </motion.button>
-                                    </div>
+                                            Try Again
+                                        </Link>
+                                    </motion.div>
                                 )}
+                            </AnimatePresence>
+                        </div>
 
-                            {/* Approve/Decline Button for Sender (Quick Pay) */}
-                            {goal === 'sender_pay' &&
-                                token.status === 'ready' && (
-                                    <div className="flex w-full gap-3">
-                                        <motion.button
-                                            initial={{ scale: 0.9, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            onClick={handleCancel}
-                                            className="rounded-2xl bg-slate-100 px-6 py-4 font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95 dark:bg-slate-800 dark:text-slate-300"
-                                        >
-                                            Decline
-                                        </motion.button>
-                                        <motion.button
-                                            initial={{ scale: 0.9, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            onClick={() => {
-                                                axios
-                                                    .post(`/qr/approve/${id}`)
-                                                    .then(() => {
-                                                        toast.success(
-                                                            'Transaction approved!',
-                                                        );
-                                                        setToken((prev) => ({
-                                                            ...prev,
-                                                            status: 'completed',
-                                                        }));
-                                                    })
-                                                    .catch((err) => {
-                                                        toast.error(
-                                                            err.response?.data
-                                                                ?.message ||
-                                                                'Approval failed',
-                                                        );
-                                                    });
-                                            }}
-                                            className="flex-1 rounded-2xl bg-emerald-600 py-4 font-bold text-white shadow-lg transition-all hover:bg-emerald-500 active:scale-95"
-                                        >
-                                            Approve Transfer
-                                        </motion.button>
-                                    </div>
-                                )}
+                        {/* Status Footer */}
+                        <div className="mt-10 space-y-4">
+                            {/* Action Buttons */}
+                            {goal === 'sender' && token.status === 'scanned' && (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="flex-1 rounded-2xl border border-border bg-card py-4 text-xs font-black tracking-widest text-foreground uppercase transition-all hover:bg-muted active:scale-95"
+                                    >
+                                        Decline
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            axios.post(`/qr/confirm/${id}`)
+                                                .then(() => {
+                                                    toast.success('Transfer authorized successfully.');
+                                                    setToken(prev => ({ ...prev, status: 'completed' }));
+                                                })
+                                                .catch(err => toast.error(err.response?.data?.message || 'Transfer failed.'));
+                                        }}
+                                        className="flex-[2] rounded-2xl bg-primary py-4 text-xs font-black tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:opacity-90 active:scale-95"
+                                    >
+                                        Confirm
+                                    </button>
+                                </div>
+                            )}
 
-                            {/* Cancel button while pending/scanned (but not yet ready/completed) */}
-                            {(token.status === 'pending' ||
-                                (token.status === 'scanned' &&
-                                    goal === 'sender_pay')) && (
+                            {goal === 'sender_pay' && token.status === 'ready' && (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="flex-1 rounded-2xl border border-border bg-card py-4 text-xs font-black tracking-widest text-foreground uppercase transition-all hover:bg-muted active:scale-95"
+                                    >
+                                        Decline
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            axios.post(`/qr/approve/${id}`)
+                                                .then(() => {
+                                                    toast.success('Payment approved successfully.');
+                                                    setToken(prev => ({ ...prev, status: 'completed' }));
+                                                })
+                                                .catch(err => toast.error(err.response?.data?.message || 'Approval failed.'));
+                                        }}
+                                        className="flex-[2] rounded-2xl bg-primary py-4 text-xs font-black tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:opacity-90 active:scale-95"
+                                    >
+                                        Authorize
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Secondary Actions */}
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={copyToClipboard}
+                                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border py-3 text-[10px] font-black tracking-widest text-muted-foreground uppercase transition-all hover:border-primary/30 hover:text-primary active:scale-95"
+                                >
+                                    <Copy className="h-3.5 w-3.5" />
+                                    Copy Link
+                                </button>
+                                <button
+                                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border py-3 text-[10px] font-black tracking-widest text-muted-foreground uppercase transition-all hover:border-primary/30 hover:text-primary active:scale-95"
+                                >
+                                    <Share2 className="h-3.5 w-3.5" />
+                                    Share
+                                </button>
+                            </div>
+
+                            {token.status === 'pending' && (
                                 <button
                                     onClick={handleCancel}
-                                    className="w-full rounded-2xl border border-slate-200 py-3 text-xs font-bold tracking-widest text-slate-400 uppercase transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
+                                    className="w-full text-center text-[10px] font-black tracking-widest text-muted-foreground/40 uppercase hover:text-destructive transition-colors"
                                 >
                                     Cancel Transaction
                                 </button>
@@ -473,28 +367,48 @@ export default function QrPage({
                     </div>
                 </div>
 
-                {/* Footer Controls */}
-                <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                    <button
-                        onClick={copyToClipboard}
-                        className="flex flex-1 items-center justify-center py-3 text-sm font-semibold text-slate-600 transition-colors hover:text-emerald-600 dark:text-slate-400"
-                    >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy Link
-                    </button>
-                    <div className="mx-2 h-6 w-px bg-slate-200 dark:bg-slate-700" />
-                    <button className="flex flex-1 items-center justify-center py-3 text-sm font-semibold text-slate-600 transition-colors hover:text-emerald-600 dark:text-slate-400">
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Share
-                    </button>
+                {/* Secure Badge */}
+                <div className="mt-8 flex items-center justify-center gap-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground uppercase opacity-40">
+                    <Lock className="h-3 w-3" />
+                    End-to-End Encrypted
                 </div>
             </motion.div>
 
-            {/* Anti-Fraud Banner */}
-            <div className="mt-8 flex items-center text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
-                <ShieldCheck className="mr-2 h-3 w-3 text-emerald-500" />
-                Secured by AtlasPay Anti-Fraud Protocol
-            </div>
+            {/* Success Overlay */}
+            <AnimatePresence>
+                {token.status === 'completed' && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 p-6 backdrop-blur-xl"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="w-full max-w-md text-center"
+                        >
+                            <div className="mx-auto mb-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-primary text-primary-foreground shadow-2xl shadow-primary/30">
+                                <CheckCircle2 className="h-12 w-12" />
+                            </div>
+                            <h2 className="font-display mb-4 text-4xl font-black tracking-tighter text-foreground uppercase">
+                                Transaction <br /> Success
+                            </h2>
+                            <p className="mb-12 text-sm font-medium leading-relaxed text-muted-foreground opacity-60">
+                                Your digital currency transfer has been <br /> 
+                                processed and settled on the network.
+                            </p>
+                            <Link
+                                href="/dashboard"
+                                className="inline-block w-full rounded-2xl bg-foreground py-5 text-xs font-black tracking-widest text-background transition-all hover:opacity-90 active:scale-95"
+                            >
+                                Return to Dashboard
+                            </Link>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
+
