@@ -19,6 +19,6 @@ export default function AlertError({
                     ))}
                 </ul>
             </AlertDescription>
-        </Alert>
+        </Alert> 
     );
 }
