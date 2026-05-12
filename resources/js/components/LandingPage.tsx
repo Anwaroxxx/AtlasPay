@@ -189,7 +189,7 @@ export default function LandingPage() {
                         className="group absolute top-[50%] left-[50%] h-[210px] w-[340px] -translate-x-[65%] -translate-y-[25%] cursor-pointer overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-[#222] to-[#111] shadow-[0_40px_80px_rgba(0,0,0,0.9)] transition-transform duration-500 hover:-translate-y-[30%]"
                     >
                         {/* Noise Texture on card */}
-                        <div className="bg-noise absolute inset-0 opacity-20 mix-blend-overlay" />
+                        <div className="bg-noise pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay" />
                         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
 
                         {/* Neon Geometric Pattern */}

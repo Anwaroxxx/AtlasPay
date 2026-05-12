@@ -52,8 +52,8 @@ class CreditController extends Controller
 
             DB::transaction(function () use ($user, $request, $totalToPay, $interestRate, $payoutAmount, $originationFee) {
                 $account = $user->accounts()->where('status', 'active')->first();
-                
-                if (!$account) {
+
+                if (! $account) {
                     throw new \Exception('No active account found to deposit the credit.');
                 }
 
@@ -106,7 +106,7 @@ class CreditController extends Controller
                     ->where('balance', '>=', $credit->total_to_pay)
                     ->first();
 
-                if (!$account) {
+                if (! $account) {
                     throw new \Exception('No active account with sufficient balance found for repayment.');
                 }
 
@@ -118,7 +118,7 @@ class CreditController extends Controller
                 $account->decrement('balance', $credit->total_to_pay);
 
                 // Create transaction record
-                \App\Models\Transaction::create([
+                Transaction::create([
                     'from_account_id' => $account->id,
                     'to_account_id' => $account->id, // Representing bank as destination
                     'amount' => $credit->total_to_pay,

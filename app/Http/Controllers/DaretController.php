@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DaretInvitationReceived;
+use App\Events\GenericNotification;
 use App\Models\DaretGroup;
 use App\Models\DaretMember;
+use App\Models\Transaction;
 use App\Models\User;
+use App\Services\DaretService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class DaretController extends Controller
 {
@@ -65,7 +69,7 @@ class DaretController extends Controller
                 ]);
 
                 // Dispatch real-time notification event
-                event(new \App\Events\DaretInvitationReceived($group, $userId));
+                event(new DaretInvitationReceived($group, $userId));
             }
         });
 
@@ -75,11 +79,11 @@ class DaretController extends Controller
     public function accept(Request $request, DaretGroup $group)
     {
         $member = $group->members()->where('user_id', $request->user()->id)->firstOrFail();
-        
+
         $managementFee = 10.00;
         $account = $request->user()->accounts()->where('status', 'active')->first();
 
-        if (!$account || $account->balance < $managementFee) {
+        if (! $account || $account->balance < $managementFee) {
             return redirect()->back()->with('error', 'Insufficient funds for the 10 MAD group management fee.');
         }
 
@@ -88,7 +92,7 @@ class DaretController extends Controller
             $member->update(['status' => 'accepted']);
 
             // Record management fee
-            \App\Models\Transaction::create([
+            Transaction::create([
                 'from_account_id' => $account->id,
                 'to_account_id' => $account->id,
                 'amount' => $managementFee,
@@ -96,7 +100,7 @@ class DaretController extends Controller
                 'category' => 'Fees',
                 'description' => "Group Management Fee for: {$group->name}",
                 'status' => 'completed',
-                'type' => 'transfer'
+                'type' => 'transfer',
             ]);
 
             // Check if all members accepted — if so, mark group as ready
@@ -131,7 +135,7 @@ class DaretController extends Controller
             // Notify all members before deletion
             foreach ($group->members as $member) {
                 if ($member->user_id !== $group->creator_id) {
-                    event(new \App\Events\GenericNotification(
+                    event(new GenericNotification(
                         $member->user_id,
                         'Daret Circle Disbanded',
                         "The savings circle '{$group->name}' has been disbanded by its creator.",
@@ -169,15 +173,17 @@ class DaretController extends Controller
             $account->decrement('balance', $group->monthly_amount);
             $member->update(['has_paid_current_round' => true]);
 
-            \App\Models\Transaction::create([
+            Transaction::create([
                 'from_account_id' => $account->id,
                 'to_account_id' => null,
                 'amount' => $group->monthly_amount,
                 'method' => 'daret_contribution',
                 'category' => 'savings',
                 'status' => 'completed',
-                'type' => 'transfer'
+                'type' => 'transfer',
             ]);
+
+            DaretService::checkAndProcessPayout($group);
         });
 
         return redirect()->back()->with('message', 'Contribution paid successfully!');

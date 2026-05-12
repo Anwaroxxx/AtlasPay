@@ -16,27 +16,27 @@ return new class extends Migration
         Schema::create('tokens', function (Blueprint $table) {
             $table->id();
             // each token will have a unique uuid
-            $table->string("token")->unique();
+            $table->string('token')->unique();
             // who initiated the create token action
             $table->foreignId('created_by_account_id')
-                    ->nullable()
-                    ->constrained("accounts");
+                ->nullable()
+                ->constrained('accounts');
             // the sender wallet account
             $table->foreignId('from_account_id')
-                    ->nullable()
-                    ->constrained("accounts");
+                ->nullable()
+                ->constrained('accounts');
             // the reciver wallet account
             $table->foreignId('to_account_id')
-                    ->nullable()
-                    ->constrained("accounts");
-            // the amount to be transfered 
+                ->nullable()
+                ->constrained('accounts');
+            // the amount to be transfered
             $table->decimal('amount', 15, 2)->nullable();
-            // the status indecates whether the token has been used or not 
-            $table->string("status")->default("not_used");
-            // when the token is set to expire 
-            $table->dateTime("expires_at");
+            // the status indecates whether the token has been used or not
+            $table->string('status')->default('not_used');
+            // when the token is set to expire
+            $table->dateTime('expires_at');
             // redirect goal
-            $table->string("goal");
+            $table->string('goal');
             $table->timestamps();
         });
     }

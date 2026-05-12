@@ -9,4 +9,3 @@ enum QrTypes: string
     case SENDERPAY = 'sender_pay';
     case RECEIVER = 'receiver';
 }
-

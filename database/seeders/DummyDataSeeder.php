@@ -2,21 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Account;
-use App\Models\Transaction;
 use App\Models\DaretGroup;
 use App\Models\DaretMember;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Transaction;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
         $user = User::first();
-        if (!$user) {
+        if (! $user) {
             $user = User::create([
                 'first_name' => 'Anwar',
                 'last_name' => 'Demo',
@@ -30,10 +29,10 @@ class DummyDataSeeder extends Seeder
         }
 
         $account = $user->accounts()->first();
-        if (!$account) {
+        if (! $account) {
             $account = Account::create([
                 'user_id' => $user->id,
-                'account_number' => 'MA' . rand(1000000000000000, 9999999999999999),
+                'account_number' => 'MA'.rand(1000000000000000, 9999999999999999),
                 'balance' => 25000,
                 'type' => 'checking',
                 'currency' => 'MAD',

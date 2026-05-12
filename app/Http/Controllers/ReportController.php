@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Account;
 use App\Models\Transaction;
-use Inertia\Inertia;
+use App\Models\User;
+use App\Services\GroqService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ReportController extends Controller
 {
     /**
      * Generate a detailed report of transactions and activities.
      */
-    public function index(Request $request, \App\Services\GroqService $groqService)
+    public function index(Request $request, GroqService $groqService)
     {
         $user = $request->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        $now = \Carbon\Carbon::now();
+        $now = Carbon::now();
         $accounts = $user->accounts()->get();
         $accountIds = $accounts->pluck('id')->toArray();
 
@@ -54,10 +55,10 @@ class ReportController extends Controller
                 ->whereYear('created_at', $month->year)
                 ->whereMonth('created_at', $month->month)
                 ->sum('amount');
-            
+
             $trends[] = [
                 'month' => $month->format('M'),
-                'total' => (float) $total
+                'total' => (float) $total,
             ];
         }
 
@@ -66,17 +67,17 @@ class ReportController extends Controller
 
         // 5. Paginated & Filtered Transactions
         $query = Transaction::query()
-            ->where(function($q) use ($accountIds) {
+            ->where(function ($q) use ($accountIds) {
                 $q->whereIn('from_account_id', $accountIds)
-                  ->orWhereIn('to_account_id', $accountIds);
+                    ->orWhereIn('to_account_id', $accountIds);
             });
 
-        $query->where(function($q) use ($request) {
+        $query->where(function ($q) use ($request) {
             if ($request->filled('search')) {
-                $q->where(function($inner) use ($request) {
-                    $inner->where('category', 'like', '%' . $request->search . '%')
-                          ->orWhere('method', 'like', '%' . $request->search . '%')
-                          ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where(function ($inner) use ($request) {
+                    $inner->where('category', 'like', '%'.$request->search.'%')
+                        ->orWhere('method', 'like', '%'.$request->search.'%')
+                        ->orWhere('description', 'like', '%'.$request->search.'%');
                 });
             }
 
@@ -97,6 +98,7 @@ class ReportController extends Controller
 
         $transactions->getCollection()->transform(function ($transaction) use ($accountIds) {
             $transaction->is_income = in_array($transaction->to_account_id, $accountIds) || $transaction->type === 'deposit';
+
             return $transaction;
         });
 
@@ -110,8 +112,8 @@ class ReportController extends Controller
                 'user' => [
                     'name' => $user->name,
                 ],
-                'filters' => $request->only(['search', 'type', 'category', 'date_from', 'date_to'])
-            ]
+                'filters' => $request->only(['search', 'type', 'category', 'date_from', 'date_to']),
+            ],
         ]);
     }
 
@@ -124,14 +126,14 @@ class ReportController extends Controller
         $accountIds = $user->accounts()->pluck('id')->toArray();
 
         $query = Transaction::query()
-            ->where(function($q) use ($accountIds) {
+            ->where(function ($q) use ($accountIds) {
                 $q->whereIn('from_account_id', $accountIds)
-                  ->orWhereIn('to_account_id', $accountIds);
+                    ->orWhereIn('to_account_id', $accountIds);
             });
 
         // Apply same filters as index
         if ($request->has('search')) {
-            $query->where('category', 'like', '%' . $request->search . '%');
+            $query->where('category', 'like', '%'.$request->search.'%');
         }
         if ($request->has('type') && $request->type !== 'all') {
             $query->where('type', $request->type);
@@ -142,7 +144,7 @@ class ReportController extends Controller
 
         $transactions = $query->orderBy('created_at', 'desc')->get();
 
-        $pdf = PDF::loadView('pdf.transactions', [
+        $pdf = Pdf::loadView('pdf.transactions', [
             'transactions' => $transactions,
             'user' => $user,
             'date' => now()->format('d/m/Y H:i'),

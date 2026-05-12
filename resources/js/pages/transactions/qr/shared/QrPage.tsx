@@ -204,7 +204,7 @@ export default function QrPage({
             >
                 {/* Main Card */}
                 <div className="shadow-elevated overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-3xl">
-                    <div className="bg-noise absolute inset-0 opacity-[0.02]" />
+                    <div className="bg-noise pointer-events-none absolute inset-0 opacity-[0.02]" />
 
                     {/* Header */}
                     <div className="relative border-b border-border/50 p-8 text-center">

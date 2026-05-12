@@ -14,10 +14,9 @@ class TransactionPolicy
     {
         //
     }
-    
+
     public function transfer(User $user, Request $request)
     {
         return false;
     }
 }
- 

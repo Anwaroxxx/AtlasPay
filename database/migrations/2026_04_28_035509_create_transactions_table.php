@@ -15,19 +15,19 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('from_account_id')
-                    ->nullable()
-                    ->constrained("accounts");
-            
+                ->nullable()
+                ->constrained('accounts');
+
             $table->foreignId('to_account_id')
-                    ->nullable()
-                    ->constrained("accounts");
-            
+                ->nullable()
+                ->constrained('accounts');
+
             $table->string('type'); // deposit, withdrawal, transfer
-            
+
             $table->decimal('amount', 15, 2);
             $table->string('category')->default('General');
             $table->string('method');
-            $table->string("status")->default("pending");
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

@@ -2,15 +2,16 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\SavingsGoal;
 use App\Models\Account;
+use App\Models\SavingsGoal;
 use App\Models\Transaction;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class ProcessAutoCut extends Command
 {
     protected $signature = 'app:process-autocut';
+
     protected $description = 'Process monthly savings deductions for all active goals';
 
     public function handle()
@@ -37,7 +38,7 @@ class ProcessAutoCut extends Command
                         'method' => 'autocut_vault',
                         'category' => 'savings',
                         'status' => 'completed',
-                        'type' => 'transfer'
+                        'type' => 'transfer',
                     ]);
 
                     if ($goal->current_amount >= $goal->target_amount) {

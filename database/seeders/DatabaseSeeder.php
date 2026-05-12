@@ -23,5 +23,4 @@ class DatabaseSeeder extends Seeder
         $this->call(AccountTypesSeeder::class);
         $this->call(DummyDataSeeder::class);
     }
-
 }

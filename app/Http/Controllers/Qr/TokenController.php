@@ -7,6 +7,7 @@ use App\Enums\RedirectGoals;
 use App\Enums\TokenStatus;
 use App\Events\QrTokenStatusUpdated;
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Token;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class TokenController extends Controller
     public function storeSender(Request $request)
     {
         $request->validate([
-            "amount" => ["required", "numeric", "min:0.01"]
+            'amount' => ['required', 'numeric', 'min:0.01'],
         ]);
 
         return $this->store($request, QrTypes::SENDER);
@@ -30,7 +31,7 @@ class TokenController extends Controller
         return $this->store($request, QrTypes::SENDERPAY);
     }
 
-public function storeReceiver(Request $request)
+    public function storeReceiver(Request $request)
     {
         return $this->store($request, QrTypes::RECEIVER);
     }
@@ -43,104 +44,104 @@ public function storeReceiver(Request $request)
     public function getPermanentMerchantToken()
     {
         $wallet = auth()->user()->wallet;
-        
-        if (!$wallet) {
-            return response()->json(["success" => false, "message" => "No wallet found."], 404);
+
+        if (! $wallet) {
+            return response()->json(['success' => false, 'message' => 'No wallet found.'], 404);
         }
 
-        $token = Token::where("created_by_account_id", $wallet->id)
-            ->where("goal", RedirectGoals::STORE)
-            ->whereNull("amount") // Permanent ones shouldn't have a fixed amount
-            ->where("status", TokenStatus::PENDING)
-            ->where("expires_at", ">", now())
-            ->orderBy("expires_at", "desc")
+        $token = Token::where('created_by_account_id', $wallet->id)
+            ->where('goal', RedirectGoals::STORE)
+            ->whereNull('amount') // Permanent ones shouldn't have a fixed amount
+            ->where('status', TokenStatus::PENDING)
+            ->where('expires_at', '>', now())
+            ->orderBy('expires_at', 'desc')
             ->first();
 
-        if (!$token) {
+        if (! $token) {
             // Create a new one if none exists
             $token = Token::create([
-                "token" => (string) \Illuminate\Support\Str::uuid(),
-                "created_by_account_id" => $wallet->id,
-                "to_account_id" => $wallet->id,
-                "expires_at" => now()->addYears(10),
-                "status" => TokenStatus::PENDING,
-                "goal" => RedirectGoals::STORE
+                'token' => (string) Str::uuid(),
+                'created_by_account_id' => $wallet->id,
+                'to_account_id' => $wallet->id,
+                'expires_at' => now()->addYears(10),
+                'status' => TokenStatus::PENDING,
+                'goal' => RedirectGoals::STORE,
             ]);
         }
 
         return response()->json([
-            "id" => Crypt::encryptString($token->token),
-            "token" => $token->load(['toAccount.user']),
-            "appUrl" => config('app.url')
+            'id' => Crypt::encryptString($token->token),
+            'token' => $token->load(['toAccount.user']),
+            'appUrl' => config('app.url'),
         ]);
     }
 
     public function store(Request $request, QrTypes $qrType)
     {
         $request->validate([
-            "from_account_id" => "nullable|exists:accounts,id"
+            'from_account_id' => 'nullable|exists:accounts,id',
         ]);
 
         $wallet = auth()->user()->wallet;
         $fromAccountId = $request->from_account_id ?? $wallet->id;
-        
+
         // Ensure user owns the account
-        $account = \App\Models\Account::where('id', $fromAccountId)
+        $account = Account::where('id', $fromAccountId)
             ->where('user_id', auth()->id())
             ->first();
 
-        if (!$account) {
-            return back()->withErrors("Invalid account selected.");
+        if (! $account) {
+            return back()->withErrors('Invalid account selected.');
         }
 
         switch ($qrType) {
             case QrTypes::SENDER:
                 $tokenData = [
-                    "from_account_id" => $account->id,
-                    "to_account_id" => null,
-                    "amount" => $request->amount,
-                    "goal" => RedirectGoals::SENDER
+                    'from_account_id' => $account->id,
+                    'to_account_id' => null,
+                    'amount' => $request->amount,
+                    'goal' => RedirectGoals::SENDER,
                 ];
                 break;
-            
+
             case QrTypes::SENDERPAY:
                 $tokenData = [
-                    "from_account_id" => $account->id,
-                    "to_account_id" => null,
-                    "goal" => RedirectGoals::SENDERPAY
+                    'from_account_id' => $account->id,
+                    'to_account_id' => null,
+                    'goal' => RedirectGoals::SENDERPAY,
                 ];
                 break;
 
             case QrTypes::RECEIVER:
                 $tokenData = [
-                    "from_account_id" => null,
-                    "to_account_id" => $account->id,
-                    "amount" => $request->amount ?? null,
-                    "goal" => RedirectGoals::RECEIVER
+                    'from_account_id' => null,
+                    'to_account_id' => $account->id,
+                    'amount' => $request->amount ?? null,
+                    'goal' => RedirectGoals::RECEIVER,
                 ];
                 break;
 
             case QrTypes::STORE:
                 $tokenData = [
-                    "from_account_id" => null,
-                    "to_account_id" => $account->id,
-                    "amount" => $request->amount ?? null,
-                    "goal" => RedirectGoals::STORE
+                    'from_account_id' => null,
+                    'to_account_id' => $account->id,
+                    'amount' => $request->amount ?? null,
+                    'goal' => RedirectGoals::STORE,
                 ];
                 break;
 
             default:
-                return back()->withErrors("Invalid QR type provided.");
+                return back()->withErrors('Invalid QR type provided.');
         }
 
         $expireDate = ($qrType === QrTypes::STORE) ? now()->addYears(10) : now()->addMinutes(10);
 
         $token = Token::create([
-            "token" => (string) Str::uuid(),
-            "created_by_account_id" => auth()->user()->wallet->id,
-            "expires_at" => $expireDate,
-            "status" => TokenStatus::PENDING,
-            ...$tokenData
+            'token' => (string) Str::uuid(),
+            'created_by_account_id' => auth()->user()->wallet->id,
+            'expires_at' => $expireDate,
+            'status' => TokenStatus::PENDING,
+            ...$tokenData,
         ]);
 
         $url = Crypt::encryptString($token->token);
@@ -156,29 +157,29 @@ public function storeReceiver(Request $request)
     public function showToken(string $id)
     {
         $tokenStr = Crypt::decryptString($id);
-        $token = Token::where("token", $tokenStr)->firstOrFail();
+        $token = Token::where('token', $tokenStr)->firstOrFail();
         $userWalletId = auth()->user()->wallet->id;
 
         // If the current user is the creator of the QR
         if ($token->created_by_account_id === $userWalletId) {
-            return Inertia::render("transactions/qr/shared/QrPage", [
-                "id" => $id,
-                "token" => $token->load(['fromAccount.user', 'toAccount.user']),
-                "goal" => $token->goal,
-                "appUrl" => config('app.url')
+            return Inertia::render('transactions/qr/shared/QrPage', [
+                'id' => $id,
+                'token' => $token->load(['fromAccount.user', 'toAccount.user']),
+                'goal' => $token->goal,
+                'appUrl' => config('app.url'),
             ]);
         }
 
         // Otherwise, they are the "other" party
         switch ($token->goal) {
             case RedirectGoals::SENDER->value:
-                return Inertia::render("transactions/qr/update/sender", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
+                return Inertia::render('transactions/qr/update/sender', ['id' => $id, 'token' => $token->load(['fromAccount.user', 'toAccount.user'])]);
             case RedirectGoals::SENDERPAY->value:
-                return Inertia::render("transactions/qr/update/sender_pay", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
+                return Inertia::render('transactions/qr/update/sender_pay', ['id' => $id, 'token' => $token->load(['fromAccount.user', 'toAccount.user'])]);
             case RedirectGoals::RECEIVER->value:
-                return Inertia::render("transactions/qr/update/receiver", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
+                return Inertia::render('transactions/qr/update/receiver', ['id' => $id, 'token' => $token->load(['fromAccount.user', 'toAccount.user'])]);
             case RedirectGoals::STORE->value:
-                return Inertia::render("transactions/qr/update/store", ["id" => $id, "token" => $token->load(['fromAccount.user', 'toAccount.user'])]);
+                return Inertia::render('transactions/qr/update/store', ['id' => $id, 'token' => $token->load(['fromAccount.user', 'toAccount.user'])]);
             default:
                 return redirect()->route('transfer');
         }
@@ -191,16 +192,17 @@ public function storeReceiver(Request $request)
     public function handleScan(string $encryptedToken)
     {
         $tokenStr = Crypt::decryptString($encryptedToken);
-        $token = Token::where("token", $tokenStr)->firstOrFail();
+        $token = Token::where('token', $tokenStr)->firstOrFail();
 
         if ($token->expires_at <= now()->subMinute()) {
-            $token->update(["status" => TokenStatus::EXPIRED]);
+            $token->update(['status' => TokenStatus::EXPIRED]);
             broadcast(new QrTokenStatusUpdated($token));
-            return Inertia::render("transactions/qr/shared/error", ["message" => "This QR code has expired."]);
+
+            return Inertia::render('transactions/qr/shared/error', ['message' => 'This QR code has expired.']);
         }
 
         if ($token->status === TokenStatus::COMPLETED) {
-            return Inertia::render("transactions/qr/shared/success", ["message" => "Transaction already completed."]);
+            return Inertia::render('transactions/qr/shared/success', ['message' => 'Transaction already completed.']);
         }
 
         $user = auth()->user();
@@ -209,21 +211,21 @@ public function storeReceiver(Request $request)
         // Flow 1: Sender generated QR, Receiver scanned it
         if ($token->goal === RedirectGoals::SENDER->value || $token->goal === RedirectGoals::SENDERPAY->value) {
             if ($token->from_account_id === $wallet->id) {
-                return Inertia::render("transactions/qr/shared/error", ["message" => "You cannot scan your own payment QR."]);
+                return Inertia::render('transactions/qr/shared/error', ['message' => 'You cannot scan your own payment QR.']);
             }
             $token->update([
-                "to_account_id" => $wallet->id,
-                "status" => TokenStatus::SCANNED
+                'to_account_id' => $wallet->id,
+                'status' => TokenStatus::SCANNED,
             ]);
-        } 
+        }
         // Flow 2/3: Receiver/Store generated QR, Payer scanned it
         else {
             if ($token->to_account_id === $wallet->id) {
-                return Inertia::render("transactions/qr/shared/error", ["message" => "You cannot pay yourself."]);
+                return Inertia::render('transactions/qr/shared/error', ['message' => 'You cannot pay yourself.']);
             }
             $token->update([
-                "from_account_id" => $wallet->id,
-                "status" => TokenStatus::SCANNED
+                'from_account_id' => $wallet->id,
+                'status' => TokenStatus::SCANNED,
             ]);
         }
 
@@ -236,22 +238,22 @@ public function storeReceiver(Request $request)
     public function confirmTransaction(Request $request, string $id)
     {
         $tokenStr = Crypt::decryptString($id);
-        $token = Token::where("token", $tokenStr)->firstOrFail();
+        $token = Token::where('token', $tokenStr)->firstOrFail();
 
         if ($token->status === TokenStatus::COMPLETED) {
-            return back()->withErrors("Transaction already completed.");
+            return back()->withErrors('Transaction already completed.');
         }
 
         if ($token->expires_at <= now()) {
-            return back()->withErrors("Token expired.");
+            return back()->withErrors('Token expired.');
         }
 
         $from = $token->fromAccount;
         $to = $token->toAccount;
         $amount = $token->amount ?? $request->amount;
 
-        if (!$from || !$to || !$amount) {
-            return response()->json(["success" => false, "message" => "Missing transaction details (amount or accounts)."], 422);
+        if (! $from || ! $to || ! $amount) {
+            return response()->json(['success' => false, 'message' => 'Missing transaction details (amount or accounts).'], 422);
         }
 
         if ($token->amount === null && $request->amount) {
@@ -260,13 +262,14 @@ public function storeReceiver(Request $request)
 
         // For Quick Pay (SENDERPAY), we don't complete yet. We wait for Sender approval.
         if ($token->goal === RedirectGoals::SENDERPAY->value) {
-            $token->update(["status" => TokenStatus::READY]);
+            $token->update(['status' => TokenStatus::READY]);
             broadcast(new QrTokenStatusUpdated($token));
-            return response()->json(["success" => true, "message" => "Request sent to sender for approval."]);
+
+            return response()->json(['success' => true, 'message' => 'Request sent to sender for approval.']);
         }
 
         if ($from->balance < $amount) {
-            return back()->withErrors("Insufficient funds.");
+            return back()->withErrors('Insufficient funds.');
         }
 
         // Determine type: if receiving, it's a deposit
@@ -274,102 +277,114 @@ public function storeReceiver(Request $request)
 
         // Perform the transfer
         TransactionService::create([
-            "from" => $from,
-            "to" => $to,
-            "amount" => $amount,
-            "method" => "qr",
-            "type" => $type,
+            'from' => $from,
+            'to' => $to,
+            'amount' => $amount,
+            'method' => 'qr',
+            'type' => $type,
         ]);
 
-        $token->update(["status" => TokenStatus::COMPLETED]);
+        $token->update(['status' => TokenStatus::COMPLETED]);
         broadcast(new QrTokenStatusUpdated($token));
 
-        return response()->json(["success" => true, "message" => "Transfer completed!"]);
+        return response()->json(['success' => true, 'message' => 'Transfer completed!']);
     }
 
     public function finalApproval(Request $request, string $id)
     {
         $tokenStr = Crypt::decryptString($id);
-        $token = Token::where("token", $tokenStr)->firstOrFail();
+        $token = Token::where('token', $tokenStr)->firstOrFail();
 
         if ($token->status === TokenStatus::COMPLETED) {
-            return response()->json(["success" => false, "message" => "Already completed."], 422);
+            return response()->json(['success' => false, 'message' => 'Already completed.'], 422);
         }
 
         // Authorize: check if the authenticated user owns the source account
-        $account = \App\Models\Account::where('id', $token->from_account_id)
+        $account = Account::where('id', $token->from_account_id)
             ->where('user_id', auth()->id())
             ->first();
 
-        if (!$account) {
-            return response()->json(["success" => false, "message" => "Unauthorized."], 403);
+        if (! $account) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 
         $from = $token->fromAccount;
         $to = $token->toAccount;
         $amount = $token->amount;
 
-        if (!$amount || $amount <= 0) {
-            return response()->json(["success" => false, "message" => "Invalid amount."], 422);
+        if (! $amount || $amount <= 0) {
+            return response()->json(['success' => false, 'message' => 'Invalid amount.'], 422);
         }
 
         if ($from->balance < $amount) {
-            return response()->json(["success" => false, "message" => "Insufficient funds."], 422);
+            return response()->json(['success' => false, 'message' => 'Insufficient funds.'], 422);
         }
 
         // Determine type: if receiving, it's a deposit
         $type = in_array($token->goal, [RedirectGoals::RECEIVER->value, RedirectGoals::STORE->value]) ? 'deposit' : 'transfer';
 
         TransactionService::create([
-            "from" => $from,
-            "to" => $to,
-            "amount" => $amount,
-            "method" => "qr",
-            "type" => $type,
+            'from' => $from,
+            'to' => $to,
+            'amount' => $amount,
+            'method' => 'qr',
+            'type' => $type,
         ]);
 
-        $token->update(["status" => TokenStatus::COMPLETED]);
+        $token->update(['status' => TokenStatus::COMPLETED]);
         broadcast(new QrTokenStatusUpdated($token));
 
-        return response()->json(["success" => true, "message" => "Transaction approved and completed!"]);
+        return response()->json(['success' => true, 'message' => 'Transaction approved and completed!']);
     }
 
     public function checkStatus(string $tokenStr)
     {
-        $token = Token::where("token", $tokenStr)->with(['toAccount.user', 'fromAccount.user'])->firstOrFail();
+        $token = Token::where('token', $tokenStr)->with(['toAccount.user', 'fromAccount.user'])->firstOrFail();
+
         return response()->json([
-            "status" => $token->status,
-            "token" => $token
+            'status' => $token->status,
+            'token' => $token,
         ]);
     }
 
     public function cancelTransaction(string $id)
     {
-        $tokenStr = \Illuminate\Support\Facades\Crypt::decryptString($id);
-        $token = Token::where("token", $tokenStr)->firstOrFail();
+        $tokenStr = Crypt::decryptString($id);
+        $token = Token::where('token', $tokenStr)->firstOrFail();
 
         if ($token->status === TokenStatus::COMPLETED) {
-            return response()->json(["success" => false, "message" => "Cannot cancel completed transaction."], 422);
+            return response()->json(['success' => false, 'message' => 'Cannot cancel completed transaction.'], 422);
         }
 
         // Log the cancellation as a transaction for report visibility
         TransactionService::create([
-            "from" => $token->fromAccount,
-            "to" => $token->toAccount,
-            "amount" => $token->amount ?? 0,
-            "method" => "qr",
-            "type" => "transfer",
-            "status" => "cancelled",
+            'from' => $token->fromAccount,
+            'to' => $token->toAccount,
+            'amount' => $token->amount ?? 0,
+            'method' => 'qr',
+            'type' => 'transfer',
+            'status' => 'cancelled',
         ]);
 
-        $token->update(["status" => TokenStatus::CANCELLED]);
+        $token->update(['status' => TokenStatus::CANCELLED]);
         broadcast(new QrTokenStatusUpdated($token));
 
-        return response()->json(["success" => true, "message" => "Transaction cancelled."]);
+        return response()->json(['success' => true, 'message' => 'Transaction cancelled.']);
     }
 
     // Keep these for Inertia rendering compatibility with current routes
-    public function updateSender(Request $request, string $id) { return $this->confirmTransaction($request, $id); }
-    public function updateReceiver(Request $request, string $id) { return $this->confirmTransaction($request, $id); }
-    public function updateReceiverSTORE(Request $request, string $id) { return $this->confirmTransaction($request, $id); }
+    public function updateSender(Request $request, string $id)
+    {
+        return $this->confirmTransaction($request, $id);
+    }
+
+    public function updateReceiver(Request $request, string $id)
+    {
+        return $this->confirmTransaction($request, $id);
+    }
+
+    public function updateReceiverSTORE(Request $request, string $id)
+    {
+        return $this->confirmTransaction($request, $id);
+    }
 }

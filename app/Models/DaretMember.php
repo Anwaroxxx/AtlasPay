@@ -12,7 +12,7 @@ class DaretMember extends Model
         'turn_order',
         'status',
         'has_paid_current_round',
-        'has_received_payout'
+        'has_received_payout',
     ];
 
     public function group()

@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\RedirectGoals;
+use App\Events\GenericNotification;
 use App\Http\Controllers\AnwarTwinController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\ChatController;
@@ -12,10 +12,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingsGoalController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransferController;
-use App\Models\Token;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::inertia('/', 'landing', [
@@ -23,10 +21,11 @@ Route::inertia('/', 'landing', [
 ])->name('home');
 
 Route::get('language/{locale}', function ($locale) {
-    if (!in_array($locale, ['en', 'fr', 'ar'])) {
+    if (! in_array($locale, ['en', 'fr', 'ar'])) {
         abort(400);
     }
     session()->put('locale', $locale);
+
     return redirect()->back();
 })->name('language.switch');
 
@@ -60,10 +59,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/daret/{group}', [DaretController::class, 'destroy'])->name('daret.destroy');
 
     // Profile Photo Upload
-    Route::post('/settings/profile/photo', function (Illuminate\Http\Request $request) {
+    Route::post('/settings/profile/photo', function (Request $request) {
         $request->validate(['photo' => 'required|image|max:2048']);
         $path = $request->file('photo')->store('profile-photos', 'public');
-        $request->user()->update(['profile_photo' => '/storage/' . $path]);
+        $request->user()->update(['profile_photo' => '/storage/'.$path]);
+
         return redirect()->back()->with('message', 'Photo updated!');
     })->name('profile.photo');
 
@@ -84,31 +84,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('qr');
 });
 
-Route::inertia("/test","test");
+Route::inertia('/test', 'test');
 
-Route::middleware(["auth"])->group(function () {
-    Route::post("/test/transfer", [TransactionController::class, 'store'])->defaults("transfer", "transfer");
-    Route::post("/test/qr", [TransactionController::class, 'store'])->defaults("transfer", "qr");
-    Route::post("/test/card", [TransactionController::class, 'store'])->defaults("transfer", "cash");
+Route::middleware(['auth'])->group(function () {
+    Route::post('/test/transfer', [TransactionController::class, 'store'])->defaults('transfer', 'transfer');
+    Route::post('/test/qr', [TransactionController::class, 'store'])->defaults('transfer', 'qr');
+    Route::post('/test/card', [TransactionController::class, 'store'])->defaults('transfer', 'cash');
     // Route::post("/test/",[TransactionController::class,'store'])->defaults("transfer", "qr");
 
 });
 
-
 // QRCODE payment service
 
-Route::middleware(["auth", "verified"])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Create QR
-    Route::inertia("qr/create/sender", "transactions/qr/create/sender");
-    Route::post("qr/create/sender",[TokenController::class, "storeSender"]);
-    Route::post("qr/create/sender/quickpay",[TokenController::class, "storeSenderPay"]);
-    Route::inertia("qr/create/receiver", "transactions/qr/create/receiver");
-    Route::post("qr/create/receiver",[TokenController::class, "storeReceiver"]);
-    Route::inertia("qr/create/store", "transactions/qr/create/store");
-    Route::post("qr/create/store",[TokenController::class, "storeReceiverSTORE"]);
-    Route::get("qr/merchant/permanent", [TokenController::class, "getPermanentMerchantToken"]);
-    
-    
+    Route::inertia('qr/create/sender', 'transactions/qr/create/sender');
+    Route::post('qr/create/sender', [TokenController::class, 'storeSender']);
+    Route::post('qr/create/sender/quickpay', [TokenController::class, 'storeSenderPay']);
+    Route::inertia('qr/create/receiver', 'transactions/qr/create/receiver');
+    Route::post('qr/create/receiver', [TokenController::class, 'storeReceiver']);
+    Route::inertia('qr/create/store', 'transactions/qr/create/store');
+    Route::post('qr/create/store', [TokenController::class, 'storeReceiverSTORE']);
+    Route::get('qr/merchant/permanent', [TokenController::class, 'getPermanentMerchantToken']);
+
     // Scan & Update
     Route::get('qr/redirect/{id}', [TokenController::class, 'handleScan'])->name('qr.scan');
     Route::get('qr/view/{id}', [TokenController::class, 'showToken'])->name('qr.update.view');
@@ -117,22 +115,22 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::post('/qr/approve/{id}', [TokenController::class, 'finalApproval'])->name('qr.approve');
     Route::post('/qr/cancel/{id}', [TokenController::class, 'cancelTransaction'])->name('qr.cancel');
     Route::get('/qr/status/{token}', [TokenController::class, 'checkStatus'])->name('qr.status');
-    
-    // Compatibility routes for existing frontend calls
-    Route::post("qr/update/sender/{id}",[TokenController::class, "updateSender"]);
-    Route::post("qr/update/receiver/{id}",[TokenController::class, "updateReceiver"]);
-    Route::post("qr/update/store/{id}",[TokenController::class, "updateReceiverSTORE"]);
 
-    Route::get('/debug-notify', function() {
-        event(new \App\Events\GenericNotification(
+    // Compatibility routes for existing frontend calls
+    Route::post('qr/update/sender/{id}', [TokenController::class, 'updateSender']);
+    Route::post('qr/update/receiver/{id}', [TokenController::class, 'updateReceiver']);
+    Route::post('qr/update/store/{id}', [TokenController::class, 'updateReceiverSTORE']);
+
+    Route::get('/debug-notify', function () {
+        event(new GenericNotification(
             auth()->id(),
             'System Diagnostic',
             'Broadcasting is operational. Connection verified.',
             'success'
         ));
-        return "Diagnostic event dispatched to user ID: " . auth()->id();
+
+        return 'Diagnostic event dispatched to user ID: '.auth()->id();
     })->middleware('auth');
 });
 
-
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

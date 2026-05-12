@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\AccountTypes;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AccountTypesSeeder extends Seeder
@@ -15,9 +14,9 @@ class AccountTypesSeeder extends Seeder
     {
         //
         AccountTypes::insert([
-            ['name'=> 'savings'],
-            ['name'=> 'code_30'],
-            ['name'=> 'tawfir'],
+            ['name' => 'savings'],
+            ['name' => 'code_30'],
+            ['name' => 'tawfir'],
         ]);
     }
 }

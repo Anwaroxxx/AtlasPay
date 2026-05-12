@@ -6,8 +6,8 @@ use App\Account\AccountTypes;
 
 trait AccountValidationRules
 {
-    protected function accountRules():array
+    protected function accountRules(): array
     {
-        return['account_type' => AccountTypes::all()];
+        return ['account_type' => AccountTypes::all()];
     }
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('month');
             $table->integer('year');
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'category', 'month', 'year']);
         });
     }

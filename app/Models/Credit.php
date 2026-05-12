@@ -13,7 +13,7 @@ class Credit extends Model
         'repaid_amount',
         'interest_rate',
         'due_date',
-        'status'
+        'status',
     ];
 
     protected $casts = [

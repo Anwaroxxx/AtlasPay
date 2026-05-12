@@ -12,7 +12,7 @@ class DaretGroup extends Model
         'cycle_duration_months',
         'current_round',
         'status',
-        'creator_id'
+        'creator_id',
     ];
 
     public function creator()

@@ -37,7 +37,7 @@ class ProfileController extends Controller
                 ['day' => 'Fri', 'score' => 98],
                 ['day' => 'Sat', 'score' => 99],
                 ['day' => 'Sun', 'score' => 100],
-            ]
+            ],
         ]);
     }
 

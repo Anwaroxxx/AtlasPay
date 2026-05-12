@@ -17,7 +17,7 @@ class SavingsGoal extends Model
         'monthly_deduction',
         'target_date',
         'locked_until',
-        'status'
+        'status',
     ];
 
     protected $casts = [

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class BudgetController extends Controller
 {
@@ -16,7 +16,7 @@ class BudgetController extends Controller
         ]);
 
         $now = Carbon::now();
-        
+
         Budget::updateOrCreate(
             [
                 'user_id' => $request->user()->id,

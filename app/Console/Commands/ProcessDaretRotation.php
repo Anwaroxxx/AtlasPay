@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\DaretGroup;
-use App\Models\DaretMember;
 use App\Models\Transaction;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class ProcessDaretRotation extends Command
 {
     protected $signature = 'app:process-daret';
+
     protected $description = 'Rotate Daret groups and process payouts';
 
     public function handle()
@@ -23,11 +23,15 @@ class ProcessDaretRotation extends Command
                 $unpaid = $group->members()->where('has_paid_current_round', false)->count();
 
                 if ($unpaid === 0) {
-                    // Everyone paid, process payout for the current turn
-                    $recipient = $group->members()->where('turn_order', $group->current_round)->first();
-                    
+                    // Everyone paid, pick a random recipient who hasn't received payout
+                    $recipient = $group->members()
+                        ->where('status', 'accepted')
+                        ->where('has_received_payout', false)
+                        ->inRandomOrder()
+                        ->first();
+
                     if ($recipient) {
-                        $payoutAmount = $group->monthly_amount * $group->cycle_duration_months;
+                        $payoutAmount = $group->monthly_amount * $group->members()->where('status', 'accepted')->count();
                         $recipientAccount = $recipient->user->accounts()->where('status', 'active')->first();
 
                         if ($recipientAccount) {
@@ -41,13 +45,19 @@ class ProcessDaretRotation extends Command
                                 'method' => 'daret_payout',
                                 'category' => 'savings',
                                 'status' => 'completed',
-                                'type' => 'deposit'
+                                'type' => 'deposit',
+                                'description' => "Daret Pool Payout: {$group->name}",
                             ]);
                         }
                     }
 
-                    // Rotate to next round
-                    if ($group->current_round >= $group->cycle_duration_months) {
+                    // Check if cycle is finished (everyone received payout)
+                    $remainingRecipients = $group->members()
+                        ->where('status', 'accepted')
+                        ->where('has_received_payout', false)
+                        ->count();
+
+                    if ($remainingRecipients === 0) {
                         $group->update(['status' => 'completed']);
                     } else {
                         $group->increment('current_round');

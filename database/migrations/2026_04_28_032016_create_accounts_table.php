@@ -17,18 +17,18 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreignId('user_id')
-                    ->constrained('users');
+                ->constrained('users');
 
-            $table->string("account_number")->unique();
+            $table->string('account_number')->unique();
             // balance data
             $table->decimal('balance', 15, 2)->default(0);
 
             // account type
             $table->string('type');
-            $table->string('currency',3)->default('MAD');
+            $table->string('currency', 3)->default('MAD');
 
-            //account status(active , frozen , closed)
-            $table->string("status");
+            // account status(active , frozen , closed)
+            $table->string('status');
         });
     }
 

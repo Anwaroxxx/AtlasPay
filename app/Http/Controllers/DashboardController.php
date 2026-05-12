@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Transaction;
-use App\Models\Credit;
-use App\Models\DaretGroup;
 use App\Services\AnwarLogic;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +15,7 @@ class DashboardController extends Controller
         $user = $request->user();
         $accounts = $user->accounts()->get();
         $totalBalance = $accounts->sum('balance');
-        
+
         $accountIds = $accounts->pluck('id')->toArray();
         $recentTransactions = Transaction::whereIn('from_account_id', $accountIds)
             ->orWhereIn('to_account_id', $accountIds)
@@ -27,17 +25,18 @@ class DashboardController extends Controller
             ->map(function ($transaction) use ($accountIds) {
                 // If the user's account is the recipient, or it's a deposit, it's income
                 $isIncome = in_array($transaction->to_account_id, $accountIds) || $transaction->type === 'deposit';
-                
-                // If it's a transfer between the user's own accounts, we might want to handle it differently, 
+
+                // If it's a transfer between the user's own accounts, we might want to handle it differently,
                 // but for now, let's just stick to the basic logic.
-                
+
                 // Add the flag to the transaction object
                 $transaction->is_income = $isIncome;
+
                 return $transaction;
             });
 
         $activeCredit = $user->credits()->where('status', 'active')->first();
-        
+
         // Fetch real Daret data for the user
         $daretCount = $user->daretGroups()->where('daret_groups.status', 'active')->count();
         $savingsGoalsCount = $user->savingsGoals()->where('status', 'active')->count();
@@ -58,9 +57,9 @@ class DashboardController extends Controller
 
         return Inertia::render('dashboard', [
             'stats' => [
-                'totalBalance' => (float)$totalBalance,
-                'creditScore' => (int)$user->credit_score,
-                'activeLoan' => $activeCredit ? (float)$activeCredit->amount : 0,
+                'totalBalance' => (float) $totalBalance,
+                'creditScore' => (int) $user->credit_score,
+                'activeLoan' => $activeCredit ? (float) $activeCredit->amount : 0,
                 'currency' => 'MAD',
                 'daretCount' => $daretCount,
                 'savingsGoalsCount' => $savingsGoalsCount,

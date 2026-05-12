@@ -13,10 +13,10 @@ class TransactionMethodsSeeder extends Seeder
     public function run(): void
     {
         ModelsTransactionMethods::insert([
-            ["method" => "card"],
-            ["method" => "qr"],
-            ["method" => "cash"],
-            ["method" => "transfer"],
+            ['method' => 'card'],
+            ['method' => 'qr'],
+            ['method' => 'cash'],
+            ['method' => 'transfer'],
         ]);
     }
 }

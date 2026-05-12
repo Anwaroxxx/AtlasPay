@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(["user_id", "account_number", "type", "status"])]
+#[Fillable(['user_id', 'account_number', 'type', 'status'])]
 
 class Account extends Model
 {
-    protected $fillable = ["user_id", "account_number", "type", "status", "balance", "currency"];
+    protected $fillable = ['user_id', 'account_number', 'type', 'status', 'balance', 'currency'];
 
     public function user()
     {

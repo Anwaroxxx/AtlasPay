@@ -6,7 +6,6 @@ use App\Models\Account;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -29,15 +28,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        Gate::define("transferMoney",function(User $user,Account $from){
-            // if the sender account "from" user's matches the current user allow the transaction 
-            if($user->id === $from->user->id)
-                {
-                    return Response::allow();
-                }
+        Gate::define('transferMoney', function (User $user, Account $from) {
+            // if the sender account "from" user's matches the current user allow the transaction
+            if ($user->id === $from->user->id) {
+                return Response::allow();
+            }
 
-            return Response::deny("invalid account") 
-            ;
+            return Response::deny('invalid account');
         });
     }
 

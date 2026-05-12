@@ -4,8 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,10 +43,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Account::class);
     }
+
     public function wallet()
     {
-        return $this->hasOne(Account::class)->where("type","wallet");
+        return $this->hasOne(Account::class)->where('type', 'wallet');
     }
+
     public function credits()
     {
         return $this->hasMany(Credit::class);
@@ -69,5 +69,3 @@ class User extends Authenticatable
         return $this->belongsToMany(DaretGroup::class, 'daret_members');
     }
 }
-
-
