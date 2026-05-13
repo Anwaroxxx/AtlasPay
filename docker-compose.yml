@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back:/var/www
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - atlaspay
+
+  frontend:
+    image: node:20-slim
+    working_dir: /app
+    volumes:
+      - ./front:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - atlaspay
+
+networks:
+  atlaspay:
+    driver: bridge
