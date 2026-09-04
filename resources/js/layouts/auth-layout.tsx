@@ -1,5 +1,4 @@
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
-import { Outlet } from 'react-router-dom';
 
 export default function AuthLayout({
     title = '',
@@ -12,7 +11,7 @@ export default function AuthLayout({
 }) {
     return (
         <AuthLayoutTemplate title={title} description={description}>
-            {children || <Outlet />}
+            {children}
         </AuthLayoutTemplate>
     );
 }
