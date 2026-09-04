@@ -12,26 +12,34 @@ class TransactionService
 {
     public static function create(array $data): Transaction
     {
-        if (($data['status'] ?? 'completed') === 'completed') {
-            ServicesTransferMoneyService::sendMoney($data['from'], $data['to'], $data['amount']);
+        $from = $data['from'] ?? null;
+        $to = $data['to'] ?? null;
+        $status = $data['status'] ?? 'completed';
+
+        if ($status === 'completed' && $from && $to && (float) $data['amount'] > 0) {
+            ServicesTransferMoneyService::sendMoney($from, $to, $data['amount']);
         }
 
         $transaction = Transaction::create([
-            'from_account_id' => $data['from']->id,
-            'to_account_id' => $data['to']->id,
+            'from_account_id' => $from?->id,
+            'to_account_id' => $to?->id,
             'amount' => $data['amount'],
             'method' => $data['method'],
             'type' => $data['type'] ?? 'transfer',
-            'status' => $data['status'] ?? 'completed',
+            'status' => $status,
             'description' => $data['description'] ?? null,
         ]);
 
         if ($transaction->status === 'completed') {
-            // Notify Sender
-            event(new TransactionCreated($transaction, $data['from']->user_id, false));
+            if ($from) {
+                // Notify Sender
+                event(new TransactionCreated($transaction, $from->user_id, false));
+            }
 
-            // Notify Receiver
-            event(new TransactionCreated($transaction, $data['to']->user_id, true));
+            if ($to && (! $from || $to->user_id !== $from->user_id)) {
+                // Notify Receiver (skip duplicate when same owner)
+                event(new TransactionCreated($transaction, $to->user_id, true));
+            }
         }
 
         return $transaction;

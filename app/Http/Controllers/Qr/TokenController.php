@@ -256,6 +256,19 @@ class TokenController extends Controller
             return response()->json(['success' => false, 'message' => 'Missing transaction details (amount or accounts).'], 422);
         }
 
+        $userId = auth()->id();
+        if ($from->user_id !== $userId && $to->user_id !== $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized for this token.'], 403);
+        }
+
+        if ($from->id === $to->id) {
+            return response()->json(['success' => false, 'message' => 'Cannot pay yourself.'], 422);
+        }
+
+        if (! is_numeric($amount) || (float) $amount <= 0) {
+            return response()->json(['success' => false, 'message' => 'Invalid amount.'], 422);
+        }
+
         if ($token->amount === null && $request->amount) {
             $token->update(['amount' => $request->amount]);
         }

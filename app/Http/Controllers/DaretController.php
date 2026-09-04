@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\DaretService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class DaretController extends Controller
@@ -164,10 +165,20 @@ class DaretController extends Controller
         }
 
         DB::transaction(function () use ($request, $group, $member) {
-            $account = $request->user()->accounts()->where('status', 'active')->firstOrFail();
+            $account = $request->user()->accounts()->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
 
-            if ($account->balance < $group->monthly_amount) {
-                return redirect()->back()->with('error', 'Not enough balance for this contribution. Please deposit funds and try again.');
+            if (! $account) {
+                throw ValidationException::withMessages([
+                    'message' => 'No active account found.',
+                ]);
+            }
+
+            if ((float) $account->balance < (float) $group->monthly_amount) {
+                throw ValidationException::withMessages([
+                    'message' => 'Not enough balance for this contribution. Please deposit funds and try again.',
+                ]);
             }
 
             $account->decrement('balance', $group->monthly_amount);
@@ -185,6 +196,10 @@ class DaretController extends Controller
 
             DaretService::checkAndProcessPayout($group);
         });
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Contribution paid successfully!']);
+        }
 
         return redirect()->back()->with('message', 'Contribution paid successfully!');
     }
