@@ -1,28 +1,21 @@
 services:
-  backend:
+  # AtlasPay — single Inertia app (Laravel API + React web served by Laravel).
+  # Mobile lives OUTSIDE this repo (../AtlasPayMobile) and talks to this
+  # same backend over HTTP + Sanctum tokens, sharing the same database.
+  app:
     build:
-      context: ./back
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./back:/var/www
+      - .:/var/www
+      - /var/www/vendor
+      - /var/www/node_modules
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
-    networks:
-      - atlaspay
-
-  frontend:
-    image: node:20-slim
-    working_dir: /app
-    volumes:
-      - ./front:/app
-    ports:
-      - "5173:5173"
-    command: sh -c "npm install && npm run dev -- --host"
-    environment:
-      - VITE_API_URL=http://localhost:8000
+      - APP_URL=http://localhost:8000
     networks:
       - atlaspay
 
